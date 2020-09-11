@@ -1,0 +1,1164 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Permissions;
+
+namespace SurvivalGame
+{
+    /// <summary>
+    /// This is the main type for your game.
+    /// </summary>
+    public class Game1 : Game
+    {
+        GraphicsDeviceManager graphics;
+        SpriteBatch spriteBatch;
+        KeyboardState kstate;
+        MouseState mstate;
+
+        Random rand = new Random();
+        Point defaultRes = new Point(800, 480);
+
+        List<string> keyHistory = new List<string>();
+        //List<string> mouseKeyHistory = new List<string>();
+        Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
+
+        Player player;
+        //Enemy enemy;
+        MouseCursor mouseCursor;
+
+        List<Entity> entities = new List<Entity>();
+        List<Bullet> bullets = new List<Bullet>();
+        List<Enemy> enemies = new List<Enemy>();
+        List<Wall> walls = new List<Wall>();
+        List<Sword> swords = new List<Sword>();
+
+        float rateOfFire = 0.2f;
+        float timeSinceLastShot = 9999999f;
+        float swordCooldown = 0.3f;
+        float timeSinceSwordAttack = 9999999f;
+        float enemySpawnRate = .1f;
+        float timeSinceEnemySpawn = 999999f;
+        float wallPlacementCooldown = 0.3f;
+        float timeSinceWallPlacement = 999999f;
+
+
+        public Game1()
+        {
+            graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+            graphics.PreferredBackBufferWidth = 1920;
+            graphics.PreferredBackBufferHeight = 1200;
+        }
+
+        /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
+        protected override void Initialize()
+        {
+            // TODO: Add your initialization logic here
+            textures.Add("Player", CreateTexture(Color.Red));
+            textures.Add("Enemy", CreateTexture(Color.Black));
+            textures.Add("MouseCursor", CreateTexture(Color.White));
+            textures.Add("Bullet", CreateTexture(Color.Orange));
+            textures.Add("Wall", CreateTexture(Color.SaddleBrown));
+            textures.Add("Sword", CreateTexture(Color.White));
+            var color = Color.SaddleBrown;
+            color.A = 100;
+            textures.Add("WallGhost", CreateTexture(color));
+
+            player = new Player(textures["Player"]);
+            entities.Add(player);
+            //for(int i = 0; i < 10; i++)
+            //{
+            //    enemies.Add(new Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500)));
+            //}
+            mouseCursor = new MouseCursor(textures["MouseCursor"]);
+            //entities.Add(mouseCursor);
+
+            base.Initialize();
+        }
+
+        /// <summary>
+        /// LoadContent will be called once per game and is the place to load
+        /// all of your content.
+        /// </summary>
+        protected override void LoadContent()
+        {
+            // Create a new SpriteBatch, which can be used to draw textures.
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // TODO: use this.Content to load your game content here
+        }
+
+        /// <summary>
+        /// UnloadContent will be called once per game and is the place to unload
+        /// game-specific content.
+        /// </summary>
+        protected override void UnloadContent()
+        {
+            // TODO: Unload any non ContentManager content here
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// Allows the game to run logic such as updating the world,
+        /// checking for collisions, gathering input, and playing audio.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// 
+        protected override void Update(GameTime gameTime)
+        {
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+            kstate = Keyboard.GetState();
+            mstate = Mouse.GetState();
+
+            // TODO: Add your update logic here
+            OnKeyDown(DetectKeyPressed(kstate, mstate), gameTime);
+            OnKeyUp(DetectKeyReleased(kstate, mstate), gameTime);
+
+            //if (mstate.LeftButton.ToString() == "Pressed")
+            //{
+            timeSinceWallPlacement += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            //}
+
+
+            mouseCursor.Update(mstate);
+
+            List<Entity> deadEntities = new List<Entity>();
+
+            UpdateEntities(gameTime, deadEntities);
+
+            KillDeadEntities(deadEntities);
+
+            timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            SpawnEnemy(gameTime);
+
+            base.Update(gameTime);
+        }
+
+
+
+
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.ForestGreen);
+
+            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            foreach (var bullet in bullets)
+            {
+                spriteBatch.Draw(bullet.Texture, bullet.Rect, null, Color.White, bullet.Rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0);
+            }
+
+            spriteBatch.Draw(player.Texture, player.Rect, Color.White);
+
+            foreach (var enemy in enemies)
+            {
+                spriteBatch.Draw(enemy.Texture, enemy.Rect, Color.White);
+            }
+            foreach (var wall in walls)
+            {
+                spriteBatch.Draw(wall.Texture, wall.Rect, Color.White);
+            }
+            foreach (var sword in swords)
+            {
+                spriteBatch.Draw(sword.Texture, sword.DrawRect, null, Color.White, sword.Rotation, new Vector2(0f, 0f), SpriteEffects.None, 0);
+                //spriteBatch.Draw(sword.Texture, sword.Rect, Color.White);
+            }
+
+            spriteBatch.Draw(mouseCursor.Texture, mouseCursor.Rect, Color.White);
+
+
+            spriteBatch.End();
+            base.Draw(gameTime);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        Texture2D CreateTexture(Color color)
+        {
+            Texture2D texture = new Texture2D(GraphicsDevice, 1, 1);
+            Color[] data = new Color[1] { color };
+            texture.SetData(data);
+            return texture;
+
+        }
+        void OnKeyDown(List<string> keysPressed, GameTime gameTime)
+        {
+            //keysPressed = new key
+            //keyHistory = all pressed keys
+            if (keysPressed.Contains("LeftButton"))
+            {
+                MakeWall();
+            }
+            if (keyHistory.Contains("RightButton"))
+            {
+                SpawnEnemy(gameTime);
+                //DeleteWall();
+            }
+            if (keysPressed.Contains(Keys.F11.ToString()))
+            {
+                graphics.ToggleFullScreen();
+            }
+            if (keyHistory.Contains(Keys.D.ToString()))
+            {
+                //Move(1, gameTime, player, player.Speed);
+                MoveV3(player, 1, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+            }
+            if (keyHistory.Contains(Keys.A.ToString()))
+            {
+                //Move(2, gameTime, player, player.Speed);
+                MoveV3(player, 2, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+            }
+            if (keyHistory.Contains(Keys.S.ToString()))
+            {
+                //Move(3, gameTime, player, player.Speed);
+                MoveV3(player, 3, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+            }
+            if (keyHistory.Contains(Keys.W.ToString()))
+            {
+                //Move(4, gameTime, player, player.Speed);
+                MoveV3(player, 4, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+            }
+            timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (keyHistory.Contains(Keys.Space.ToString()) && timeSinceLastShot > rateOfFire)
+            {
+                timeSinceLastShot = 0f;
+                double yEdge = (player.Center.Y - mouseCursor.Center.Y);
+                double xEdge = (player.Center.X - mouseCursor.Center.X);
+                Bullet bullet = new Bullet(textures["Bullet"], player.Center.X, player.Center.Y, (float)Math.Atan2(yEdge, xEdge), new Vector2((float)xEdge, (float)yEdge));
+                bullets.Add(bullet);
+                entities.Add(bullet);
+            }
+            timeSinceSwordAttack += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (keyHistory.Contains(Keys.V.ToString()) && timeSinceSwordAttack > swordCooldown)
+            {
+                timeSinceSwordAttack = 0f;
+                double yEdge = (player.Center.Y - mouseCursor.Center.Y);
+                double xEdge = (player.Center.X - mouseCursor.Center.X);
+                Sword sword = new Sword(textures["Sword"], player, (float)Math.Atan2(yEdge, xEdge));
+                swords.Add(sword);
+                entities.Add(sword);
+            }
+        }
+        void OnKeyUp(List<string> keysReleased, GameTime gameTime)
+        {
+
+        }
+        List<string> DetectKeyPressed(KeyboardState kstate, MouseState mstate)
+        {
+            List<string> keysPressed = new List<string>();
+            foreach (Keys key in kstate.GetPressedKeys())
+            {
+                if (!keyHistory.Contains(key.ToString()))
+                {
+                    keysPressed.Add(key.ToString());
+                    keyHistory.Add(key.ToString());
+                }
+            }
+            if (mstate.LeftButton.ToString() == "Pressed")
+            {
+                if (!keyHistory.Contains("LeftButton"))
+                {
+                    keysPressed.Add("LeftButton");
+                    keyHistory.Add("LeftButton");
+                }
+            }
+            if (mstate.RightButton.ToString() == "Pressed")
+            {
+                if (!keyHistory.Contains("RightButton"))
+                {
+                    keysPressed.Add("RightButton");
+                    keyHistory.Add("RightButton");
+                }
+            }
+            return keysPressed;
+        }
+        List<string> DetectKeyReleased(KeyboardState kstate, MouseState mstate)
+        {
+            List<string> keysReleased = new List<string>();
+            foreach (string key in keyHistory)
+            {
+                bool keyFound = false;
+                foreach (Keys k in kstate.GetPressedKeys())
+                {
+                    if (key == k.ToString())
+                    {
+                        keyFound = true;
+                    }
+                }
+                if (key == "LeftButton")
+                {
+                    keyFound = false;
+                    if (!(mstate.LeftButton.ToString() == "Released"))
+                    {
+                        keyFound = true;
+                    }
+                }
+                if (key == "RightButton")
+                {
+                    keyFound = false;
+                    if (!(mstate.RightButton.ToString() == "Released"))
+                    {
+                        keyFound = true;
+                    }
+                }
+                if (!keyFound)
+                {
+                    keysReleased.Add(key);
+                }
+            }
+
+            foreach (string key in keysReleased)
+            {
+                if (keyHistory.Contains(key))
+                {
+                    keyHistory.Remove(key);
+                }
+            }
+            return keysReleased;
+        }
+
+        void UpdateEntities(GameTime gameTime, List<Entity> deadEntities)
+        {
+            foreach (var ent in entities)
+            {
+                if (ent.GetType().Equals(typeof(Player)))
+                {
+                    player.Update();
+                }
+                else if (ent.GetType().Equals(typeof(Enemy)))
+                {
+                    foreach (var enemy in enemies)
+                    {
+                        if (enemy.Equals(ent))
+                        {
+                            enemy.Update(gameTime);
+                            enemy.Movement(enemy.X - player.X, enemy.Y - player.Y);
+                            if (enemy.XMovement > 0)
+                            {
+                                //Move(1, gameTime, enemy, enemy.XMovement);
+                                //MoveV2(enemy, 1, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                                MoveV3(enemy, 1, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            }
+                            else
+                            {
+                                //Move(2, gameTime, enemy, -enemy.XMovement);
+                                //MoveV2(enemy, 2, -enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                                MoveV3(enemy, 2, -enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            }
+                            if (enemy.YMovement > 0)
+                            {
+                                //Move(3, gameTime, enemy, enemy.YMovement);
+                                //MoveV2(enemy, 3, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
+
+                                MoveV3(enemy, 3, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            }
+                            else
+                            {
+                                //Move(4, gameTime, enemy, -enemy.YMovement); 
+                                //MoveV2(enemy, 4, -enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
+
+                                MoveV3(enemy, 4, -enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            }
+                            foreach (var bullet in bullets)
+                            {
+                                if (enemy.Rect.Intersects(bullet.Rect))
+                                {
+                                    enemy.DamageHealth(deadEntities);
+                                    deadEntities.Add(bullet);
+                                }
+                            }
+                            foreach (var sword in swords)
+                            {
+                                if (enemy.Rect.Intersects(sword.Rect))
+                                {
+                                    enemy.DamageHealth(deadEntities);
+
+                                }
+                            }
+                            enemy.Update();
+                        }
+                    }
+                }
+                else if (ent.GetType().Equals(typeof(Bullet)))
+                {
+                    foreach (var bullet in bullets)
+                    {
+                        if (bullet.Equals(ent))
+                        {
+
+                            if (bullet.XMovement > 0)
+                            {
+                                MoveV3(bullet, 1, bullet.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            }
+                            else MoveV3(bullet, 2, -bullet.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            if (bullet.YMovement > 0)
+                            {
+                                MoveV3(bullet, 3, bullet.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            }
+                            else MoveV3(bullet, 4, -bullet.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
+                            bullet.Update(gameTime, deadEntities);
+                            //foreach (var enemy in enemies)
+                            //{
+                            //    if (bullet.Detect(enemy))
+                            //    {
+                            //        enemy.Health--;
+                            //        enemy.Size = new Point((int)(enemy.Size.X * 0.8), (int)(enemy.Size.Y * 0.8));
+                            //        deadEntities.Add(bullet);
+                            //    }
+                            //}
+                            foreach (var wall in walls)
+                            {
+                                if (bullet.Detect(wall) && wall.Collision)
+                                {
+                                    deadEntities.Add(bullet);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (ent.GetType().Equals(typeof(Wall)))
+                {
+                    foreach (var wall in walls)
+                    {
+                        if (wall.Equals(ent))
+                        {
+                            wall.Update(gameTime, deadEntities);
+                        }
+                    }
+                }
+                else if (ent.GetType().Equals(typeof(Sword)))
+                {
+                    foreach (var sword in swords)
+                    {
+                        if (sword.Equals(ent))
+                        {
+                            sword.Update(gameTime, deadEntities);
+                            //foreach (var enemy in enemies)
+                            //{
+                            //    if (sword.Rect.Intersects(enemy.Rect))
+                            //    {
+                            //        enemy.Health--;
+                            //        enemy.Size = new Point((int)(enemy.Size.X * 0.8), (int)(enemy.Size.Y * 0.8));
+                            //    }
+                            //}
+                        }
+                    }
+                }
+            }
+        }
+
+        void KillDeadEntities(List<Entity> deadEntities)
+        {
+            foreach (var entity in deadEntities)
+            {
+                entities.Remove(entity);
+                if (entity.GetType().Equals(typeof(Bullet)))
+                {
+                    Bullet bullet = null;
+                    foreach (var b in bullets)
+                    {
+                        if (b.Equals(entity))
+                        {
+                            bullet = b;
+                        }
+                    }
+                    bullets.Remove(bullet);
+                }
+                if (entity.GetType().Equals(typeof(Enemy)))
+                {
+                    Enemy enemy = null;
+                    foreach (var e in enemies)
+                    {
+                        if (e.Equals(entity))
+                        {
+                            enemy = e;
+                        }
+                    }
+                    enemies.Remove(enemy);
+                }
+                if (entity.GetType().Equals(typeof(Wall)))
+                {
+                    Wall wall = null;
+                    foreach (var w in walls)
+                    {
+                        if (w.Equals(entity))
+                        {
+                            wall = w;
+                        }
+                    }
+                    walls.Remove(wall);
+                }
+                if (entity.GetType().Equals(typeof(Sword)))
+                {
+                    Sword sword = null;
+                    foreach (var s in swords)
+                    {
+                        if (s.Equals(entity))
+                        {
+                            sword = s;
+                        }
+                    }
+                    swords.Remove(sword);
+                }
+            }
+        }
+
+        void SpawnEnemy(GameTime gameTime)
+        {
+            if (timeSinceEnemySpawn > enemySpawnRate)
+            {
+                int i = 0;
+                while (i < 10)
+                {
+                    bool suitableSpot = true;
+                    var enemy = new Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35));
+                    enemy.Update();
+                    foreach (var entity in entities)
+                    {
+                        if (enemy != entity && enemy.Rect.Intersects(entity.Rect))
+                        {
+                            suitableSpot = false;
+                            break;
+                        }
+                    }
+                    if (suitableSpot)
+                    {
+                        enemies.Add(enemy);
+                        entities.Add(enemy);
+                        break;
+                    }
+                    i++;
+                }
+                timeSinceEnemySpawn = 0f;
+            }
+        }
+        void MakeWall()
+        {
+            //var enemy = new Enemy(textures["Enemy"], mstate.X, mstate.Y);
+            //enemy.Update();
+            //foreach (var e in enemies)
+            //{
+            //    if (enemy.Rect.Intersects(e.Rect) && e.Collision)
+            //    {
+            //        enemy.Texture = textures["Player"];
+            //        enemy.Collision = false;
+            //    }
+            //}
+            //enemies.Add(enemy);
+            //entities.Add(enemy);
+
+            bool success = false;
+            if (timeSinceWallPlacement > wallPlacementCooldown)
+            {
+                var wall = new Wall(textures["Wall"], mstate.X, mstate.Y);
+                wall.Update();
+                bool suitableSpot = true;
+                foreach (var w in walls)
+                {
+                    if (wall.Rect.Intersects(w.Rect))
+                    {
+                        suitableSpot = false;
+                    }
+                }
+                if (suitableSpot)
+                {
+                    success = true;
+                    entities.Add(wall);
+                    walls.Add(wall);
+                    timeSinceWallPlacement = 0f;
+                }
+            }
+            if (!success)
+            {
+                MakeGhost();
+            }
+        }
+        void MakeGhost()
+        {
+            var wallGhost = new Wall(textures["WallGhost"], mstate.X, mstate.Y, false);
+            wallGhost.Update();
+            bool intersects = false;
+            foreach (var w in walls)
+            {
+                if (!w.Collision && wallGhost.Rect.Intersects(w.Rect))
+                {
+                    intersects = true;
+                }
+            }
+            if (!intersects)
+            {
+                entities.Add(wallGhost);
+                walls.Add(wallGhost);
+            }
+        }
+        void DeleteWall()
+        {
+            Wall wall = null;
+            bool targetFound = false;
+            foreach (var w in walls)
+            {
+                if (w.Collision && w.Rect.Contains(mstate.X, mstate.Y))
+                {
+                    targetFound = true;
+                    wall = w;
+                }
+            }
+            if (targetFound)
+            {
+                entities.Remove(wall);
+                walls.Remove(wall);
+            }
+        }
+
+        List<Tuple<List<double>, Entity>> MoveV3(Entity entity, int direction, double movement/* speed*time */, float? mass = null, List<Tuple<List<double>, Entity>> v = null, bool firsTime = true, int? id = 0)
+        {
+            if (firsTime)
+            {
+                v = new List<Tuple<List<double>, Entity>>() { Tuple.Create(new List<double>() { 0, movement }, entity) };
+            }
+            else
+            {
+                //if (id != 0)
+                //{
+                //    switch (direction)
+                //    {
+                //        case 2:
+                //            entity.X = v[(int)id].Item2.Rect.Left - entity.Size.X + movement;
+                //            break;
+                //        case 1:
+                //            entity.X = v[(int)id].Item2.Rect.Right - movement;
+                //            break;
+                //        case 4:
+                //            entity.Y = v[(int)id].Item2.Rect.Top - entity.Size.Y + movement;
+                //            break;
+                //        case 3:
+                //            entity.Y = v[(int)id].Item2.Rect.Bottom - movement;
+                //            break;
+                //    }
+
+                //}
+                v.Add(Tuple.Create(new List<double>() { (double)id, movement }, entity));
+
+
+            }
+
+            int ownID = v.Count - 1;
+            for (int i = 0; i < v.Count; i++)
+            {
+                if (v[i].Item2 == entity && i != ownID)
+                {
+                    //v.RemoveAt(v.Count-1);
+                    ownID = i;
+                    break;
+                }
+            }
+            List<double> coords = new List<double>();
+            List<double> distances = new List<double>();
+            List<double> maths = new List<double>();
+            double old;
+            if (mass == null)
+            {
+                mass = entity.Mass;
+            }
+
+            if (!firsTime && ownID != v.Count - 1)
+            {
+                var s = new Tuple<List<double>, Entity>(v[ownID].Item1, null);
+                switch (direction)
+                {
+                    case 1:
+                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Right > v[(int)id].Item2.Rect.Right - movement)
+                        {
+                            v[v.Count - 1] = s;
+                            return v;
+                        }
+                        else
+                        {
+                            DestroyFamily(v, ownID);
+                            v[ownID] = s;
+
+                            ownID = v.Count - 1;
+                        }
+                        break;
+                    case 2:
+                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Left < v[(int)id].Item2.Rect.Left + movement)
+                        {
+                            v[v.Count - 1] = s;
+                            return v;
+                        }
+                        else
+                        {
+                            DestroyFamily(v, ownID);
+                            v[ownID] = s;
+
+                            ownID = v.Count - 1;
+                        }
+                        break;
+                    case 3:
+                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Bottom > v[(int)id].Item2.Rect.Bottom - movement)
+                        {
+                            v[v.Count - 1] = s;
+                            return v;
+                        }
+                        else
+                        {
+                            DestroyFamily(v, ownID);
+                            v[ownID] = s;
+
+                            ownID = v.Count - 1;
+                        }
+                        break;
+                    case 4:
+                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Top < v[(int)id].Item2.Rect.Top + movement)
+                        {
+                            v[v.Count - 1] = s;
+                            return v;
+                        }
+                        else
+                        {
+                            DestroyFamily(v, ownID);
+                            v[ownID] = s;
+
+                            ownID = v.Count - 1;
+                        }
+                        break;
+                }
+            }
+            switch (direction)
+            {
+                case 1:
+                    old = entity.X;
+                    entity.X += movement;
+                    coords.Add(entity.X);
+                    distances.Add(movement);
+                    entity.Update();
+                    foreach (var e in entities)
+                    {
+                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
+                        {
+                            if (mass > e.Mass)
+                            {
+                                if (firsTime)
+                                {
+                                    entity.Collision = false;
+                                    int l = v.Count - 1;
+                                    //v=(MoveV3(e, 1, movement - (e.Rect.Left - entity.Rect.Right), 999, v, firsTime: false, 0));
+                                    //double math = -(e.Rect.Left - entity.Rect.Right);
+                                    double math = movement - (e.Rect.Left - (old + entity.Size.X));
+                                    maths.Add(math);
+                                    if (math < 0)
+                                        math = 0;
+                                    v = (MoveV3(e, 1, math, 999, v, firsTime: false, 0));
+                                    entity.Collision = true;
+                                    for (int k = l; k < v.Count; k++)
+                                    {
+                                        double math2 = movement - math;
+                                        if (math2 < 0) math2 = 0;
+                                        distances.Add(v[k].Item1[1] + math2);
+                                        coords.Add(Math.Floor(old + v[k].Item1[1] + math2));
+
+                                    }
+
+                                    //foreach (var k in v)
+                                    //{
+                                    //    distances.Add(k.Item1[1]+math);
+                                    //    coords.Add(old + k.Item1[1]+math);
+                                    //}
+                                }
+                                else
+                                {
+                                    entity.Collision = false;
+                                    v = (MoveV3(e, 1, movement, 999, v, firsTime: false, ownID));
+                                    entity.Collision = true;
+                                }
+                            }
+                            else
+                            {
+                                coords.Add(e.Rect.Left - entity.Size.X);
+                                if (e.Rect.Left - (old + entity.Size.X) >= 0)
+                                {
+                                    distances.Add(e.Rect.Left - (old + entity.Size.X));
+                                }
+                                else
+                                {
+                                    distances.Add(0);
+                                }
+                                //if(distances[distances.Count - 1] < 0)
+                                //{
+                                //    distances[distances.Count - 1] = 0;
+                                //}
+                            }
+                        }
+                    }
+                    entity.X = old;
+                    break;
+                case 2:
+                    old = entity.X;
+                    entity.X -= movement;
+                    coords.Add(entity.X);
+                    distances.Add(movement);
+                    entity.Update();
+                    foreach (var e in entities)
+                    {
+                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
+                        {
+                            if (mass > e.Mass)
+                            {
+                                if (firsTime)
+                                {
+                                    entity.Collision = false;
+                                    int l = v.Count - 1;
+                                    //v = MoveV3(e, 2, movement - (entity.Rect.Left - e.Rect.Right), 999, v, firsTime: false, 0);
+                                    //double math = -(entity.Rect.Left - e.Rect.Right);
+                                    double math = movement - (old - e.Rect.Right);
+                                    maths.Add(math);
+                                    v = MoveV3(e, 2, math, 999, v, firsTime: false, 0);
+                                    entity.Collision = true;
+                                    for (int k = l; k < v.Count; k++)
+                                    {
+                                        double math2 = movement - math;
+                                        if (math2 < 0) math2 = 0;
+                                        distances.Add(v[k].Item1[1] + math2);
+                                        coords.Add(Math.Ceiling(old - v[k].Item1[1] + math2));
+
+                                    }
+                                    //foreach (var k in v)
+                                    //{
+                                    //    distances.Add(k.Item1[1]+math);
+                                    //    coords.Add(old - k.Item1[1]+math);
+                                    //}
+                                }
+                                else
+                                {
+                                    entity.Collision = false;
+                                    v = (MoveV3(e, 2, movement, 999, v, firsTime: false, ownID));
+                                    entity.Collision = true;
+                                }
+                            }
+                            else
+                            {
+                                coords.Add(e.Rect.Right);
+                                if (old - e.Rect.Right >= 0)
+                                {
+                                    distances.Add(old - e.Rect.Right);
+                                }
+                                else
+                                {
+                                    distances.Add(0);
+                                }
+                            }
+                        }
+                    }
+                    entity.X = old;
+                    break;
+                case 3:
+                    old = entity.Y;
+                    entity.Y += movement;
+                    coords.Add(entity.Y);
+                    distances.Add(movement);
+                    entity.Update();
+                    foreach (var e in entities)
+                    {
+                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
+                        {
+                            if (mass > e.Mass)
+                            {
+                                if (firsTime)
+                                {
+                                    int l = v.Count - 1;
+                                    entity.Collision = false;
+                                    //v = (MoveV3(e, 3, movement - (e.Rect.Top - entity.Rect.Bottom), 999, v, firsTime: false, 0));
+                                    //double math = -(e.Rect.Top - entity.Rect.Bottom);
+
+                                    double math = movement - (e.Rect.Top - (old + entity.Size.Y));
+                                    maths.Add(math);
+                                    if (math < 0) math = 0;
+                                    v = (MoveV3(e, 3, math, 999, v, firsTime: false, 0));
+                                    entity.Collision = true;
+                                    //foreach (var k in v)
+                                    //{
+                                    //    distances.Add(k.Item1[1] +math);
+                                    //    coords.Add(old + k.Item1[1] + math);
+                                    //}
+                                    for (int k = l; k < v.Count; k++)
+                                    {
+                                        double math2 = movement - math;
+                                        if (math2 < 0) math2 = 0;
+                                        distances.Add(v[k].Item1[1] + math2);
+                                        coords.Add(Math.Floor(old + v[k].Item1[1] + math2));
+
+                                    }
+                                }
+                                else
+                                {
+                                    entity.Collision = false;
+                                    v = (MoveV3(e, 3, movement, 999, v, firsTime: false, ownID));
+                                    entity.Collision = true;
+                                }
+                            }
+                            else
+                            {
+                                coords.Add(e.Rect.Top - entity.Size.Y);
+                                if (e.Rect.Top - (old + entity.Size.Y) >= 0)
+                                {
+                                    distances.Add(e.Rect.Top - (old + entity.Size.Y));
+                                }
+                                else
+                                {
+                                    distances.Add(0);
+                                }
+                            }
+                        }
+                    }
+                    entity.Y = old;
+                    break;
+                case 4:
+                    old = entity.Y;
+                    entity.Y -= movement;
+                    coords.Add(entity.Y);
+                    distances.Add(movement);
+                    entity.Update();
+                    foreach (var e in entities)
+                    {
+                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
+                        {
+                            if (mass > e.Mass)
+                            {
+                                if (firsTime)
+                                {
+                                    int l = v.Count - 1;
+                                    entity.Collision = false;
+                                    //v = MoveV3(e, 4, movement - (entity.Rect.Top - e.Rect.Bottom), 999, v, firsTime: false, 0);
+                                    //double math = -(entity.Rect.Top - e.Rect.Bottom);
+                                    double math = movement - (old - e.Rect.Bottom);
+                                    maths.Add(math);
+                                    if (math < 0) math = 0;
+                                    v = MoveV3(e, 4, math, 999, v, firsTime: false, 0);
+                                    entity.Collision = true;
+                                    //foreach (var k in v)
+                                    //{
+                                    //    distances.Add(k.Item1[1] + math);
+                                    //    coords.Add(old - k.Item1[1] + math);
+                                    //}
+
+                                    for (int k = l; k < v.Count; k++)
+                                    {
+                                        double math2 = movement - math;
+                                        if (math2 < 0) math2 = 0;
+                                        distances.Add(v[k].Item1[1] + math2);
+                                        coords.Add(Math.Ceiling(old - v[k].Item1[1] + math2));
+
+                                    }
+                                }
+                                else
+                                {
+                                    entity.Collision = false;
+                                    v = (MoveV3(e, 4, movement, 999, v, firsTime: false, ownID));
+                                    entity.Collision = true;
+                                }
+                            }
+                            else
+                            {
+                                coords.Add(e.Rect.Bottom);
+                                if(old - e.Rect.Bottom >= 0)
+                                {
+                                    distances.Add(old - e.Rect.Bottom);
+                                }
+                                else
+                                {
+                                    distances.Add(0);
+                                }
+                            }
+                        }
+                    }
+                    entity.Y = old;
+                    break;
+            }
+
+            if (firsTime)
+            {
+                if (direction < 3)
+                {
+                    if (distances.Min() < 0)
+                    {
+                        entity.Texture = textures["Bullet"];
+                    }
+                    else
+                    {
+                        entity.Texture = textures["Enemy"];
+                    }
+                    entity.X = coords[distances.IndexOf(distances.Min())];
+                }
+                else
+                {
+                    if (distances.Min() < 0)
+                    {
+                        entity.Texture = textures["Bullet"];
+                    }
+                    else
+                    {
+                        entity.Texture = textures["Enemy"];
+                    }
+                    entity.Y = coords[distances.IndexOf(distances.Min())];
+                }
+                entity.Update();
+                //List<Tuple<List<double>, Entity>> z = v.OrderBy(tuple => tuple.Item1[0]).ToList();
+                //parentId, movement, entity
+                foreach (var i in v)
+                {
+                    if (i.Item2 != null && i.Item2 != entity)
+                    {
+                        switch (direction)
+                        {
+                            case 1:
+                                if (v[(int)i.Item1[0]].Item2 != null)
+                                {
+                                    i.Item2.X = v[(int)i.Item1[0]].Item2.Rect.Right;
+                                    i.Item2.Update();
+                                }
+                                break;
+                            case 2:
+                                if (v[(int)i.Item1[0]].Item2 != null)
+                                {
+                                    i.Item2.X = v[(int)i.Item1[0]].Item2.Rect.Left - i.Item2.Size.X;
+                                    i.Item2.Update();
+                                }
+                                break;
+                            case 3:
+                                if (v[(int)i.Item1[0]].Item2 != null)
+                                {
+                                    i.Item2.Y = v[(int)i.Item1[0]].Item2.Rect.Bottom;
+                                    i.Item2.Update();
+                                }
+                                break;
+                            case 4:
+                                if (v[(int)i.Item1[0]].Item2 != null)
+                                {
+                                    i.Item2.Y = v[(int)i.Item1[0]].Item2.Rect.Top - i.Item2.Size.Y;
+                                    i.Item2.Update();
+                                }
+                                break;
+                        }
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                entity.Update();
+                //double ID = (double)id;
+                //for (int i = 0; i < v.Count; i++)
+                //{
+                //    if(v[i].Item2 != null && v[(int)v[i].Item1[0]].Item2  != null &&  v[i].Item2 == entity && (v[i].Item1[0] != ID))
+                //    {
+                //        var s = new Tuple<List<double>, Entity>(v[ownID].Item1, null);
+                //        if(direction % 2 == 1)
+                //        {
+                //            if (v[(int)v[i].Item1[0]].Item2.Rect.Right < v[(int)ID].Item2.Rect.Right)
+                //            {
+                //                v[ownID] = s;
+                //                return v;
+                //            }
+                //            else
+                //            {
+                //                v[i] = s;
+                //            }
+
+                //        }
+                //        else
+                //        {
+                //            if (v[(int)v[i].Item1[0]].Item2.Rect.Left < v[(int)ID].Item2.Rect.Left + movement)
+                //            {
+                //                v[ownID] = s;
+                //                return v;
+                //            }
+                //            else
+                //            {
+                //                v[i] = s;
+                //            }
+                //        }
+                //    }
+                //}
+                //foreach(var i in v)
+                //{
+                //    if(i.Item2 == entity)
+                //    {
+                //        if(i.Item1[0] != ID)
+                //        {
+                //            if (i.Item1[1] < movement)
+                //            {
+                //                v[ownID] = null;
+                //                return v;
+                //                //ID = i.Item1[0];
+                //                //movement = i.Item1[1];
+                //            }
+                //            else
+                //            {
+                //                c
+                //            }
+                //        }
+                //    }
+                //}
+                v[ownID] = Tuple.Create(new List<double>() { (double)id, distances.Min() }, entity);
+                return v;
+            }
+        }
+        double findID(List<Tuple<List<double>, Entity>> v, int id)
+        {
+            if (v[id].Item2 == null)
+            {
+                return findID(v, (int)v[id].Item1[0]);
+            }
+            else
+                return id;
+        }
+        void DestroyFamily(List<Tuple<List<double>, Entity>> v, int id)
+        {
+            for (int i = 0; i < v.Count; i++)
+            {
+                if (v[i].Item1[0] == id)
+                {
+                    DestroyFamily(v, i);
+                    //v.Remove(v[i]);
+                    v[i] = new Tuple<List<double>, Entity>(v[id].Item1, null);
+                }
+            }
+            return;
+        }
+    }
+}
