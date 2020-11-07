@@ -16,7 +16,7 @@ namespace SurvivalGame
         {
             Random rand = new Random();
             //Force = 5;
-            Mass = 9;
+            Mass = 19;
             //Speed = 1;
             Texture = texture;
             //X = (int)(x / 50) * 50;

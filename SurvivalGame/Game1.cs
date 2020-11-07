@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Permissions;
@@ -234,27 +235,19 @@ namespace SurvivalGame
             }
             if (keyHistory.Contains(Keys.D.ToString()))
             {
-                //Move(1, gameTime, player, player.Speed);
-                //MoveV3(player, 1, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
-                MoveV4(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
+                MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
             }
             if (keyHistory.Contains(Keys.A.ToString()))
             {
-                //Move(2, gameTime, player, player.Speed);
-                //MoveV3(player, 2, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
-                MoveV4(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
+                MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
             }
             if (keyHistory.Contains(Keys.S.ToString()))
             {
-                //Move(3, gameTime, player, player.Speed);
-                //MoveV3(player, 3, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
-                MoveV4(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
+                MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
             }
             if (keyHistory.Contains(Keys.W.ToString()))
             {
-                //Move(4, gameTime, player, player.Speed);
-                //MoveV3(player, 4, player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
-                MoveV4(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
+                MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
             }
             timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyHistory.Contains(Keys.Space.ToString()) && timeSinceLastShot > rateOfFire)
@@ -371,35 +364,9 @@ namespace SurvivalGame
                         {
                             enemy.Update(gameTime);
                             enemy.Movement(enemy.X - player.X, enemy.Y - player.Y);
-                            MoveV4(enemy, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
+                            MoveV5(enemy, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
 
-                            MoveV4(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
-                            //if (enemy.XMovement > 0)
-                            //{
-                            //    //Move(1, gameTime, enemy, enemy.XMovement);
-                            //    //MoveV2(enemy, 1, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //    MoveV3(enemy, 1, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //}
-                            //else
-                            //{
-                            //    //Move(2, gameTime, enemy, -enemy.XMovement);
-                            //    //MoveV2(enemy, 2, -enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //    MoveV3(enemy, 2, -enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //}
-                            //if (enemy.YMovement > 0)
-                            //{
-                            //    //Move(3, gameTime, enemy, enemy.YMovement);
-                            //    //MoveV2(enemy, 3, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
-
-                            //    MoveV3(enemy, 3, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //}
-                            //else
-                            //{
-                            //    //Move(4, gameTime, enemy, -enemy.YMovement); 
-                            //    //MoveV2(enemy, 4, -enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
-
-                            //    MoveV3(enemy, 4, -enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //}
+                            MoveV5(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
                             foreach (var bullet in bullets)
                             {
                                 if (enemy.Rect.Intersects(bullet.Rect))
@@ -426,29 +393,9 @@ namespace SurvivalGame
                     {
                         if (bullet.Equals(ent))
                         {
-
-                            //if (bullet.XMovement > 0)
-                            //{
-                            //    MoveV3(bullet, 1, bullet.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //}
-                            //else MoveV3(bullet, 2, -bullet.XMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //if (bullet.YMovement > 0)
-                            //{
-                            //    MoveV3(bullet, 3, bullet.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            //}
-                            //else MoveV3(bullet, 4, -bullet.YMovement * gameTime.ElapsedGameTime.TotalSeconds);
-                            MoveV4(bullet, bullet.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
-                            MoveV4(bullet, bullet.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
+                            MoveV5(bullet, bullet.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                            MoveV5(bullet, bullet.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
                             bullet.Update(gameTime, deadEntities);
-                            //foreach (var enemy in enemies)
-                            //{
-                            //    if (bullet.Detect(enemy))
-                            //    {
-                            //        enemy.Health--;
-                            //        enemy.Size = new Point((int)(enemy.Size.X * 0.8), (int)(enemy.Size.Y * 0.8));
-                            //        deadEntities.Add(bullet);
-                            //    }
-                            //}
                             foreach (var wall in walls)
                             {
                                 if (bullet.Detect(wall) && wall.Collision)
@@ -548,7 +495,7 @@ namespace SurvivalGame
 
         void SpawnEnemy(GameTime gameTime)
         {
-            if (timeSinceEnemySpawn > enemySpawnRate)
+            if (timeSinceEnemySpawn > enemySpawnRate && enemies.Count < 100)
             {
                 int i = 0;
                 while (i < 10)
@@ -653,638 +600,241 @@ namespace SurvivalGame
             }
         }
 
-        List<Tuple<List<double>, Entity>> MoveV3(Entity entity, int direction, double movement/* speed*time */, float? force = null, List<Tuple<List<double>, Entity>> v = null, bool firsTime = true, int? id = 0)
+        double MoveV5(Entity pusher, double movement, char xORy, List<(Entity, int)> pushedEntities = null, int parentId = -1, double mass = -1)
         {
-            if (firsTime)
+            if(mass == -1)
             {
-                v = new List<Tuple<List<double>, Entity>>() { Tuple.Create(new List<double>() { 0, movement }, entity) };
+                mass = pusher.Mass;
+            }
+            bool firstime = false;
+            if (pushedEntities == null)
+            {
+                pushedEntities = new List<(Entity, int)>() { (pusher, -1) };
+                firstime = true;
             }
             else
             {
-                v.Add(Tuple.Create(new List<double>() { (double)id, movement }, entity));
-            }
-
-            int ownID = v.Count - 1;
-            for (int i = 0; i < v.Count; i++)
-            {
-                if (v[i].Item2 == entity && i != ownID)
+                for(int i = 0; i < pushedEntities.Count; i++)
                 {
-                    ownID = i;
-                    break;
-                }
-            }
-            List<double> coords = new List<double>();
-            List<double> distances = new List<double>();
-            List<double> maths = new List<double>();
-            double old;
-            if (force == null)
-            {
-                force = entity.Mass;
-            }
-
-            if (!firsTime && ownID != v.Count - 1)
-            {
-                var s = new Tuple<List<double>, Entity>(v[ownID].Item1, null);
-                switch (direction)
-                {
-                    case 1:
-                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Right > v[(int)id].Item2.Rect.Right - movement)
-                        {
-                            v[v.Count - 1] = s;
-                            return v;
-                        }
-                        else
-                        {
-                            DestroyFamily(v, ownID);
-                            v[ownID] = s;
-
-                            ownID = v.Count - 1;
-                        }
-                        break;
-                    case 2:
-                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Left < v[(int)id].Item2.Rect.Left + movement)
-                        {
-                            v[v.Count - 1] = s;
-                            return v;
-                        }
-                        else
-                        {
-                            DestroyFamily(v, ownID);
-                            v[ownID] = s;
-
-                            ownID = v.Count - 1;
-                        }
-                        break;
-                    case 3:
-                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Bottom > v[(int)id].Item2.Rect.Bottom - movement)
-                        {
-                            v[v.Count - 1] = s;
-                            return v;
-                        }
-                        else
-                        {
-                            DestroyFamily(v, ownID);
-                            v[ownID] = s;
-
-                            ownID = v.Count - 1;
-                        }
-                        break;
-                    case 4:
-                        if (v[(int)v[ownID].Item1[0]].Item2.Rect.Top < v[(int)id].Item2.Rect.Top + movement)
-                        {
-                            v[v.Count - 1] = s;
-                            return v;
-                        }
-                        else
-                        {
-                            DestroyFamily(v, ownID);
-                            v[ownID] = s;
-
-                            ownID = v.Count - 1;
-                        }
-                        break;
-                }
-            }
-            switch (direction)
-            {
-                case 1:
-                    old = entity.X;
-                    entity.X += movement;
-                    coords.Add(entity.X);
-                    distances.Add(movement);
-                    entity.Update();
-                    foreach (var e in entities)
+                    var tuple = pushedEntities[i];
+                    if(tuple.Item1 == pusher)
                     {
-                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
+                        if (xORy == 'x')
                         {
-                            if (force > e.Mass)
+                            if (movement >= 0)
                             {
-                                if (firsTime)
+                                if (pushedEntities[parentId].Item1.X + pushedEntities[parentId].Item1.Size.X > pushedEntities[tuple.Item2].Item1.X + pushedEntities[tuple.Item2].Item1.Size.X)
                                 {
-                                    entity.Collision = false;
-                                    int l = v.Count - 1;
-                                    double math = -(e.Rect.Left - entity.Rect.Right);
-                                    maths.Add(math);
-                                    if (math < 0)
-                                        math = 0;
-                                    v = (MoveV3(e, 1, math, 999, v, firsTime: false, 0));
-                                    entity.Collision = true;
-                                    for (int k = l; k < v.Count; k++)
-                                    {
-                                        double math2 = movement - math;
-                                        if (math2 < 0) math2 = 0;
-                                        distances.Add(v[k].Item1[1] + math2);
-                                        coords.Add(Math.Floor(old + v[k].Item1[1] + math2));
-
-                                    }
+                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
                                 }
                                 else
-                                {
-                                    entity.Collision = false;
-                                    v = (MoveV3(e, 1, movement, 999, v, firsTime: false, ownID));
-                                    entity.Collision = true;
-                                }
+                                    return movement;
                             }
                             else
                             {
-                                coords.Add(e.Rect.Left - entity.Size.X);
-                                distances.Add(e.Rect.Left - (old + entity.Size.X));
-                            }
-                        }
-                    }
-                    entity.X = old;
-                    break;
-                case 2:
-                    old = entity.X;
-                    entity.X -= movement;
-                    coords.Add(entity.X);
-                    distances.Add(movement);
-                    entity.Update();
-                    foreach (var e in entities)
-                    {
-                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
-                        {
-                            if (force > e.Mass)
-                            {
-                                if (firsTime)
+                                if (pushedEntities[parentId].Item1.X < pushedEntities[tuple.Item2].Item1.X)
                                 {
-                                    entity.Collision = false;
-                                    int l = v.Count - 1;
-                                    double math = -(entity.Rect.Left - e.Rect.Right);
-                                    maths.Add(math);
-                                    v = MoveV3(e, 2, math, 999, v, firsTime: false, 0);
-                                    entity.Collision = true;
-                                    for (int k = l; k < v.Count; k++)
-                                    {
-                                        double math2 = movement - math;
-                                        if (math2 < 0) math2 = 0;
-                                        distances.Add(v[k].Item1[1] + math2);
-                                        coords.Add(Math.Ceiling(old - v[k].Item1[1] + math2));
-                                    }
+                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
                                 }
                                 else
-                                {
-                                    entity.Collision = false;
-                                    v = (MoveV3(e, 2, movement, 999, v, firsTime: false, ownID));
-                                    entity.Collision = true;
-                                }
+                                    return movement;
                             }
-                            else
-                            {
-                                coords.Add(e.Rect.Right);
-                                distances.Add(old - e.Rect.Right);
-                            }
-                        }
-                    }
-                    entity.X = old;
-                    break;
-                case 3:
-                    old = entity.Y;
-                    entity.Y += movement;
-                    coords.Add(entity.Y);
-                    distances.Add(movement);
-                    entity.Update();
-                    foreach (var e in entities)
-                    {
-                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
-                        {
-                            if (force > e.Mass)
-                            {
-                                if (firsTime)
-                                {
-                                    int l = v.Count - 1;
-                                    entity.Collision = false;
-                                    double math = -(e.Rect.Top - entity.Rect.Bottom);
-                                    maths.Add(math);
-                                    if (math < 0) math = 0;
-                                    v = (MoveV3(e, 3, math, 999, v, firsTime: false, 0));
-                                    entity.Collision = true;
-                                    for (int k = l; k < v.Count; k++)
-                                    {
-                                        double math2 = movement - math;
-                                        if (math2 < 0) math2 = 0;
-                                        distances.Add(v[k].Item1[1] + math2);
-                                        coords.Add(old + v[k].Item1[1] + math2);
-
-                                    }
-                                }
-                                else
-                                {
-                                    entity.Collision = false;
-                                    v = (MoveV3(e, 3, movement, 999, v, firsTime: false, ownID));
-                                    entity.Collision = true;
-                                }
-                            }
-                            else
-                            {
-                                coords.Add(e.Rect.Top - entity.Size.Y);
-                                distances.Add(e.Rect.Top - (old + entity.Size.Y));
-                            }
-                        }
-                    }
-                    entity.Y = old;
-                    break;
-                case 4:
-                    old = entity.Y;
-                    entity.Y -= movement;
-                    coords.Add(entity.Y);
-                    distances.Add(movement);
-                    entity.Update();
-                    foreach (var e in entities)
-                    {
-                        if (entity.Collision && e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
-                        {
-                            if (force > e.Mass)
-                            {
-                                if (firsTime)
-                                {
-                                    int l = v.Count - 1;
-                                    entity.Collision = false;
-                                    double math = -(entity.Rect.Top - e.Rect.Bottom);
-                                    maths.Add(math);
-                                    if (math < 0) math = 0;
-                                    v = MoveV3(e, 4, math, 999, v, firsTime: false, 0);
-                                    entity.Collision = true;
-                                    for (int k = l; k < v.Count; k++)
-                                    {
-                                        double math2 = movement - math;
-                                        if (math2 < 0) math2 = 0;
-                                        distances.Add(v[k].Item1[1] + math2);
-                                        coords.Add(Math.Ceiling(old - v[k].Item1[1] + math2));
-
-                                    }
-                                }
-                                else
-                                {
-                                    entity.Collision = false;
-                                    v = (MoveV3(e, 4, movement, 999, v, firsTime: false, ownID));
-                                    entity.Collision = true;
-                                }
-                            }
-                            else
-                            {
-                                coords.Add(e.Rect.Bottom);
-                                distances.Add(old - e.Rect.Bottom);
-                            }
-                        }
-                    }
-                    entity.Y = old;
-                    break;
-            }
-
-            if (firsTime)
-            {
-                if (direction < 3)
-                {
-                      entity.X = coords[distances.IndexOf(distances.Min())];
-                }
-                else
-                {
-                      entity.Y = coords[distances.IndexOf(distances.Min())];
-                }
-                entity.Update();
-                foreach (var i in v)
-                {
-                    if (i.Item2 != null && i.Item2 != entity)
-                    {
-                        switch (direction)
-                        {
-                            case 1:
-                                if (v[(int)i.Item1[0]].Item2 != null)
-                                {
-                                    i.Item2.X = v[(int)i.Item1[0]].Item2.Rect.Right;
-                                    i.Item2.Update();
-                                }
-                                break;
-                            case 2:
-                                if (v[(int)i.Item1[0]].Item2 != null)
-                                {
-                                    i.Item2.X = v[(int)i.Item1[0]].Item2.Rect.Left - i.Item2.Size.X;
-                                    i.Item2.Update();
-                                }
-                                break;
-                            case 3:
-                                if (v[(int)i.Item1[0]].Item2 != null)
-                                {
-                                    i.Item2.Y = v[(int)i.Item1[0]].Item2.Rect.Bottom;
-                                    i.Item2.Update();
-                                }
-                                break;
-                            case 4:
-                                if (v[(int)i.Item1[0]].Item2 != null)
-                                {
-                                    i.Item2.Y = v[(int)i.Item1[0]].Item2.Rect.Top - i.Item2.Size.Y;
-                                    i.Item2.Update();
-                                }
-                                break;
-                        }
-                    }
-                }
-                return null;
-            }
-            else
-            {
-                entity.Update();
-                v[ownID] = Tuple.Create(new List<double>() { (double)id, distances.Min() }, entity);
-                return v;
-            }
-        }
-        double findID(List<Tuple<List<double>, Entity>> v, int id)
-        {
-            if (v[id].Item2 == null)
-            {
-                return findID(v, (int)v[id].Item1[0]);
-            }
-            else
-                return id;
-        }
-        void DestroyFamily(List<Tuple<List<double>, Entity>> v, int id)
-        {
-            for (int i = 0; i < v.Count; i++)
-            {
-                if (v[i].Item1[0] == id)
-                {
-                    DestroyFamily(v, i);
-                    //v.Remove(v[i]);
-                    v[i] = new Tuple<List<double>, Entity>(v[id].Item1, null);
-                }
-            }
-            return;
-        }
-        void DestroyFamilyV2(List<(Entity, (int, double))> family, int id)
-        {
-            for (int i = 0; i < family.Count; i++)
-            {
-                if (family[i].Item2.Item1 == id)
-                {
-                    DestroyFamilyV2(family, i);
-                    //v.Remove(v[i]);
-                    family[i] = (null, family[i].Item2);
-                }
-            }
-            family[id] = (null, family[id].Item2);
-            return;
-        }
-        (double, float) MoveV4(Entity entity, double movement, bool xAxis, List<(Entity, (int, double))> family = null, bool firstTime = true, int parentId = 0, float mass = 0f)
-        {
-            if(family == null)
-            {
-                family = new List<(Entity, (int, double))>();
-            }
-            double distanceFromParent = 0;
-            if (!firstTime)
-            {
-                if (xAxis)
-                {
-                    if (movement > 0)
-                        distanceFromParent = entity.X - (family[parentId].Item1.X + family[parentId].Item1.Size.X/* - movement*/);
-                    else
-                        distanceFromParent = entity.X + entity.Size.X - (family[parentId].Item1.X/* - movement*/);
-                }
-                else
-                {
-                    if (movement > 0)
-                        distanceFromParent = entity.Y - (family[parentId].Item1.Y + family[parentId].Item1.Size.Y/* - movement*/);
-                    else
-                        distanceFromParent = entity.Y + entity.Size.Y - (family[parentId].Item1.Y/* - movement*/);
-                }
-                if(distanceFromParent != 0)
-                    Console.WriteLine(distanceFromParent);
-            }
-            (Entity, (int, double)) member = (entity, (parentId, distanceFromParent));
-            for (int i = 0; i < family.Count; i++)
-            {
-                if(family[i].Item1 == entity)
-                {
-                    if (xAxis)
-                    {
-                        if (movement > 0)
-                        {
-                            //if (entity.X > family[i].Item1.X)
-                            if (family[family[i].Item2.Item1].Item1.X + family[family[i].Item2.Item1].Item1.Size.X < family[parentId].Item1.X + family[parentId].Item1.Size.X)
-                                DestroyFamilyV2(family, i);
-                            else
-                                return (movement, mass);
                         }
                         else
                         {
-                            //if (entity.X < family[i].Item1.X)
-                            if (family[family[i].Item2.Item1].Item1.X > family[parentId].Item1.X)
-                                DestroyFamilyV2(family, i);
+                            if (movement >= 0)
+                            {
+                                if (pushedEntities[parentId].Item1.Y + pushedEntities[parentId].Item1.Size.Y > pushedEntities[tuple.Item2].Item1.Y + pushedEntities[tuple.Item2].Item1.Size.Y)
+                                {
+                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
+                                }
+                                else
+                                    return movement;
+                            }
                             else
-                                return (movement, mass);
+                            {
+
+                                if (pushedEntities[parentId].Item1.Y < pushedEntities[tuple.Item2].Item1.Y)
+                                {
+                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
+                                }
+                                else
+                                    return movement;
+                            }
                         }
                     }
-                    else
+                }
+                pushedEntities.Add((pusher, parentId));
+
+            }
+            int selfId = pushedEntities.Count - 1;
+
+            if (xORy == 'x')
+            {
+                double oldX = pusher.X;
+                foreach (var entity in entities)
+                {
+                    pusher.X = oldX;
+                    pusher.X += movement;
+                    pusher.Update();
+
+                    if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
                     {
-                        if (movement > 0)
+                        if(mass > entity.Mass)
                         {
-                            //if (entity.Y > family[i].Item1.Y)
-                            if (family[family[i].Item2.Item1].Item1.Y + family[family[i].Item2.Item1].Item1.Size.Y < family[parentId].Item1.Y + family[parentId].Item1.Size.Y)
-                                DestroyFamilyV2(family, i);
-                            else
-                                return (movement, mass);
+                            pusher.X = oldX;
+                            pusher.Update();
+                            pusher.Collision = false;
+                            movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
+                            pusher.Collision = true;
                         }
                         else
                         {
-                            //if (entity.Y < family[i].Item1.Y)
-                            if (family[family[i].Item2.Item1].Item1.Y > family[parentId].Item1.Y)
-                                DestroyFamilyV2(family, i);
-                            else
-                                return (movement, mass);
-                        }
-                    }
-                }
-            }
-            //me, parentId, distanceTillParent
-            family.Add(member);
-            if (mass == 0)
-            {
-                mass = entity.Mass;
-            }
-            else
-            {
-                ////var old = movement;
-                //movement += -(movement * (entity.Mass / (mass + entity.Mass)));
-                ////movement *= entity.Mass / (mass + entity.Mass);
-                //mass -= entity.Mass;
-                ////if (old < 0 && movement > 0 || old > 0 && movement < 0)
-                //if (mass < entity.Mass)
-                //    return (movement, mass);
-                //mass -= entity.Mass;
-                //float minMovement = 0.1f;
-                //if (mass < 0)
-                //{
-                //    mass = 0;
-                //}
-                //if(mass / (mass + entity.Mass) > minMovement)
-                //{
-                //    movement *= mass / (mass + entity.Mass);
-                //}
-                //else
-                //  movement *= minMovement;
-
-                double old = movement;
-                movement *= mass / (mass + entity.Mass);
-                //if(Math.Abs(movement) < 0.1 && old > 0)
-                //{
-                //    movement = 0.1;
-                //}
-
-
-            }
-            int ownId = family.Count - 1;
-            //List<>
-            if (xAxis)
-            {
-                double old = entity.X;
-                entity.X += movement;
-                entity.Update();
-                if (entity.Collision)
-                {
-                    foreach (var e in entities)
-                    {
-                        //e.Update();
-                        if (e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
-                        {
-                            if(mass > e.Mass)
+                            if (movement >= 0)
                             {
-                                entity.Collision = false;
-                                entity.X = old;
-                                entity.Update();
-                                e.X = Math.Floor(e.X) + Math.Abs(entity.X % 1);
-                                var tuple = MoveV4(e, movement, xAxis/*true*/, family, false, ownId, mass);
-                                movement = tuple.Item1;
-                                mass = tuple.Item2;
-                                entity.X += movement;
-                                entity.Update();
-                                entity.Collision = true;
+                                movement = entity.Rect.Left - (oldX + pusher.Size.X);
+                                if (movement < 0)
+                                    movement = 0;
                             }
                             else
                             {
-                                if(movement > 0)
-                                {
-                                    //if(movement - (entity.X + entity.Size.X - e.X) < movement)
-                                    //  movement -= entity.X + entity.Size.X - e.X;
-                                    //if(e.Rect.X - (old + entity.Size.X) < movement)
-                                    //  movement = e.Rect.X - (old + entity.Size.X);
-
-                                    if (e.X - (old + entity.Size.X) < movement)
-                                        movement = e.X - (old + entity.Size.X);
-                                    if (movement < 0)
-                                        movement = 0;
-                                }
-                                else if(movement < 0)
-                                {
-                                    //if(movement + (e.X + e.Size.X - entity.X) > movement)
-                                    //    movement += e.X + e.Size.X - entity.X;
-                                    //if(old - (e.Rect.X + e.Size.X) > movement)
-                                    //  movement = old - (e.Rect.X + e.Size.X);
-
-                                    if ((e.X + e.Size.X) - old > movement)
-                                        movement = (e.X + e.Size.X) - old;
-                                    if (movement > 0)
-                                        movement = 0;
-                                }
-                            }
-                        }
-                    }
-                }
-                entity.X = old;
-            }
-            else
-            {
-                double old = entity.Y;
-                entity.Y += movement;
-                entity.Update();
-                if (entity.Collision)
-                {
-                    foreach (var e in entities)
-                    {
-                        //e.Update();
-                        if (e != entity && e.Collision && e.Rect.Intersects(entity.Rect))
-                        {
-                            if (mass > e.Mass)
-                            {
-                                entity.Collision = false;
-                                entity.Y = old;
-                                entity.Update();
-                                e.Y = Math.Floor(e.Y) + Math.Abs(entity.Y % 1);
-                                var tuple = MoveV4(e, movement, xAxis/*false*/, family, false, ownId, mass);
-                                movement = tuple.Item1;
-                                mass = tuple.Item2;
-                                entity.Y += movement;
-                                entity.Update();
-                                entity.Collision = true;
-                            }
-                            else
-                            {
+                                movement = entity.Rect.Right - (oldX);
                                 if (movement > 0)
-                                {
-                                    //if (movement - (entity.Y + entity.Size.Y - e.Y) < movement)
-                                    //    movement -= entity.Y + entity.Size.Y - e.Y;
-                                    //if (e.Rect.Y - (old + entity.Size.Y) < movement)
-                                    //movement = e.Rect.Y - (old + entity.Size.Y);
-                                    if (e.Y - (old + entity.Size.Y) < movement)
-                                        movement = e.Y - (old + entity.Size.Y);
-                                    if (movement < 0)
-                                        movement = 0;
-                                }
-                                else if (movement < 0)
-                                {
-                                    //if (movement + (e.Y + e.Size.Y - entity.Y) > movement)
-                                    //    movement += e.Y + e.Size.Y - entity.Y;
-                                    //if (old - (e.Y + e.Size.Y) > movement)
-                                    //movement = old - (e.Y + e.Size.Y);
-                                    if ((e.Y + e.Size.Y) - old > movement)
-                                        movement = (e.Y + e.Size.Y) - old;
-                                    if (movement > 0)
-                                        movement = 0;
-                                }
+                                    movement = 0;
                             }
                         }
                     }
                 }
-                entity.Y = old;
+                pusher.X = oldX;
+                pusher.Update();
             }
-
-            if (firstTime && movement != 0)
+            else
             {
-                if (xAxis)
-                    entity.X += movement;
-                else
-                    entity.Y += movement;
-                entity.Update();
-
-                for (int i = 1; i < family.Count; i++)
+                double oldY = pusher.Y;
+                foreach (var entity in entities)
                 {
-                    if (family[i].Item1 != null && family[i].Item2.Item2 <= Math.Abs(movement))
-                    {
-                    //    bool closeEnough = false;
-                    //    if (movement > 0 && family[i].Item2.Item2 <= movement)
-                    //        closeEnough = true;
-                    //    else if (movement < 0 && family[i].Item2.Item2 >= movement)
+                    pusher.Y = oldY;
+                    pusher.Y += movement;
+                    pusher.Update();
 
-                        if (xAxis)
+                    if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
+                    {
+                        if (mass > entity.Mass)
                         {
-                            if (movement > 0)
-                                family[i].Item1.X = family[family[i].Item2.Item1].Item1.X + family[family[i].Item2.Item1].Item1.Size.X;
-                            else
-                                family[i].Item1.X = family[family[i].Item2.Item1].Item1.X - family[i].Item1.Size.X;
+                            pusher.Y = oldY;
+                            pusher.Update();
+                            pusher.Collision = false;
+                            movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
+                            pusher.Collision = true;
                         }
                         else
                         {
-                            if (movement > 0)
-                                family[i].Item1.Y = family[family[i].Item2.Item1].Item1.Y + family[family[i].Item2.Item1].Item1.Size.Y;
+                            if (movement >= 0)
+                            {
+                                movement = entity.Rect.Top - (oldY + pusher.Size.Y);
+                                if (movement < 0)
+                                    movement = 0;
+                            }
                             else
-                                family[i].Item1.Y = family[family[i].Item2.Item1].Item1.Y - family[i].Item1.Size.Y;
+                            {
+                                movement = entity.Rect.Bottom - (oldY);
+                                if (movement > 0)
+                                    movement = 0;
+                            }
                         }
-                        family[i].Item1.Update();
+                    }
+                }
+                pusher.Y = oldY;
+                pusher.Update();
+            }
+
+            if (firstime)
+            {
+
+                var pushedEntitiesSorted = new List<(Entity, int)>();
+                for (int i = 0; i < pushedEntities.Count; i++)
+                {
+                    if (pushedEntities[i].Item1 != null)
+                    {
+                        pushedEntitiesSorted.Add(pushedEntities[i]);
+                    }
+
+                }
+                pushedEntitiesSorted = pushedEntitiesSorted.OrderBy(x => x.Item2).ToList();
+
+                for(int i = pushedEntitiesSorted.Count/3; i > 0; i--)
+                {
+                    movement *= 0.7;
+                }
+
+                if (xORy == 'x')
+                {
+                    pusher.X += movement;
+                }
+                else
+                    pusher.Y += movement;
+                pusher.Update();
+
+                for (int i = 0; i < pushedEntitiesSorted.Count; i++)
+                {
+                    var pushed = pushedEntitiesSorted[i];
+                    //if (pushed.Item1 == null)
+                    //    break;
+                    if(pushed.Item1 != pusher && pushedEntities[pushed.Item2].Item1 != null && pushed.Item1 != null)
+                    {
+                        if (pushed.Item1.Rect.Intersects(pushedEntities[pushed.Item2].Item1.Rect))
+                        {
+                            if (xORy == 'x')
+                            {
+                                if(movement <= 0)
+                                {
+                                    pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X - pushed.Item1.Size.X;
+                                    pushed.Item1.Update();
+                                }
+                                else
+                                {
+                                    pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X + pushedEntities[pushed.Item2].Item1.Size.X;
+                                    pushed.Item1.Update();
+                                }
+                            
+                            }
+                            else
+                            {
+                                if (movement <= 0)
+                                {
+                                    pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y - pushed.Item1.Size.Y;
+                                    pushed.Item1.Update();
+                                }
+                                else
+                                {
+                                    pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y + pushedEntities[pushed.Item2].Item1.Size.Y;
+                                    pushed.Item1.Update();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            pushedEntities[i] = (null, pushed.Item2);
+                        }
                     }
                 }
             }
-            return (movement, mass);
+            return movement;
 
+        }
+
+        void DestroyFamilyV3(List<(Entity, int)> pushedEntities, int id)
+        {
+            for (int i = 0; i < pushedEntities.Count; i++)
+            {
+                if (pushedEntities[i].Item2 == id)
+                {
+                    DestroyFamilyV3(pushedEntities, i);
+                    pushedEntities[i] = (null, pushedEntities[i].Item2);
+                }
+            }
+            pushedEntities[id] = (null, pushedEntities[id].Item2);
+            return;
         }
     }
 }
