@@ -32,16 +32,18 @@ namespace SurvivalGame
         MouseCursor mouseCursor;
 
         List<Entity> entities = new List<Entity>();
-        List<Bullet> bullets = new List<Bullet>();
+        //List<Bullet> bullets = new List<Bullet>();
+        List<Projectile> projectiles = new List<Projectile>();
         List<Enemy> enemies = new List<Enemy>();
         List<Wall> walls = new List<Wall>();
         List<Sword> swords = new List<Sword>();
 
         float rateOfFire = 0.2f;
         float timeSinceLastShot = 9999999f;
+        int bulletType = 0;
         float swordCooldown = 0.3f;
         float timeSinceSwordAttack = 9999999f;
-        float enemySpawnRate = 1.1f;
+        float enemySpawnRate = .1f;
         float timeSinceEnemySpawn = 999999f;
         float wallPlacementCooldown = 0.3f;
         float timeSinceWallPlacement = 999999f;
@@ -68,6 +70,7 @@ namespace SurvivalGame
             textures.Add("Enemy", CreateTexture(Color.Black));
             textures.Add("MouseCursor", CreateTexture(Color.White));
             textures.Add("Bullet", CreateTexture(Color.Orange));
+            textures.Add("Flame", CreateTexture(Color.DarkOrange));
             textures.Add("Wall", CreateTexture(Color.SaddleBrown));
             textures.Add("Sword", CreateTexture(Color.White));
             var color = Color.SaddleBrown;
@@ -170,9 +173,9 @@ namespace SurvivalGame
             // TODO: Add your drawing code here
             spriteBatch.Begin();
 
-            foreach (var bullet in bullets)
+            foreach (var projectile in projectiles)
             {
-                spriteBatch.Draw(bullet.Texture, bullet.Rect, null, Color.White, bullet.Rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0);
+                spriteBatch.Draw(projectile.Texture, projectile.Rect, null, Color.White, projectile.Rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0);
             }
 
             spriteBatch.Draw(player.Texture, player.Rect, Color.White);
@@ -229,6 +232,19 @@ namespace SurvivalGame
             {
                 DeleteWall();
             }
+            if (keysPressed.Contains(Keys.D1.ToString()))
+            {
+                if (bulletType == 0)
+                {
+                    bulletType = 1;
+                    rateOfFire = 0.02f;
+                }
+                else
+                {
+                    bulletType = 0;
+                    rateOfFire = 0.2f;
+                }
+            }
             if (keysPressed.Contains(Keys.F11.ToString()))
             {
                 graphics.ToggleFullScreen();
@@ -250,15 +266,35 @@ namespace SurvivalGame
                 MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
             }
             timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (keyHistory.Contains(Keys.Space.ToString()) && timeSinceLastShot > rateOfFire)
+            if (keyHistory.Contains(Keys.Space.ToString()))
             {
-                timeSinceLastShot = 0f;
-                double yEdge = (player.Center.Y - mouseCursor.Center.Y);
-                double xEdge = (player.Center.X - mouseCursor.Center.X);
-                Bullet bullet = new Bullet(textures["Bullet"], player.Center.X, player.Center.Y, (float)Math.Atan2(yEdge, xEdge), new Vector2((float)xEdge, (float)yEdge));
-                bullets.Add(bullet);
-                entities.Add(bullet);
+                if (bulletType == 0 && timeSinceLastShot > rateOfFire)
+                {
+
+                    Projectile projectile = new Projectile(textures["Bullet"], 500f, player.Center, mouseCursor.Center, 100);
+                    projectiles.Add(projectile);
+                    entities.Add(projectile);
+
+                    timeSinceLastShot = 0f;
+                }
+                else if (bulletType == 1 && timeSinceLastShot > rateOfFire)
+                {
+                    Projectile projectile = new Projectile(textures["Flame"], 300f, player.Center, mouseCursor.Center, 1);
+                    projectiles.Add(projectile);
+                    entities.Add(projectile);
+
+                    timeSinceLastShot = 0f;
+                }
             }
+            //if (keyHistory.Contains(Keys.Space.ToString()) && timeSinceLastShot > rateOfFire)
+            //{
+            //    timeSinceLastShot = 0f;
+            //    double yEdge = (player.Center.Y - mouseCursor.Center.Y);
+            //    double xEdge = (player.Center.X - mouseCursor.Center.X);
+            //    Bullet bullet = new Bullet(textures["Bullet"], 500f, player.Center.X, player.Center.Y, (float)Math.Atan2(yEdge, xEdge), new Vector2((float)xEdge, (float)yEdge));
+            //    bullets.Add(bullet);
+            //    entities.Add(bullet);
+            //}
             timeSinceSwordAttack += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyHistory.Contains(Keys.V.ToString()) && timeSinceSwordAttack > swordCooldown)
             {
@@ -367,12 +403,12 @@ namespace SurvivalGame
                             MoveV5(enemy, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
 
                             MoveV5(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                            foreach (var bullet in bullets)
+                            foreach (var projectile in projectiles)
                             {
-                                if (enemy.Rect.Intersects(bullet.Rect))
+                                if (enemy.Rect.Intersects(projectile.Rect))
                                 {
-                                    enemy.DamageHealth(deadEntities);
-                                    deadEntities.Add(bullet);
+                                    enemy.DamageHealth(deadEntities, projectile.Damage);
+                                    deadEntities.Add(projectile);
                                 }
                             }
                             foreach (var sword in swords)
@@ -387,20 +423,20 @@ namespace SurvivalGame
                         }
                     }
                 }
-                else if (ent.GetType().Equals(typeof(Bullet)))
+                else if (ent.GetType().Equals(typeof(Projectile)))
                 {
-                    foreach (var bullet in bullets)
+                    foreach (var projectile in projectiles)
                     {
-                        if (bullet.Equals(ent))
+                        if (projectile.Equals(ent))
                         {
-                            MoveV5(bullet, bullet.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
-                            MoveV5(bullet, bullet.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                            bullet.Update(gameTime, deadEntities);
+                            MoveV5(projectile, projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                            MoveV5(projectile, projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                            projectile.Update(gameTime, deadEntities);
                             foreach (var wall in walls)
                             {
-                                if (bullet.Detect(wall) && wall.Collision)
+                                if (projectile.Detect(wall) && wall.Collision)
                                 {
-                                    deadEntities.Add(bullet);
+                                    deadEntities.Add(projectile);
                                 }
                             }
                         }
@@ -442,17 +478,17 @@ namespace SurvivalGame
             foreach (var entity in deadEntities)
             {
                 entities.Remove(entity);
-                if (entity.GetType().Equals(typeof(Bullet)))
+                if (entity.GetType().Equals(typeof(Projectile)))
                 {
-                    Bullet bullet = null;
-                    foreach (var b in bullets)
+                    Projectile projectile = null;
+                    foreach (var b in projectiles)
                     {
                         if (b.Equals(entity))
                         {
-                            bullet = b;
+                            projectile = b;
                         }
                     }
-                    bullets.Remove(bullet);
+                    projectiles.Remove(projectile);
                 }
                 if (entity.GetType().Equals(typeof(Enemy)))
                 {
@@ -495,7 +531,7 @@ namespace SurvivalGame
 
         void SpawnEnemy(GameTime gameTime)
         {
-            if (timeSinceEnemySpawn > enemySpawnRate && enemies.Count < 100)
+            if (timeSinceEnemySpawn > enemySpawnRate && enemies.Count < 200)
             {
                 int i = 0;
                 while (i < 10)
@@ -612,7 +648,7 @@ namespace SurvivalGame
                 pushedEntities = new List<(Entity, int)>() { (pusher, -1) };
                 firstime = true;
             }
-            else
+            else //remove duplicate or destroy this duplicate
             {
                 for(int i = 0; i < pushedEntities.Count; i++)
                 {
@@ -665,11 +701,10 @@ namespace SurvivalGame
                     }
                 }
                 pushedEntities.Add((pusher, parentId));
-
             }
             int selfId = pushedEntities.Count - 1;
 
-            if (xORy == 'x')
+            if (xORy == 'x') //move in x axis
             {
                 double oldX = pusher.X;
                 foreach (var entity in entities)
@@ -680,7 +715,7 @@ namespace SurvivalGame
 
                     if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
                     {
-                        if(mass > entity.Mass)
+                        if(mass > entity.Mass) //can push
                         {
                             pusher.X = oldX;
                             pusher.Update();
@@ -688,7 +723,7 @@ namespace SurvivalGame
                             movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
                             pusher.Collision = true;
                         }
-                        else
+                        else //cant push
                         {
                             if (movement >= 0)
                             {
@@ -708,7 +743,7 @@ namespace SurvivalGame
                 pusher.X = oldX;
                 pusher.Update();
             }
-            else
+            else // move in y axis
             {
                 double oldY = pusher.Y;
                 foreach (var entity in entities)
@@ -719,7 +754,7 @@ namespace SurvivalGame
 
                     if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
                     {
-                        if (mass > entity.Mass)
+                        if (mass > entity.Mass) // can push
                         {
                             pusher.Y = oldY;
                             pusher.Update();
@@ -727,7 +762,7 @@ namespace SurvivalGame
                             movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
                             pusher.Collision = true;
                         }
-                        else
+                        else //cant push
                         {
                             if (movement >= 0)
                             {
@@ -748,7 +783,7 @@ namespace SurvivalGame
                 pusher.Update();
             }
 
-            if (firstime)
+            if (firstime) //real push
             {
 
                 var pushedEntitiesSorted = new List<(Entity, int)>();
@@ -762,7 +797,7 @@ namespace SurvivalGame
                 }
                 pushedEntitiesSorted = pushedEntitiesSorted.OrderBy(x => x.Item2).ToList();
 
-                for(int i = pushedEntitiesSorted.Count/3; i > 0; i--)
+                for(int i = pushedEntitiesSorted.Count/3; i > 0; i--) //weakens push
                 {
                     movement *= 0.7;
                 }
@@ -778,8 +813,6 @@ namespace SurvivalGame
                 for (int i = 0; i < pushedEntitiesSorted.Count; i++)
                 {
                     var pushed = pushedEntitiesSorted[i];
-                    //if (pushed.Item1 == null)
-                    //    break;
                     if(pushed.Item1 != pusher && pushedEntities[pushed.Item2].Item1 != null && pushed.Item1 != null)
                     {
                         if (pushed.Item1.Rect.Intersects(pushedEntities[pushed.Item2].Item1.Rect))

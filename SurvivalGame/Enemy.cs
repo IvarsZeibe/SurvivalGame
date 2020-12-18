@@ -11,16 +11,17 @@ namespace SurvivalGame
 {
     class Enemy : Entity
     {
-        int Health { get; set; }
+        bool isDead;
         float TimeSinceDamageRecieved;
         float DamageRecievedCooldown = 0.2f;
         public Enemy(Texture2D texture, double x, double y, int sizex = 20, int sizey = 30, int speed = 100, bool collision = true)
         {
+            isDead = false;
             Mass = 5;
             //Force = 2;
             Collision = collision;
             Speed = speed;
-            Health = 3;
+            Health = 300;
             X = x;
             Y = y;
             Size = new Point(sizex, sizey);
@@ -38,12 +39,13 @@ namespace SurvivalGame
             XMovement = -xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
             YMovement = -yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
         }
-        public void DamageHealth(List<Entity> deadEntities)
+        public void DamageHealth(List<Entity> deadEntities, int amount = 100)
         {
             if(TimeSinceDamageRecieved > DamageRecievedCooldown)
             {
-                Health--;
-                Size = new Point((int)(Size.X * 0.8), (int)(Size.Y * 0.8));
+                Health = Health - amount;
+                if(Health / 100 != (Health + amount) / 100)
+                    Size = new Point((int)(Size.X * 0.8), (int)(Size.Y * 0.8));
                 if (Health <= 0)
                 {
                     deadEntities.Add(this);

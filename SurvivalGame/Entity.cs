@@ -29,5 +29,11 @@ namespace SurvivalGame
             Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
             Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
         }
+        public int Health { get; set; }
+        public bool DamageEntity(int damage, string source)
+        {
+            Health -= damage;
+            return true;
+        }
     }
 }

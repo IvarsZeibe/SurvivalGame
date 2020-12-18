@@ -8,26 +8,32 @@ using System.Threading.Tasks;
 
 namespace SurvivalGame
 {
-    class Bullet : Entity
+    class Projectile : Entity
     {
-        int Damage { get; set; }
+        public int Damage { get; set; }
         int Range { get; set; }
         public float Rotation { get; set; }
         List<double> RelativCoord { get; set; }
         List<double> StartingCoord { get; set; }
-        public Bullet(Texture2D texture, float speed, double x, double y, float rotation, Vector2 relativeMouse)
+        public Projectile(Texture2D texture, float speed, Vector2 source, Vector2 target, int damage)
         {
-            Mass = 1f;
             Collision = false;
-            StartingCoord = new List<double>() { x, y };
-            X = x;
-            Y = y;
-            Rotation = rotation;
+            StartingCoord = new List<double>() { source.X, source.Y };
             RelativCoord = new List<double>() { 0, 0 };
-            Speed = 500f;
             Range = 300;
             Size = new Point(10, 2);
+
             Texture = texture;
+            Speed = speed;
+            X = source.X;
+            Y = source.Y;
+            Damage = damage;
+
+            double yEdge = (source.Y - target.Y);
+            double xEdge = (source.X - target.X);
+            Rotation = (float)Math.Atan2(yEdge, xEdge);
+
+            Vector2 relativeMouse = new Vector2((float)xEdge, (float)yEdge);
             XMovement = -relativeMouse.X / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
             YMovement = -relativeMouse.Y / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
         }
