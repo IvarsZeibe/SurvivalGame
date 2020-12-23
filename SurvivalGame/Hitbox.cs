@@ -76,7 +76,15 @@ namespace SurvivalGame
                 //    $"Y: {radius + halfHeight - distanceY},{Math.Sqrt(requiredDistance * requiredDistance - distanceX * distanceX)}");
 
                 float cornerX = (float)(Math.Sqrt(radius * radius - (distanceY - halfHeight) * (distanceY - halfHeight)) - (distanceX - halfWidth));
+                if (cornerX < 0)
+                {
+                    cornerX = 0;
+                }
                 float cornerY = (float)(Math.Sqrt(radius * radius - (distanceX - halfWidth) * (distanceX - halfWidth)) - (distanceY - halfHeight));
+                if (cornerY < 0)
+                {
+                    cornerY = 0;
+                }
 
                 float edgeX = (float)(radius + halfWidth - distanceX);
                 float edgeY = (float)(radius + halfHeight - distanceY);

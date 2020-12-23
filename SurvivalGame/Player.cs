@@ -19,9 +19,9 @@ namespace SurvivalGame
             Speed = 1/200f;
             X = 100;
             Y = 100;
-            Size = new Point(24, 24);
+            Size = new Point(124, 124);
             Texture = texture;
-            Hitbox = new Circle(X, Y, 24);
+            Hitbox = new Circle(X, Y, 124);
             Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
         }
 
