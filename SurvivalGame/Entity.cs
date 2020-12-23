@@ -21,13 +21,18 @@ namespace SurvivalGame
         public double XMovement { get; set; }
         public double YMovement { get; set; }
         public Point Size { get; set; }
+        public Hitbox Hitbox { get; set; }
         public Rectangle Rect { get; set; }
         public Texture2D Texture { get; set; }
         public void Update()
         {
             Force = Mass/* * (Speed+1)*/;
-            Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
+            X = Hitbox.X;
+            Y = Hitbox.Y;
+            //Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
             Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
+            //Hitbox.X = X;
+            //Hitbox.Y = Y;
         }
         public int Health { get; set; }
         public bool DamageEntity(int damage, string source)
@@ -35,5 +40,6 @@ namespace SurvivalGame
             Health -= damage;
             return true;
         }
+        public bool isDead = false;
     }
 }

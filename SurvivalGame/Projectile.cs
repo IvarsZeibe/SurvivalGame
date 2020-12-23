@@ -37,7 +37,7 @@ namespace SurvivalGame
             XMovement = -relativeMouse.X / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
             YMovement = -relativeMouse.Y / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
         }
-        public void Update(GameTime gameTime, List<Entity> deadEntities)
+        public void Update(GameTime gameTime)
         {
             //Force = Mass * Speed;
             Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
@@ -56,7 +56,7 @@ namespace SurvivalGame
 
             if (RelativCoord[0] * RelativCoord[0] + RelativCoord[1] * RelativCoord[1] > Range * Range)
             {
-                deadEntities.Add(this);
+                isDead = true;
             }
         }
         public bool Detect(Entity entity)

@@ -10,6 +10,7 @@ namespace SurvivalGame
 {
     class Sword:Entity
     {
+        public List<Entity> hitEntities = new List<Entity>();
         public Rectangle DrawRect;
         Point Hitbox { get; set; }
         float StartingRotation { get; set; }
@@ -18,8 +19,10 @@ namespace SurvivalGame
         Entity Player { get; set; }
         float timeAlive;
         float timeTillDeath = 0.2f;
+        public int Damage { get; set; }
         public Sword(Texture2D texture, Entity player, float rotation)
         {
+            Damage = 100;
             Collision = false;
             Mass = 1f;
             Hitbox = new Point(80, 60);
@@ -52,7 +55,7 @@ namespace SurvivalGame
             }
             Rotation = StartingRotation;
         }
-        public void Update(GameTime gameTime, List<Entity> deadEntities)
+        public void Update(GameTime gameTime)
         {
             //Force = Mass * Speed;
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -63,7 +66,7 @@ namespace SurvivalGame
             DrawRect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
             if (timeAlive > timeTillDeath)
             {
-                deadEntities.Add(this);
+                isDead = true;
             }
             switch (Direction)
             {

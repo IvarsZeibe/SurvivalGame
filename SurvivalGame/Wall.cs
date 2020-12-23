@@ -27,14 +27,16 @@ namespace SurvivalGame
             Size = new Point(rand.Next(18, 20), rand.Next(18, 20));
             Collision = collision;
             ghost = !collision;
+            Hitbox = new Rect(X, Y, Size.X, Size.Y);
+
         }
-        public void Update(GameTime gameTime, List<Entity> deadEntities)
+        public void Update(GameTime gameTime)
         {
             Force = Mass * Speed;
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(ghost && timeAlive > 0.1)
             {
-                deadEntities.Add(this);
+                isDead = true;
             }
             Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
             Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);

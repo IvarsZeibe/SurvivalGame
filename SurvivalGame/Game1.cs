@@ -66,7 +66,7 @@ namespace SurvivalGame
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            textures.Add("Player", CreateTexture(Color.Red));
+            //textures.Add("Player", CreateTexture(Color.Red));
             textures.Add("Enemy", CreateTexture(Color.Black));
             textures.Add("MouseCursor", CreateTexture(Color.White));
             textures.Add("Bullet", CreateTexture(Color.Orange));
@@ -76,6 +76,9 @@ namespace SurvivalGame
             var color = Color.SaddleBrown;
             color.A = 100;
             textures.Add("WallGhost", CreateTexture(color));
+
+
+            textures.Add("Player", this.Content.Load<Texture2D>("Untitled"));
 
             player = new Player(textures["Player"]);
             entities.Add(player);
@@ -97,7 +100,6 @@ namespace SurvivalGame
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
             // TODO: use this.Content to load your game content here
         }
 
@@ -148,7 +150,6 @@ namespace SurvivalGame
             mouseCursor.Update(mstate);
 
             List<Entity> deadEntities = new List<Entity>();
-
             UpdateEntities(gameTime, deadEntities);
 
             KillDeadEntities(deadEntities);
@@ -178,11 +179,15 @@ namespace SurvivalGame
                 spriteBatch.Draw(projectile.Texture, projectile.Rect, null, Color.White, projectile.Rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0);
             }
 
-            spriteBatch.Draw(player.Texture, player.Rect, Color.White);
+            //spriteBatch.Draw(player.Texture, player.Rect, Color.White
+            spriteBatch.Draw(player.Texture, new Rectangle((int)(player.Hitbox.X - (player.Size.X / 2f)), (int)(player.Hitbox.Y - (player.Size.Y / 2f)), player.Size.X, player.Size.Y), Color.White);
+            //spriteBatch.Draw(player.Texture, new Vector2((float)player.X, (float)player.Y), null, Color.White, 0, Vector2.Zero, new Vector2(player.Size.X / player.Texture.Width, player.Size.Y / player.Texture.Height), SpriteEffects.None, 0);
 
             foreach (var enemy in enemies)
             {
-                spriteBatch.Draw(enemy.Texture, enemy.Rect, Color.White);
+                //spriteBatch.Draw(enemy.Texture, enemy.Rect, Color.White);
+                spriteBatch.Draw(enemy.Texture, new Rectangle((int)(enemy.Hitbox.X - (enemy.Rect.Width / 2f)), (int)(enemy.Hitbox.Y - (enemy.Rect.Height / 2f)), enemy.Rect.Width, enemy.Rect.Height), Color.White);
+                //spriteBatch.Draw(enemy.Texture, new Rectangle((int)enemy.X + (enemy.Size.X / 2), (int)enemy.Y + (enemy.Size.Y / 2), enemy.Size.X, enemy.Size.Y), Color.White);
             }
             foreach (var wall in walls)
             {
@@ -226,7 +231,7 @@ namespace SurvivalGame
             //keyHistory = all pressed keys
             if (keysPressed.Contains("LeftButton"))
             {
-                MakeWall();
+                //MakeWall();
             }
             if (keyHistory.Contains("RightButton"))
             {
@@ -251,19 +256,23 @@ namespace SurvivalGame
             }
             if (keyHistory.Contains(Keys.D.ToString()))
             {
-                MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                //MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                MoveV6(player, 'x', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
             }
             if (keyHistory.Contains(Keys.A.ToString()))
             {
-                MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                //MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                MoveV6(player, 'x', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
             }
             if (keyHistory.Contains(Keys.S.ToString()))
             {
-                MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                //MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                MoveV6(player, 'y', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
             }
             if (keyHistory.Contains(Keys.W.ToString()))
             {
-                MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                //MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                MoveV6(player, 'y', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
             }
             timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyHistory.Contains(Keys.Space.ToString()))
@@ -279,7 +288,7 @@ namespace SurvivalGame
                 }
                 else if (bulletType == 1 && timeSinceLastShot > rateOfFire)
                 {
-                    Projectile projectile = new Projectile(textures["Flame"], 300f, player.Center, mouseCursor.Center, 1);
+                    Projectile projectile = new Projectile(textures["Flame"], 300f, player.Center, mouseCursor.Center, 20);
                     projectiles.Add(projectile);
                     entities.Add(projectile);
 
@@ -388,87 +397,73 @@ namespace SurvivalGame
         {
             foreach (var ent in entities)
             {
-                if (ent.GetType().Equals(typeof(Player)))
+                if (ent is Player)
                 {
                     player.Update();
                 }
-                else if (ent.GetType().Equals(typeof(Enemy)))
+                else if (ent is Enemy)
                 {
-                    foreach (var enemy in enemies)
-                    {
-                        if (enemy.Equals(ent))
-                        {
-                            enemy.Update(gameTime);
-                            enemy.Movement(enemy.X - player.X, enemy.Y - player.Y);
-                            MoveV5(enemy, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                    Enemy enemy = ent as Enemy;
+                    enemy.Update(gameTime);
+                    enemy.Movement(enemy.Hitbox.X - player.Hitbox.X, enemy.Hitbox.Y - player.Hitbox.Y);
+                    //MoveV5(enemy, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
 
-                            MoveV5(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                            foreach (var projectile in projectiles)
-                            {
-                                if (enemy.Rect.Intersects(projectile.Rect))
-                                {
-                                    enemy.DamageHealth(deadEntities, projectile.Damage);
-                                    deadEntities.Add(projectile);
-                                }
-                            }
-                            foreach (var sword in swords)
-                            {
-                                if (enemy.Rect.Intersects(sword.Rect))
-                                {
-                                    enemy.DamageHealth(deadEntities);
-
-                                }
-                            }
-                            enemy.Update();
-                        }
-                    }
-                }
-                else if (ent.GetType().Equals(typeof(Projectile)))
-                {
+                   // MoveV5(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
                     foreach (var projectile in projectiles)
                     {
-                        if (projectile.Equals(ent))
+                        if (enemy.Rect.Intersects(projectile.Rect))
                         {
-                            MoveV5(projectile, projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
-                            MoveV5(projectile, projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                            projectile.Update(gameTime, deadEntities);
-                            foreach (var wall in walls)
-                            {
-                                if (projectile.Detect(wall) && wall.Collision)
-                                {
-                                    deadEntities.Add(projectile);
-                                }
-                            }
+                            enemy.DamageEntity(projectile.Damage, "Projectile");
+                            projectile.isDead = true;
                         }
                     }
-                }
-                else if (ent.GetType().Equals(typeof(Sword)))
-                {
                     foreach (var sword in swords)
                     {
-                        if (sword.Equals(ent))
+                        if (enemy.Rect.Intersects(sword.Rect) && !sword.hitEntities.Contains(enemy))
                         {
-                            sword.Update(gameTime, deadEntities);
-                            //foreach (var enemy in enemies)
-                            //{
-                            //    if (sword.Rect.Intersects(enemy.Rect))
-                            //    {
-                            //        enemy.Health--;
-                            //        enemy.Size = new Point((int)(enemy.Size.X * 0.8), (int)(enemy.Size.Y * 0.8));
-                            //    }
-                            //}
+                            enemy.DamageEntity(sword.Damage, "Sword");
+                            sword.hitEntities.Add(enemy);
+                        }
+                    }
+                    enemy.Update();
+                }
+                else if (ent is Projectile)
+                {
+                    Projectile projectile = ent as Projectile;
+                    //MoveV5(projectile, projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
+                    //MoveV5(projectile, projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                    projectile.Update(gameTime);
+                    foreach (var wall in walls)
+                    {
+                        if (projectile.Detect(wall) && wall.Collision)
+                        {
+                            projectile.isDead = true;
                         }
                     }
                 }
-                else if (ent.GetType().Equals(typeof(Wall)))
+                else if (ent is Sword)
                 {
-                    foreach (var wall in walls)
-                    {
-                        if (wall.Equals(ent))
-                        {
-                            wall.Update(gameTime, deadEntities);
-                        }
-                    }
+                    Sword sword = ent as Sword;
+                    sword.Update(gameTime);
+                    //foreach (var enemy in enemies)
+                    //{
+                    //    if (sword.Rect.Intersects(enemy.Rect))
+                    //    {
+                    //        enemy.Health--;
+                    //        enemy.Size = new Point((int)(enemy.Size.X * 0.8), (int)(enemy.Size.Y * 0.8));
+                    //    }
+                    //}
+                }
+                else if (ent is Wall)
+                {
+                    Wall wall = ent as Wall;
+                    wall.Update(gameTime);
+                }
+
+
+                if (ent.isDead)
+                {
+                    deadEntities.Add(ent);
                 }
             }
         }
@@ -478,60 +473,28 @@ namespace SurvivalGame
             foreach (var entity in deadEntities)
             {
                 entities.Remove(entity);
-                if (entity.GetType().Equals(typeof(Projectile)))
+                if (entity is Projectile)
                 {
-                    Projectile projectile = null;
-                    foreach (var b in projectiles)
-                    {
-                        if (b.Equals(entity))
-                        {
-                            projectile = b;
-                        }
-                    }
-                    projectiles.Remove(projectile);
+                    projectiles.Remove(entity as Projectile);
                 }
-                if (entity.GetType().Equals(typeof(Enemy)))
+                if (entity is Enemy)
                 {
-                    Enemy enemy = null;
-                    foreach (var e in enemies)
-                    {
-                        if (e.Equals(entity))
-                        {
-                            enemy = e;
-                        }
-                    }
-                    enemies.Remove(enemy);
+                    enemies.Remove(entity as Enemy);
                 }
-                if (entity.GetType().Equals(typeof(Wall)))
+                if (entity is Wall)
                 {
-                    Wall wall = null;
-                    foreach (var w in walls)
-                    {
-                        if (w.Equals(entity))
-                        {
-                            wall = w;
-                        }
-                    }
-                    walls.Remove(wall);
+                    walls.Remove(entity as Wall);
                 }
-                if (entity.GetType().Equals(typeof(Sword)))
+                if (entity is Sword)
                 {
-                    Sword sword = null;
-                    foreach (var s in swords)
-                    {
-                        if (s.Equals(entity))
-                        {
-                            sword = s;
-                        }
-                    }
-                    swords.Remove(sword);
+                    swords.Remove(entity as Sword);
                 }
             }
         }
 
         void SpawnEnemy(GameTime gameTime)
         {
-            if (timeSinceEnemySpawn > enemySpawnRate && enemies.Count < 200)
+            if (timeSinceEnemySpawn > enemySpawnRate && enemies.Count < 1)
             {
                 int i = 0;
                 while (i < 10)
@@ -636,225 +599,230 @@ namespace SurvivalGame
             }
         }
 
-        double MoveV5(Entity pusher, double movement, char xORy, List<(Entity, int)> pushedEntities = null, int parentId = -1, double mass = -1)
-        {
-            if(mass == -1)
-            {
-                mass = pusher.Mass;
-            }
-            bool firstime = false;
-            if (pushedEntities == null)
-            {
-                pushedEntities = new List<(Entity, int)>() { (pusher, -1) };
-                firstime = true;
-            }
-            else //remove duplicate or destroy this duplicate
-            {
-                for(int i = 0; i < pushedEntities.Count; i++)
-                {
-                    var tuple = pushedEntities[i];
-                    if(tuple.Item1 == pusher)
-                    {
-                        if (xORy == 'x')
-                        {
-                            if (movement >= 0)
-                            {
-                                if (pushedEntities[parentId].Item1.X + pushedEntities[parentId].Item1.Size.X > pushedEntities[tuple.Item2].Item1.X + pushedEntities[tuple.Item2].Item1.Size.X)
-                                {
-                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-                                }
-                                else
-                                    return movement;
-                            }
-                            else
-                            {
-                                if (pushedEntities[parentId].Item1.X < pushedEntities[tuple.Item2].Item1.X)
-                                {
-                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-                                }
-                                else
-                                    return movement;
-                            }
-                        }
-                        else
-                        {
-                            if (movement >= 0)
-                            {
-                                if (pushedEntities[parentId].Item1.Y + pushedEntities[parentId].Item1.Size.Y > pushedEntities[tuple.Item2].Item1.Y + pushedEntities[tuple.Item2].Item1.Size.Y)
-                                {
-                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-                                }
-                                else
-                                    return movement;
-                            }
-                            else
-                            {
+        //double MoveV5(Entity pusher, double movement, char xORy, List<(Entity, int)> pushedEntities = null, int parentId = -1, double mass = -1)
+        //{
+        //    if(mass == -1)
+        //    {
+        //        mass = pusher.Mass;
+        //    }
+        //    bool firstime = false;
+        //    if (pushedEntities == null)
+        //    {
+        //        pushedEntities = new List<(Entity, int)>() { (pusher, -1) };
+        //        firstime = true;
+        //    }
+        //    else //remove duplicate or destroy this duplicate
+        //    {
+        //        for(int i = 0; i < pushedEntities.Count; i++)
+        //        {
+        //            var tuple = pushedEntities[i];
+        //            if(tuple.Item1 == pusher)
+        //            {
+        //                if (xORy == 'x')
+        //                {
+        //                    if (movement >= 0)
+        //                    {
+        //                        if (pushedEntities[parentId].Item1.X + pushedEntities[parentId].Item1.Size.X > pushedEntities[tuple.Item2].Item1.X + pushedEntities[tuple.Item2].Item1.Size.X)
+        //                        {
+        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
+        //                        }
+        //                        else
+        //                            return movement;
+        //                    }
+        //                    else
+        //                    {
+        //                        if (pushedEntities[parentId].Item1.X < pushedEntities[tuple.Item2].Item1.X)
+        //                        {
+        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
+        //                        }
+        //                        else
+        //                            return movement;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (movement >= 0)
+        //                    {
+        //                        if (pushedEntities[parentId].Item1.Y + pushedEntities[parentId].Item1.Size.Y > pushedEntities[tuple.Item2].Item1.Y + pushedEntities[tuple.Item2].Item1.Size.Y)
+        //                        {
+        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
+        //                        }
+        //                        else
+        //                            return movement;
+        //                    }
+        //                    else
+        //                    {
 
-                                if (pushedEntities[parentId].Item1.Y < pushedEntities[tuple.Item2].Item1.Y)
-                                {
-                                    DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-                                }
-                                else
-                                    return movement;
-                            }
-                        }
-                    }
-                }
-                pushedEntities.Add((pusher, parentId));
-            }
-            int selfId = pushedEntities.Count - 1;
+        //                        if (pushedEntities[parentId].Item1.Y < pushedEntities[tuple.Item2].Item1.Y)
+        //                        {
+        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
+        //                        }
+        //                        else
+        //                            return movement;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        pushedEntities.Add((pusher, parentId));
+        //    }
+        //    int selfId = pushedEntities.Count - 1;
 
-            if (xORy == 'x') //move in x axis
-            {
-                double oldX = pusher.X;
-                foreach (var entity in entities)
-                {
-                    pusher.X = oldX;
-                    pusher.X += movement;
-                    pusher.Update();
+        //    if (xORy == 'x') //move in x axis
+        //    {
+        //        double oldX = pusher.X;
+        //        foreach (var entity in entities)
+        //        {
+        //            pusher.X = oldX;
+        //            pusher.X += movement;
+        //            pusher.Update();
 
-                    if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
-                    {
-                        if(mass > entity.Mass) //can push
-                        {
-                            pusher.X = oldX;
-                            pusher.Update();
-                            pusher.Collision = false;
-                            movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
-                            pusher.Collision = true;
-                        }
-                        else //cant push
-                        {
-                            if (movement >= 0)
-                            {
-                                movement = entity.Rect.Left - (oldX + pusher.Size.X);
-                                if (movement < 0)
-                                    movement = 0;
-                            }
-                            else
-                            {
-                                movement = entity.Rect.Right - (oldX);
-                                if (movement > 0)
-                                    movement = 0;
-                            }
-                        }
-                    }
-                }
-                pusher.X = oldX;
-                pusher.Update();
-            }
-            else // move in y axis
-            {
-                double oldY = pusher.Y;
-                foreach (var entity in entities)
-                {
-                    pusher.Y = oldY;
-                    pusher.Y += movement;
-                    pusher.Update();
+        //            //if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
+        //            if(pusher != entity && entity.Collision && pusher.Collision && pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox))
+        //            {
+        //                if(mass > entity.Mass) //can push
+        //                {
+        //                    pusher.X = oldX;
+        //                    pusher.Update();
+        //                    pusher.Collision = false;
+        //                    movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
+        //                    pusher.Collision = true;
+        //                }
+        //                else //cant push
+        //                {
+        //                    if (movement >= 0)
+        //                    {
+        //                        movement = entity.Rect.Left - (oldX + pusher.Size.X);
+        //                        if (movement < 0)
+        //                            movement = 0;
+        //                    }
+        //                    else
+        //                    {
+        //                        movement = entity.Rect.Right - (oldX);
+        //                        if (movement > 0)
+        //                            movement = 0;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        pusher.X = oldX;
+        //        pusher.Update();
+        //    }
+        //    else // move in y axis
+        //    {
+        //        double oldY = pusher.Y;
+        //        foreach (var entity in entities)
+        //        {
+        //            pusher.Y = oldY;
+        //            pusher.Y += movement;
+        //            pusher.Update();
 
-                    if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
-                    {
-                        if (mass > entity.Mass) // can push
-                        {
-                            pusher.Y = oldY;
-                            pusher.Update();
-                            pusher.Collision = false;
-                            movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
-                            pusher.Collision = true;
-                        }
-                        else //cant push
-                        {
-                            if (movement >= 0)
-                            {
-                                movement = entity.Rect.Top - (oldY + pusher.Size.Y);
-                                if (movement < 0)
-                                    movement = 0;
-                            }
-                            else
-                            {
-                                movement = entity.Rect.Bottom - (oldY);
-                                if (movement > 0)
-                                    movement = 0;
-                            }
-                        }
-                    }
-                }
-                pusher.Y = oldY;
-                pusher.Update();
-            }
+        //            if (pusher != entity && entity.Collision && pusher.Collision && pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox))
+        //            {
+        //                if (mass > entity.Mass) // can push
+        //                {
+        //                    pusher.Y = oldY;
+        //                    pusher.Update();
+        //                    pusher.Collision = false;
+        //                    movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
+        //                    pusher.Collision = true;
+        //                }
+        //                else //cant push
+        //                {
+        //                    if (movement >= 0)
+        //                    {
+        //                        movement = entity.Rect.Top - (oldY + pusher.Size.Y);
+        //                        if (movement < 0)
+        //                            movement = 0;
+        //                    }
+        //                    else
+        //                    {
+        //                        movement = entity.Rect.Bottom - (oldY);
+        //                        if (movement > 0)
+        //                            movement = 0;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        pusher.Y = oldY;
+        //        pusher.Update();
+        //    }
 
-            if (firstime) //real push
-            {
+        //    if (firstime) //real push
+        //    {
 
-                var pushedEntitiesSorted = new List<(Entity, int)>();
-                for (int i = 0; i < pushedEntities.Count; i++)
-                {
-                    if (pushedEntities[i].Item1 != null)
-                    {
-                        pushedEntitiesSorted.Add(pushedEntities[i]);
-                    }
+        //        var pushedEntitiesSorted = new List<(Entity, int)>();
+        //        for (int i = 0; i < pushedEntities.Count; i++)
+        //        {
+        //            if (pushedEntities[i].Item1 != null)
+        //            {
+        //                pushedEntitiesSorted.Add(pushedEntities[i]);
+        //            }
 
-                }
-                pushedEntitiesSorted = pushedEntitiesSorted.OrderBy(x => x.Item2).ToList();
+        //        }
+        //        pushedEntitiesSorted = pushedEntitiesSorted.OrderBy(x => x.Item2).ToList();
 
-                for(int i = pushedEntitiesSorted.Count/3; i > 0; i--) //weakens push
-                {
-                    movement *= 0.7;
-                }
+        //        for(int i = pushedEntitiesSorted.Count/3; i > 0; i--) //weakens push
+        //        {
+        //            movement *= 0.7;
+        //        }
 
-                if (xORy == 'x')
-                {
-                    pusher.X += movement;
-                }
-                else
-                    pusher.Y += movement;
-                pusher.Update();
+        //        if (xORy == 'x')
+        //        {
+        //            pusher.X += movement;
+        //        }
+        //        else
+        //            pusher.Y += movement;
+        //        pusher.Update();
 
-                for (int i = 0; i < pushedEntitiesSorted.Count; i++)
-                {
-                    var pushed = pushedEntitiesSorted[i];
-                    if(pushed.Item1 != pusher && pushedEntities[pushed.Item2].Item1 != null && pushed.Item1 != null)
-                    {
-                        if (pushed.Item1.Rect.Intersects(pushedEntities[pushed.Item2].Item1.Rect))
-                        {
-                            if (xORy == 'x')
-                            {
-                                if(movement <= 0)
-                                {
-                                    pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X - pushed.Item1.Size.X;
-                                    pushed.Item1.Update();
-                                }
-                                else
-                                {
-                                    pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X + pushedEntities[pushed.Item2].Item1.Size.X;
-                                    pushed.Item1.Update();
-                                }
+        //        for (int i = 0; i < pushedEntitiesSorted.Count; i++)
+        //        {
+        //            var pushed = pushedEntitiesSorted[i];
+        //            if(pushed.Item1 != pusher && pushedEntities[pushed.Item2].Item1 != null && pushed.Item1 != null)
+        //            {
+        //                if (pushed.Item1.Rect.Intersects(pushedEntities[pushed.Item2].Item1.Rect))
+        //                {
+        //                    if (xORy == 'x')
+        //                    {
+        //                        if(movement <= 0)
+        //                        {
+        //                            //pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X - pushed.Item1.Size.X;
+        //                            pushed.Item1.X += movement;
+        //                            pushed.Item1.Update();
+        //                        }
+        //                        else
+        //                        {
+        //                            //pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X + pushedEntities[pushed.Item2].Item1.Size.X;
+        //                            pushed.Item1.X += movement;
+        //                            pushed.Item1.Update();
+        //                        }
                             
-                            }
-                            else
-                            {
-                                if (movement <= 0)
-                                {
-                                    pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y - pushed.Item1.Size.Y;
-                                    pushed.Item1.Update();
-                                }
-                                else
-                                {
-                                    pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y + pushedEntities[pushed.Item2].Item1.Size.Y;
-                                    pushed.Item1.Update();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            pushedEntities[i] = (null, pushed.Item2);
-                        }
-                    }
-                }
-            }
-            return movement;
+        //                    }
+        //                    else
+        //                    {
+        //                        if (movement <= 0)
+        //                        {
+        //                            //pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y - pushed.Item1.Size.Y;
+        //                            pushed.Item1.Y += movement;
+        //                            pushed.Item1.Update();
+        //                        }
+        //                        else
+        //                        {
+        //                            //pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y + pushedEntities[pushed.Item2].Item1.Size.Y;
+        //                            pushed.Item1.Y += movement;
+        //                            pushed.Item1.Update();
+        //                        }
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    pushedEntities[i] = (null, pushed.Item2);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return movement;
 
-        }
+        //}
 
         void DestroyFamilyV3(List<(Entity, int)> pushedEntities, int id)
         {
@@ -869,5 +837,125 @@ namespace SurvivalGame
             pushedEntities[id] = (null, pushedEntities[id].Item2);
             return;
         }
+        void MoveV6(Entity pusher, char xORy, double movement, List<(Entity, double)> pushedEntties = null, bool firstTime = true)
+        {
+            if (pusher.Collision)
+            {
+                if(pushedEntties == null)
+                {
+                    pushedEntties = new List<(Entity, double)>() { (pusher, movement) };
+                }
+                int index = pushedEntties.Count - 1;
+
+                foreach(var i in pushedEntties)
+                {
+                    if(i.Item1 == pusher)
+                    {
+                        if(i.Item2 < movement)
+                        {
+                            index = pushedEntties.IndexOf(i);
+                        }
+                    }
+                }
+                if(index != pushedEntties.Count - 1)
+                    pushedEntties.Add((pusher, movement));
+
+
+                double oldX = pusher.Hitbox.X;
+                double oldY = pusher.Hitbox.Y;
+
+                if (xORy == 'x')
+                {
+                    pusher.Hitbox.X += movement;
+                    foreach (Entity entity in entities)
+                    {
+                        if (entity.Collision && entity != pusher)
+                        {
+                            double intersect = pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox).X;
+                            Console.WriteLine("Value: " + intersect);
+
+                            if (movement < 0 && intersect != 0)
+                            {
+                                //if (entity.Hitbox is Rect)
+                                //    movement += intersect;
+                                //else
+                                //    movement += intersect;
+
+                                //if (movement > 0)
+                                //    movement = 0;
+                                movement += intersect;
+                            }
+                            else
+                                movement -= intersect;
+                            //pusher.Hitbox.X = oldX;
+                            //if (intersect != 0)
+                            //{
+                            //    if (false) // too big mass
+                            //    {
+                            //        movement -= intersect;
+                            //    }
+                            //    else
+                            //    {
+                            //        pusher.Collision = false;
+                            //        movement -= MoveV6(entity, xORy, intersect, pushedEntties, false);
+                            //        pusher.Collision = true;
+                            //    }
+                            //}
+                        }
+                    }
+                    pusher.Hitbox.X = Math.Round(oldX + movement, 5);
+                }
+                else
+                {
+                    pusher.Hitbox.Y += movement;
+                    foreach (Entity entity in entities)
+                    {
+                        if (entity.Collision && entity != pusher)
+                        {
+                            double intersect = pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox).Y;
+                            if (movement < 0 && intersect != 0)
+                            {
+                                //if (entity.Hitbox is Rect)
+                                //    movement -= intersect;
+                                //else
+                                //    movement -= intersect;
+
+                                //if (movement > 0)
+                                //    movement = 0;
+                                movement += intersect;
+                            }
+                            else
+                                movement -= intersect;
+
+                            //pusher.Hitbox.Y = oldY;
+                            //if (intersect != 0)
+                            //{
+                            //    if (false) // too big mass
+                            //    {
+                            //        movement -= intersect;
+                            //    }
+                            //    else
+                            //    {
+                            //        pusher.Collision = false;
+                            //        movement -= MoveV6(entity, xORy, intersect, pushedEntties, false);
+                            //        pusher.Collision = true;
+                            //    }
+                            //}
+                        }
+                    }
+                    pusher.Hitbox.Y = Math.Round(oldY + movement, 5);
+                }
+                pusher.Update();
+                //if (firstTime)
+                //{
+                //    foreach
+                //}
+
+                
+            }
+        }
+
+
+
     }
 }
