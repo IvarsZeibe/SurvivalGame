@@ -180,23 +180,27 @@ namespace SurvivalGame
             }
 
             //spriteBatch.Draw(player.Texture, player.Rect, Color.White
-            spriteBatch.Draw(player.Texture, new Rectangle((int)(player.Hitbox.X - (player.Size.X / 2f)), (int)(player.Hitbox.Y - (player.Size.Y / 2f)), player.Size.X, player.Size.Y), Color.White);
+            //spriteBatch.Draw(player.Texture, new Rectangle((int)player.Hitbox.Left, (int)player.Hitbox.Top, player.Hitbox.Width, player.Hitbox.Height), Color.White);
+            spriteBatch.Draw(player.Texture, new Vector2((float)player.X, (float)player.Y), scale: new Vector2(2f, 1f));
+
+
             //spriteBatch.Draw(player.Texture, new Vector2((float)player.X, (float)player.Y), null, Color.White, 0, Vector2.Zero, new Vector2(player.Size.X / player.Texture.Width, player.Size.Y / player.Texture.Height), SpriteEffects.None, 0);
 
             foreach (var enemy in enemies)
             {
                 //spriteBatch.Draw(enemy.Texture, enemy.Rect, Color.White);
-                spriteBatch.Draw(enemy.Texture, new Rectangle((int)(enemy.Hitbox.X - (enemy.Rect.Width / 2f)), (int)(enemy.Hitbox.Y - (enemy.Rect.Height / 2f)), enemy.Rect.Width, enemy.Rect.Height), Color.White);
+                spriteBatch.Draw(enemy.Texture, new Rectangle((int)enemy.Hitbox.Left, (int)enemy.Hitbox.Top, enemy.Hitbox.Width, enemy.Hitbox.Height), Color.White);
                 //spriteBatch.Draw(enemy.Texture, new Rectangle((int)enemy.X + (enemy.Size.X / 2), (int)enemy.Y + (enemy.Size.Y / 2), enemy.Size.X, enemy.Size.Y), Color.White);
             }
             foreach (var wall in walls)
             {
-                spriteBatch.Draw(wall.Texture, wall.Rect, Color.White);
+                spriteBatch.Draw(wall.Texture, new Rectangle((int)wall.Hitbox.Left, (int)wall.Hitbox.Top, wall.Hitbox.Width, wall.Hitbox.Height), Color.White);
             }
             foreach (var sword in swords)
             {
-                spriteBatch.Draw(sword.Texture, sword.DrawRect, null, Color.White, sword.Rotation, new Vector2(0f, 0f), SpriteEffects.None, 0);
-                //spriteBatch.Draw(sword.Texture, sword.Rect, Color.White);
+                //spriteBatch.Draw(sword.Texture, sword.DrawRect, null, Color.White, sword.Rotation, new Vector2(0f, 0f), SpriteEffects.None, 0);
+                spriteBatch.Draw(sword.Texture, new Rectangle((int)sword.Drawing.X, (int)sword.Drawing.Y, sword.Drawing.Width, sword.Drawing.Height), null, Color.White, sword.Rotation, new Vector2(0f, 0f), SpriteEffects.None, 0);
+                //spriteBatch.Draw(sword.Texture, new Rectangle((int)sword.Hitbox.Left, (int)sword.Hitbox.Top, sword.Hitbox.Width, sword.Hitbox.Height), Color.White);
             }
 
             spriteBatch.Draw(mouseCursor.Texture, mouseCursor.Rect, Color.White);
@@ -231,7 +235,7 @@ namespace SurvivalGame
             //keyHistory = all pressed keys
             if (keysPressed.Contains("LeftButton"))
             {
-                //MakeWall();
+                MakeWall();
             }
             if (keyHistory.Contains("RightButton"))
             {
@@ -257,22 +261,26 @@ namespace SurvivalGame
             if (keyHistory.Contains(Keys.D.ToString()))
             {
                 //MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
-                MoveV6(player, 'x', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                //MoveV6(player, 'x', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
             }
             if (keyHistory.Contains(Keys.A.ToString()))
             {
                 //MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
-                MoveV6(player, 'x', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                //MoveV6(player, 'x', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
             }
             if (keyHistory.Contains(Keys.S.ToString()))
             {
                 //MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                MoveV6(player, 'y', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                //MoveV6(player, 'y', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
             }
             if (keyHistory.Contains(Keys.W.ToString()))
             {
                 //MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                MoveV6(player, 'y', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                //MoveV6(player, 'y', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
+                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
             }
             timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyHistory.Contains(Keys.Space.ToString()))
@@ -308,8 +316,8 @@ namespace SurvivalGame
             if (keyHistory.Contains(Keys.V.ToString()) && timeSinceSwordAttack > swordCooldown)
             {
                 timeSinceSwordAttack = 0f;
-                double yEdge = (player.Center.Y - mouseCursor.Center.Y);
-                double xEdge = (player.Center.X - mouseCursor.Center.X);
+                double yEdge = (player.Y - mouseCursor.Center.Y);
+                double xEdge = (player.X - mouseCursor.Center.X);
                 Sword sword = new Sword(textures["Sword"], player, (float)Math.Atan2(yEdge, xEdge));
                 swords.Add(sword);
                 entities.Add(sword);
@@ -408,7 +416,11 @@ namespace SurvivalGame
                     enemy.Movement(enemy.Hitbox.X - player.Hitbox.X, enemy.Hitbox.Y - player.Hitbox.Y);
                     //MoveV5(enemy, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
 
-                   // MoveV5(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                    // MoveV5(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+
+                    enemy.Move(enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
+                    enemy.Move(enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
+
                     foreach (var projectile in projectiles)
                     {
                         if (enemy.Rect.Intersects(projectile.Rect))
@@ -419,7 +431,8 @@ namespace SurvivalGame
                     }
                     foreach (var sword in swords)
                     {
-                        if (enemy.Rect.Intersects(sword.Rect) && !sword.hitEntities.Contains(enemy))
+                        //if (enemy.Rect.Intersects(sword.Rect) && !sword.hitEntities.Contains(enemy))
+                        if(sword.Hitbox.CollisionDetect(sword.Hitbox, enemy.Hitbox) != Vector2.Zero && !sword.hitEntities.Contains(enemy))
                         {
                             enemy.DamageEntity(sword.Damage, "Sword");
                             sword.hitEntities.Add(enemy);
@@ -504,7 +517,7 @@ namespace SurvivalGame
                     enemy.Update();
                     foreach (var entity in entities)
                     {
-                        if (enemy != entity && enemy.Rect.Intersects(entity.Rect))
+                        if (enemy != entity && enemy.Hitbox.CollisionDetect(enemy.Hitbox, entity.Hitbox) != Vector2.Zero)
                         {
                             suitableSpot = false;
                             break;
@@ -523,7 +536,9 @@ namespace SurvivalGame
         }
         void MakeWall()
         {
-            //var enemy = new Enemy(textures["Enemy"], mstate.X, mstate.Y);
+            //var enemy = new Enemy(textures["Enemy"], mstate.X, mstate.Y, rand.Next(19, 21), rand.Next(19, 21));
+            //enemy.Hitbox.Left = mstate.X;
+            //enemy.Hitbox.Top = mstate.Y;
             //enemy.Update();
             //foreach (var e in enemies)
             //{
@@ -544,7 +559,7 @@ namespace SurvivalGame
                 bool suitableSpot = true;
                 foreach (var w in walls)
                 {
-                    if (wall.Rect.Intersects(w.Rect))
+                    if (wall.Hitbox.CollisionDetect(wall.Hitbox, w.Hitbox) != Vector2.Zero)
                     {
                         suitableSpot = false;
                     }
@@ -569,7 +584,7 @@ namespace SurvivalGame
             bool intersects = false;
             foreach (var w in walls)
             {
-                if (!w.Collision && wallGhost.Rect.Intersects(w.Rect))
+                if (!w.Collision && wallGhost.Hitbox.CollisionDetect(wallGhost.Hitbox, w.Hitbox) != Vector2.Zero)
                 {
                     intersects = true;
                 }
@@ -598,364 +613,5 @@ namespace SurvivalGame
                 walls.Remove(wall);
             }
         }
-
-        //double MoveV5(Entity pusher, double movement, char xORy, List<(Entity, int)> pushedEntities = null, int parentId = -1, double mass = -1)
-        //{
-        //    if(mass == -1)
-        //    {
-        //        mass = pusher.Mass;
-        //    }
-        //    bool firstime = false;
-        //    if (pushedEntities == null)
-        //    {
-        //        pushedEntities = new List<(Entity, int)>() { (pusher, -1) };
-        //        firstime = true;
-        //    }
-        //    else //remove duplicate or destroy this duplicate
-        //    {
-        //        for(int i = 0; i < pushedEntities.Count; i++)
-        //        {
-        //            var tuple = pushedEntities[i];
-        //            if(tuple.Item1 == pusher)
-        //            {
-        //                if (xORy == 'x')
-        //                {
-        //                    if (movement >= 0)
-        //                    {
-        //                        if (pushedEntities[parentId].Item1.X + pushedEntities[parentId].Item1.Size.X > pushedEntities[tuple.Item2].Item1.X + pushedEntities[tuple.Item2].Item1.Size.X)
-        //                        {
-        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-        //                        }
-        //                        else
-        //                            return movement;
-        //                    }
-        //                    else
-        //                    {
-        //                        if (pushedEntities[parentId].Item1.X < pushedEntities[tuple.Item2].Item1.X)
-        //                        {
-        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-        //                        }
-        //                        else
-        //                            return movement;
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    if (movement >= 0)
-        //                    {
-        //                        if (pushedEntities[parentId].Item1.Y + pushedEntities[parentId].Item1.Size.Y > pushedEntities[tuple.Item2].Item1.Y + pushedEntities[tuple.Item2].Item1.Size.Y)
-        //                        {
-        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-        //                        }
-        //                        else
-        //                            return movement;
-        //                    }
-        //                    else
-        //                    {
-
-        //                        if (pushedEntities[parentId].Item1.Y < pushedEntities[tuple.Item2].Item1.Y)
-        //                        {
-        //                            DestroyFamilyV3(pushedEntities, pushedEntities.IndexOf(tuple));
-        //                        }
-        //                        else
-        //                            return movement;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        pushedEntities.Add((pusher, parentId));
-        //    }
-        //    int selfId = pushedEntities.Count - 1;
-
-        //    if (xORy == 'x') //move in x axis
-        //    {
-        //        double oldX = pusher.X;
-        //        foreach (var entity in entities)
-        //        {
-        //            pusher.X = oldX;
-        //            pusher.X += movement;
-        //            pusher.Update();
-
-        //            //if (pusher.Rect.Intersects(entity.Rect) && pusher != entity && entity.Collision && pusher.Collision)
-        //            if(pusher != entity && entity.Collision && pusher.Collision && pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox))
-        //            {
-        //                if(mass > entity.Mass) //can push
-        //                {
-        //                    pusher.X = oldX;
-        //                    pusher.Update();
-        //                    pusher.Collision = false;
-        //                    movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
-        //                    pusher.Collision = true;
-        //                }
-        //                else //cant push
-        //                {
-        //                    if (movement >= 0)
-        //                    {
-        //                        movement = entity.Rect.Left - (oldX + pusher.Size.X);
-        //                        if (movement < 0)
-        //                            movement = 0;
-        //                    }
-        //                    else
-        //                    {
-        //                        movement = entity.Rect.Right - (oldX);
-        //                        if (movement > 0)
-        //                            movement = 0;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        pusher.X = oldX;
-        //        pusher.Update();
-        //    }
-        //    else // move in y axis
-        //    {
-        //        double oldY = pusher.Y;
-        //        foreach (var entity in entities)
-        //        {
-        //            pusher.Y = oldY;
-        //            pusher.Y += movement;
-        //            pusher.Update();
-
-        //            if (pusher != entity && entity.Collision && pusher.Collision && pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox))
-        //            {
-        //                if (mass > entity.Mass) // can push
-        //                {
-        //                    pusher.Y = oldY;
-        //                    pusher.Update();
-        //                    pusher.Collision = false;
-        //                    movement = MoveV5(entity, movement, xORy, pushedEntities, selfId, mass);
-        //                    pusher.Collision = true;
-        //                }
-        //                else //cant push
-        //                {
-        //                    if (movement >= 0)
-        //                    {
-        //                        movement = entity.Rect.Top - (oldY + pusher.Size.Y);
-        //                        if (movement < 0)
-        //                            movement = 0;
-        //                    }
-        //                    else
-        //                    {
-        //                        movement = entity.Rect.Bottom - (oldY);
-        //                        if (movement > 0)
-        //                            movement = 0;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        pusher.Y = oldY;
-        //        pusher.Update();
-        //    }
-
-        //    if (firstime) //real push
-        //    {
-
-        //        var pushedEntitiesSorted = new List<(Entity, int)>();
-        //        for (int i = 0; i < pushedEntities.Count; i++)
-        //        {
-        //            if (pushedEntities[i].Item1 != null)
-        //            {
-        //                pushedEntitiesSorted.Add(pushedEntities[i]);
-        //            }
-
-        //        }
-        //        pushedEntitiesSorted = pushedEntitiesSorted.OrderBy(x => x.Item2).ToList();
-
-        //        for(int i = pushedEntitiesSorted.Count/3; i > 0; i--) //weakens push
-        //        {
-        //            movement *= 0.7;
-        //        }
-
-        //        if (xORy == 'x')
-        //        {
-        //            pusher.X += movement;
-        //        }
-        //        else
-        //            pusher.Y += movement;
-        //        pusher.Update();
-
-        //        for (int i = 0; i < pushedEntitiesSorted.Count; i++)
-        //        {
-        //            var pushed = pushedEntitiesSorted[i];
-        //            if(pushed.Item1 != pusher && pushedEntities[pushed.Item2].Item1 != null && pushed.Item1 != null)
-        //            {
-        //                if (pushed.Item1.Rect.Intersects(pushedEntities[pushed.Item2].Item1.Rect))
-        //                {
-        //                    if (xORy == 'x')
-        //                    {
-        //                        if(movement <= 0)
-        //                        {
-        //                            //pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X - pushed.Item1.Size.X;
-        //                            pushed.Item1.X += movement;
-        //                            pushed.Item1.Update();
-        //                        }
-        //                        else
-        //                        {
-        //                            //pushed.Item1.X = pushedEntities[pushed.Item2].Item1.X + pushedEntities[pushed.Item2].Item1.Size.X;
-        //                            pushed.Item1.X += movement;
-        //                            pushed.Item1.Update();
-        //                        }
-                            
-        //                    }
-        //                    else
-        //                    {
-        //                        if (movement <= 0)
-        //                        {
-        //                            //pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y - pushed.Item1.Size.Y;
-        //                            pushed.Item1.Y += movement;
-        //                            pushed.Item1.Update();
-        //                        }
-        //                        else
-        //                        {
-        //                            //pushed.Item1.Y = pushedEntities[pushed.Item2].Item1.Y + pushedEntities[pushed.Item2].Item1.Size.Y;
-        //                            pushed.Item1.Y += movement;
-        //                            pushed.Item1.Update();
-        //                        }
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    pushedEntities[i] = (null, pushed.Item2);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return movement;
-
-        //}
-
-        void DestroyFamilyV3(List<(Entity, int)> pushedEntities, int id)
-        {
-            for (int i = 0; i < pushedEntities.Count; i++)
-            {
-                if (pushedEntities[i].Item2 == id)
-                {
-                    DestroyFamilyV3(pushedEntities, i);
-                    pushedEntities[i] = (null, pushedEntities[i].Item2);
-                }
-            }
-            pushedEntities[id] = (null, pushedEntities[id].Item2);
-            return;
-        }
-        void MoveV6(Entity pusher, char xORy, double movement, List<(Entity, double)> pushedEntties = null, bool firstTime = true)
-        {
-            if (pusher.Collision)
-            {
-                if(pushedEntties == null)
-                {
-                    pushedEntties = new List<(Entity, double)>() { (pusher, movement) };
-                }
-                int index = pushedEntties.Count - 1;
-
-                foreach(var i in pushedEntties)
-                {
-                    if(i.Item1 == pusher)
-                    {
-                        if(i.Item2 < movement)
-                        {
-                            index = pushedEntties.IndexOf(i);
-                        }
-                    }
-                }
-                if(index != pushedEntties.Count - 1)
-                    pushedEntties.Add((pusher, movement));
-
-
-                double oldX = pusher.Hitbox.X;
-                double oldY = pusher.Hitbox.Y;
-
-                if (xORy == 'x')
-                {
-                    pusher.Hitbox.X += movement;
-                    foreach (Entity entity in entities)
-                    {
-                        if (entity.Collision && entity != pusher)
-                        {
-                            double intersect = pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox).X;
-                            Console.WriteLine("Value: " + intersect);
-
-                            if (movement < 0 && intersect != 0)
-                            {
-                                //if (entity.Hitbox is Rect)
-                                //    movement += intersect;
-                                //else
-                                //    movement += intersect;
-
-                                //if (movement > 0)
-                                //    movement = 0;
-                                movement += intersect;
-                            }
-                            else
-                                movement -= intersect;
-                            //pusher.Hitbox.X = oldX;
-                            //if (intersect != 0)
-                            //{
-                            //    if (false) // too big mass
-                            //    {
-                            //        movement -= intersect;
-                            //    }
-                            //    else
-                            //    {
-                            //        pusher.Collision = false;
-                            //        movement -= MoveV6(entity, xORy, intersect, pushedEntties, false);
-                            //        pusher.Collision = true;
-                            //    }
-                            //}
-                        }
-                    }
-                    pusher.Hitbox.X = Math.Round(oldX + movement, 5);
-                }
-                else
-                {
-                    pusher.Hitbox.Y += movement;
-                    foreach (Entity entity in entities)
-                    {
-                        if (entity.Collision && entity != pusher)
-                        {
-                            double intersect = pusher.Hitbox.CollisionDetect(pusher.Hitbox, entity.Hitbox).Y;
-                            if (movement < 0 && intersect != 0)
-                            {
-                                //if (entity.Hitbox is Rect)
-                                //    movement -= intersect;
-                                //else
-                                //    movement -= intersect;
-
-                                //if (movement > 0)
-                                //    movement = 0;
-                                movement += intersect;
-                            }
-                            else
-                                movement -= intersect;
-
-                            //pusher.Hitbox.Y = oldY;
-                            //if (intersect != 0)
-                            //{
-                            //    if (false) // too big mass
-                            //    {
-                            //        movement -= intersect;
-                            //    }
-                            //    else
-                            //    {
-                            //        pusher.Collision = false;
-                            //        movement -= MoveV6(entity, xORy, intersect, pushedEntties, false);
-                            //        pusher.Collision = true;
-                            //    }
-                            //}
-                        }
-                    }
-                    pusher.Hitbox.Y = Math.Round(oldY + movement, 5);
-                }
-                pusher.Update();
-                //if (firstTime)
-                //{
-                //    foreach
-                //}
-
-                
-            }
-        }
-
-
-
     }
 }

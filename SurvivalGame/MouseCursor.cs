@@ -11,6 +11,7 @@ namespace SurvivalGame
 {
     class MouseCursor : Entity
     {
+        Point Size;
         public MouseCursor(Texture2D texture)
         {
             Collision = false;

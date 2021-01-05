@@ -10,6 +10,7 @@ namespace SurvivalGame
 {
     class Projectile : Entity
     {
+        Point Size;
         public int Damage { get; set; }
         int Range { get; set; }
         public float Rotation { get; set; }

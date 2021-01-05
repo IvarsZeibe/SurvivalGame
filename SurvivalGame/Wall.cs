@@ -10,6 +10,8 @@ namespace SurvivalGame
 {
     class Wall : Entity
     {
+
+        //Point Size;
         bool ghost;
         float timeAlive;
         public Wall(Texture2D texture, double x, double y, bool collision = true)
@@ -22,12 +24,12 @@ namespace SurvivalGame
             //X = (int)(x / 50) * 50;
             //Y = (int)(y / 50) * 50;
             //Size = new Point(50, 50);
-            X = x;
-            Y = y;
-            Size = new Point(rand.Next(18, 20), rand.Next(18, 20));
+            //X = x;
+            //Y = y;
+            //Size = new Point(rand.Next(18, 20), rand.Next(18, 20));
             Collision = collision;
             ghost = !collision;
-            Hitbox = new Rect(X, Y, Size.X, Size.Y);
+            Hitbox = new Rect(x, y, 50, 50);
 
         }
         public void Update(GameTime gameTime)
@@ -38,8 +40,8 @@ namespace SurvivalGame
             {
                 isDead = true;
             }
-            Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
-            Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
+            //Center = new Vector2((float)X + Hitbox.Width / 2, (float)Y + Hitbox.Height / 2);
+            //Rect = new Rectangle((int)X, (int)Y, Hitbox.Width, Hitbox.Height);
         }
     }
 }

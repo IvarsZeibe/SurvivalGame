@@ -15,6 +15,7 @@ namespace SurvivalGame
         public float Rotation { get; set; }
         List<double> RelativCoord { get; set; }
         List<double> StartingCoord { get; set; }
+        Point Size;
         public Bullet(Texture2D texture, float speed, double x, double y, float rotation, Vector2 relativeMouse)
         {
             Mass = 1f;

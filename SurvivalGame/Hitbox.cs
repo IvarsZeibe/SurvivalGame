@@ -9,8 +9,16 @@ namespace SurvivalGame
 {
     class Hitbox
     {
+        //public bool Collision { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
+        public virtual double Left { get; set; }
+        public virtual double Top { get; set; }
+        public virtual double Right { get; set; }
+        public virtual double Bottom { get; set; }
+        public virtual int Width { get; set; }
+        public virtual int Height { get; set; }
+
         // Collsion using center coords
         // h1 = self hitbox
         // h2 = other hitbox
@@ -34,8 +42,8 @@ namespace SurvivalGame
 
         Vector2 CollisionRectRect(Rect h1, Rect h2)
         {
-            double distanceX = Math.Abs(h1.X - h2.X);
-            double distanceY = Math.Abs(h1.Y - h2.Y);
+            double distanceX = Math.Round(Math.Abs(h1.X - h2.X), 2);
+            double distanceY = Math.Round(Math.Abs(h1.Y - h2.Y), 2);
 
             if (distanceX >= (h1.Width + h2.Width) / 2f)
             {
@@ -50,8 +58,8 @@ namespace SurvivalGame
         }
         Vector2 CollisionRecCircle(Rect h1, Circle h2)
         {
-            double distanceX = Math.Abs(h1.X - h2.X);
-            double distanceY = Math.Abs(h1.Y - h2.Y);
+            double distanceX = Math.Round(Math.Abs(h1.X - h2.X), 2);
+            double distanceY = Math.Round(Math.Abs(h1.Y - h2.Y), 2);
 
             double halfWidth = h1.Width / 2f;
             double halfHeight = h1.Height / 2f;
@@ -65,16 +73,8 @@ namespace SurvivalGame
             {
                 return Vector2.Zero;
             }
-            //else if (Math.Sqrt(distanceX * distanceX + distanceY * distanceY) >= Math.Sqrt(halfWidth * halfWidth + halfHeight * halfHeight) + radius)
-            //{
-            //    return Vector2.Zero;
-            //}
             else
             {
-                double requiredDistance = Math.Sqrt(halfWidth * halfWidth + halfHeight + halfHeight) + radius;
-                //Console.WriteLine($"\nX: {radius + halfWidth - distanceX},{Math.Sqrt(requiredDistance * requiredDistance - distanceY * distanceY)}\n" +
-                //    $"Y: {radius + halfHeight - distanceY},{Math.Sqrt(requiredDistance * requiredDistance - distanceX * distanceX)}");
-
                 float cornerX = (float)(Math.Sqrt(radius * radius - (distanceY - halfHeight) * (distanceY - halfHeight)) - (distanceX - halfWidth));
                 if (cornerX < 0)
                 {
@@ -92,78 +92,59 @@ namespace SurvivalGame
                 return new Vector2(
                     distanceY > halfHeight ? cornerX : edgeX,
                     distanceX > halfWidth ? cornerY : edgeY);
-
-                //if (distanceY > halfHeight)
-                    //return new Vector2((float)cornerX, (float)cornerY);
-                //else
-                //    return new Vector2((float)(radius + halfWidth - distanceX), (float)(radius + halfHeight - distanceY));
-                //return new Vector2
-                //    (
-                //    (float)Math.Min(radius + halfWidth - distanceX, cornerX),
-                //    (float)Math.Min(radius + halfHeight - distanceY, cornerY)
-                //    );
             }
-
-            //Console.WriteLine($"{Math.Sqrt(distanceX * distanceX + distanceY * distanceY)}  { (Math.Sqrt(h1.Width * h1.Width + h1.Height * h1.Height) + Math.Sqrt(h2.Diameter * h2.Diameter)) / 2f}");
-
-                //if (Math.Sqrt(distanceX * distanceX + distanceY * distanceY) < (Math.Sqrt(halfWidth * halfWidth + halfHeight * halfHeight) + radius))
-                //{
-                //    //return overlapCorner
-
-                //    double requiredDistance = Math.Sqrt(halfWidth * halfWidth + halfHeight + halfHeight) + radius;
-                //    //double realDistance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
-
-                //    return new Vector2((float)Math.Sqrt(requiredDistance * requiredDistance - distanceY * distanceY), (float)Math.Sqrt(requiredDistance * requiredDistance - distanceX * distanceX));
-                //}
-                //else if (distanceX < radius + halfWidth && distanceY < radius + halfHeight)
-                //{
-                //    return new Vector2((float)(radius + halfWidth - distanceX), (float)(radius + halfHeight - radius));
-                //}
-                //else return Vector2.Zero;
-
-
-
-
-                //if (distanceX >= (h1.Width + h2.Diameter) / 2f)
-                //{
-                //    return Vector2.Zero;
-                //}
-                //else if (distanceY >= (h1.Height + h2.Diameter) / 2f)
-                //{
-                //    return Vector2.Zero;
-                //}
-                //else if (Math.Sqrt(distanceX * distanceX + distanceY * distanceY) >= (Math.Sqrt(h1.Width * h1.Width + h1.Height * h1.Height) + Math.Sqrt(h2.Diameter * h2.Diameter)) / 2f)
-                //{
-                //    return Vector2.Zero;
-                //}
-                //else if (distanceX >= (h1.Width + h2.Diameter) / 2f && distanceY >= (h1.Height + h2.Diameter) / 2f)
-                //{
-                //    double minimalX = Math.Sqrt(Math.Pow(Math.Sqrt(halfH1Width * halfH1Width + halfH1Height * halfH1Height) + h2.Diameter / 2, 2) - distanceY * distanceY);
-                //    double minimalY = Math.Sqrt(Math.Pow(Math.Sqrt(halfH1Width * halfH1Width + halfH1Height * halfH1Height) + h2.Diameter / 2, 2) - distanceX * distanceX);
-
-                //    return new Vector2((float)(minimalX - distanceX), (float)(minimalY - distanceY));
-                //}
-                //else
-                //{
-                //    return new Vector2((float)((h1.Width + h2.Diameter) / 2f - distanceX), (float)((h1.Height + h2.Diameter) / 2f - distanceY));
-                //}
         }
         Vector2 CollisionCircleCircle(Circle h1, Circle h2)
         {
-                double distanceX = Math.Abs(h1.X - h2.X);
-                double distanceY = Math.Abs(h1.Y - h2.Y);
+            double distanceX = Math.Round(Math.Abs(h1.X - h2.X), 2);
+            double distanceY = Math.Round(Math.Abs(h1.Y - h2.Y), 2);
 
-            if (distanceX * distanceX + distanceY * distanceY >= (h1.Diameter * h1.Diameter + h2.Diameter * h2.Diameter) / 2f)
+            double radius1 = h1.Diameter / 2f;
+            double radius2 = h2.Diameter / 2f;
+
+            double minimalDistance = radius1 + radius2;
+
+            if (distanceX * distanceX + distanceY * distanceY >= minimalDistance * minimalDistance)
             {
                 return Vector2.Zero;
             }
             else
             {
-                double minimalX = Math.Sqrt(h1.Diameter * h1.Diameter + h2.Diameter * h2.Diameter - distanceY * distanceY);
-                double minimalY = Math.Sqrt(h1.Diameter * h1.Diameter + h2.Diameter * h2.Diameter - distanceX * distanceX);
+                double minimalDistanceX = Math.Sqrt(minimalDistance * minimalDistance - distanceY * distanceY);
+                float offsetX = (float)(minimalDistanceX - distanceX);
+                //if (offsetX < 0)
+                //{
+                //    offsetX = 0;
+                //}
+                double minimalDistanceY = Math.Sqrt(minimalDistance * minimalDistance - distanceX * distanceX);
+                float offsetY = (float)(minimalDistanceY - distanceY);
+                //if (offsetY < 0)
+                //{
+                //    offsetY = 0;
+                //}
 
-                return new Vector2((float)(minimalX - distanceX), (float)(minimalY - distanceY));
+                //loat edgeX = (float)(radius2 + radius1 - distanceX);
+                //float edgeY = (float)(radius2 + radius1 - distanceY);
+
+                // return new Vector2(
+                //distanceY > radius1 ? offsetX : edgeX,
+                //distanceX > radius1 ? offsetY : edgeY);
+                return new Vector2(offsetX, offsetY);
             }
-            }
+            //double distanceX = Math.Abs(h1.X - h2.X);
+            //double distanceY = Math.Abs(h1.Y - h2.Y);
+
+            //if (distanceX * distanceX + distanceY * distanceY >= (h1.Diameter * h1.Diameter + h2.Diameter * h2.Diameter) / 2f)
+            //{
+            //    return Vector2.Zero;
+            //}
+            //else
+            //{
+            //    double minimalX = Math.Sqrt(h1.Diameter * h1.Diameter + h2.Diameter * h2.Diameter - distanceY * distanceY);
+            //    double minimalY = Math.Sqrt(h1.Diameter * h1.Diameter + h2.Diameter * h2.Diameter - distanceX * distanceX);
+
+            //    return new Vector2((float)(minimalX - distanceX), (float)(minimalY - distanceY));
+            //}
+        }
     }
 }

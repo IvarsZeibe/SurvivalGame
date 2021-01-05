@@ -17,14 +17,19 @@ namespace SurvivalGame
             //Force = 10;
             Collision = true;
             Speed = 1/200f;
-            X = 100;
-            Y = 100;
-            Size = new Point(124, 124);
+            //X = 100;
+            //Y = 100;
+            //Size = new Point(124, 124);
             Texture = texture;
-            Hitbox = new Circle(X, Y, 124);
-            Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
+            Hitbox = new Circle(100, 100, 200);
+            //Hitbox = new Rect(X, Y, 64, 64);
+            //Rect = new Rectangle((int)Hitbox.X, (int)Hitbox.Y, 124, 124);
         }
 
+        public readonly Vector2 Scale 
+        {
+            get => new Vector2(0.5, 0.5);
+        }
 
     }
 }
