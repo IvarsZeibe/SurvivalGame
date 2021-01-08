@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SurvivalGame
 {
-    public enum Direction { Left, Right, Up, Down};
+    enum Direction { Left, Right, Up, Down};
     class Entity
     {
         public bool Collision { get; set; }
@@ -63,7 +63,7 @@ namespace SurvivalGame
             return true;
         }
 
-        public float Move(double movement, bool xDirection, List<Entity> entities, List<(Entity movedEntity, float maxMovement)> movedEntities = null, float movementDecreaseTotal = 0f, float mass = 0)
+        public float Move(double movement, bool xDirection, List<(Entity movedEntity, float maxMovement)> movedEntities = null, float movementDecreaseTotal = 0f, float mass = 0)
         {
             bool first = false;
             float movementDecrease = 0f;
@@ -108,7 +108,7 @@ namespace SurvivalGame
             //pushing
             if (Collision)
             {
-                foreach (Entity entity in entities)
+                foreach (Entity entity in EntityTracker.Entities)
                 {
                     if (entity.Collision && entity != this)
                     {
@@ -129,7 +129,7 @@ namespace SurvivalGame
                                 Collision = false;
                                 if (movement < 0)
                                     intersection *= -1;
-                                float potencialDecrease = entity.Move(intersection, xDirection, entities, movedEntities, movementDecreaseTotal, mass);
+                                float potencialDecrease = entity.Move(intersection, xDirection, movedEntities, movementDecreaseTotal, mass);
                                 if (potencialDecrease > movementDecrease)
                                     movementDecrease = potencialDecrease;
                                 Collision = true;

@@ -31,7 +31,7 @@ namespace SurvivalGame
         //Enemy enemy;
         MouseCursor mouseCursor;
 
-        List<Entity> entities = new List<Entity>();
+        //List<Entity> entities = new List<Entity>();
         //List<Bullet> bullets = new List<Bullet>();
         List<Projectile> projectiles = new List<Projectile>();
         List<Enemy> enemies = new List<Enemy>();
@@ -81,14 +81,8 @@ namespace SurvivalGame
 
             textures.Add("Circle", this.Content.Load<Texture2D>("Circle"));
 
-            player = new Player(textures["Player"]);
-            entities.Add(player);
-            //for(int i = 0; i < 10; i++)
-            //{
-            //    enemies.Add(new Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500)));
-            //}
-            mouseCursor = new MouseCursor(textures["MouseCursor"]);
-            entities.Add(mouseCursor);
+            player = EntityTracker.Add.Player(textures["Player"]);
+            mouseCursor = EntityTracker.Add.MouseCursor(textures["MouseCursor"]);
 
             base.Initialize();
         }
@@ -175,7 +169,7 @@ namespace SurvivalGame
 
             spriteBatch.Begin(SpriteSortMode.BackToFront);
 
-            foreach(var entity in entities)
+            foreach(var entity in EntityTracker.Entities)
             {
                 spriteBatch.Draw(entity.Texture, entity.Drawing, null, Color.White, entity.Rotation, Vector2.Zero, SpriteEffects.None, entity.LayerDepth);
             }
@@ -225,19 +219,19 @@ namespace SurvivalGame
             }
             if (keyHistory.Contains(Keys.D.ToString()))
             {
-                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
+                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
             }
             else if (keyHistory.Contains(Keys.A.ToString()))
             {
-                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
+                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
             }
             if (keyHistory.Contains(Keys.S.ToString()))
             {
-                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
+                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
             }
             else if (keyHistory.Contains(Keys.W.ToString()))
             {
-                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
+                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
             }
             timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyHistory.Contains(Keys.Space.ToString()))
@@ -245,17 +239,15 @@ namespace SurvivalGame
                 if (bulletType == 0 && timeSinceLastShot > rateOfFire)
                 {
 
-                    Projectile projectile = new Projectile(textures["Bullet"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 100);
+                    Projectile projectile = EntityTracker.Add.Projectile(textures["Bullet"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 100);
                     projectiles.Add(projectile);
-                    entities.Add(projectile);
 
                     timeSinceLastShot = 0f;
                 }
                 else if (bulletType == 1 && timeSinceLastShot > rateOfFire)
                 {
-                    Projectile projectile = new Projectile(textures["Flame"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 200);
+                    Projectile projectile = EntityTracker.Add.Projectile(textures["Flame"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 200);
                     projectiles.Add(projectile);
-                    entities.Add(projectile);
 
                     timeSinceLastShot = 0f;
                 }
@@ -266,9 +258,9 @@ namespace SurvivalGame
                 timeSinceSwordAttack = 0f;
                 double yEdge = (player.Y - mouseCursor.Y);
                 double xEdge = (player.X - mouseCursor.X);
-                Sword sword = new Sword(textures["Sword"], player, (float)Math.Atan2(yEdge, xEdge));
+
+                Sword sword = EntityTracker.Add.Sword(textures["Sword"], player, (float)Math.Atan2(yEdge, xEdge));
                 swords.Add(sword);
-                entities.Add(sword);
             }
         }
         void OnKeyUp(List<string> keysReleased, GameTime gameTime)
@@ -351,7 +343,7 @@ namespace SurvivalGame
 
         void UpdateEntities(GameTime gameTime, List<Entity> deadEntities)
         {
-            foreach (var ent in entities)
+            foreach (var ent in EntityTracker.Entities)
             {
                 if (ent is Player)
                 {
@@ -366,8 +358,8 @@ namespace SurvivalGame
 
                     // MoveV5(enemy, enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
 
-                    enemy.Move(enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
-                    enemy.Move(enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
+                    enemy.Move(enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
+                    enemy.Move(enemy.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
 
                     foreach (var projectile in projectiles)
                     {
@@ -392,8 +384,8 @@ namespace SurvivalGame
                     Projectile projectile = ent as Projectile;
                     //MoveV5(projectile, projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
                     //MoveV5(projectile, projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                    projectile.Move(projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
-                    projectile.Move(projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
+                    projectile.Move(projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
+                    projectile.Move(projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
                     projectile.Update(gameTime);
                     foreach (var wall in walls)
                     {
@@ -427,6 +419,7 @@ namespace SurvivalGame
                 {
                     deadEntities.Add(ent);
                 }
+
             }
         }
 
@@ -434,7 +427,7 @@ namespace SurvivalGame
         {
             foreach (var entity in deadEntities)
             {
-                entities.Remove(entity);
+                EntityTracker.Entities.Remove(entity);
                 if (entity is Projectile)
                 {
                     projectiles.Remove(entity as Projectile);
@@ -464,12 +457,13 @@ namespace SurvivalGame
                     Enemy enemy;
                     bool suitableSpot = true;
                     if(rand.Next(2) == 1)
-                        enemy = new Enemy(textures["Circle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25));
+                        enemy = EntityTracker.Add.Enemy(textures["Circle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25));
                     else
-                        enemy = new Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35));
+                        enemy = EntityTracker.Add.Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35));
 
-                    enemy.Update();
-                    foreach (var entity in entities)
+                    enemies.Add(enemy);
+
+                    foreach (var entity in EntityTracker.Entities)
                     {
                         if (enemy != entity && enemy.Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero)
                         {
@@ -477,10 +471,10 @@ namespace SurvivalGame
                             break;
                         }
                     }
-                    if (suitableSpot)
+                    if (!suitableSpot)
                     {
-                        enemies.Add(enemy);
-                        entities.Add(enemy);
+                        enemies.Remove(enemy);
+                        EntityTracker.Entities.Remove(enemy);
                         break;
                     }
                     i++;
@@ -490,27 +484,30 @@ namespace SurvivalGame
         }
         void MakeWall()
         {
-            bool success = false;
+            bool success = true;
             if (timeSinceWallPlacement > wallPlacementCooldown)
             {
-                var wall = new Wall(textures["Wall"], mstate.X, mstate.Y);
-                wall.Update();
+                var wall = EntityTracker.Add.Wall(textures["Wall"], mstate.X, mstate.Y);
+                walls.Add(wall);
+
                 bool suitableSpot = true;
-                foreach (var w in entities)
+                foreach (var entity in EntityTracker.Entities)
                 {
-                    if (w is MouseCursor)
+                    if (entity is MouseCursor)
                         continue;
-                    if (wall.Hitbox.CollisionDetect(w.Hitbox) != Vector2.Zero)
+                    if (wall.Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero && entity != wall)
                     {
                         suitableSpot = false;
                     }
                 }
-                if (suitableSpot)
+                if (!suitableSpot)
                 {
-                    success = true;
-                    entities.Add(wall);
-                    walls.Add(wall);
+                    EntityTracker.Entities.Remove(wall);
+                    walls.Remove(wall);
+
                     timeSinceWallPlacement = 0f;
+
+                    success = false;
                 }
             }
             if (!success)
@@ -520,39 +517,44 @@ namespace SurvivalGame
         }
         void MakeGhost()
         {
-            var wallGhost = new Wall(textures["WallGhost"], mstate.X, mstate.Y, false);
-            wallGhost.Update();
+            var wallGhost = EntityTracker.Add.Wall(textures["WallGhost"], mstate.X, mstate.Y, false);
+            walls.Add(wallGhost);
+
             bool intersects = false;
             foreach (var w in walls)
             {
-                if (!w.Collision && wallGhost.Hitbox.CollisionDetect(w.Hitbox) != Vector2.Zero)
+                if (!w.Collision && wallGhost.Hitbox.CollisionDetect(w.Hitbox) != Vector2.Zero && w != wallGhost)
                 {
                     intersects = true;
                 }
             }
-            if (!intersects)
+            if (intersects)
             {
-                entities.Add(wallGhost);
-                walls.Add(wallGhost);
+                EntityTracker.Entities.Remove(wallGhost);
+                walls.Remove(wallGhost);
             }
         }
         void DeleteWall()
         {
-            Wall wall = null;
-            bool targetFound = false;
-            foreach (var w in walls)
+            //Wall wall = null;
+            foreach (var wall in walls)
             {
-                if (w.Collision && w.Hitbox.CollisionDetect(mouseCursor.Hitbox) != Vector2.Zero)
+                if (wall.Collision && wall.Hitbox.CollisionDetect(mouseCursor.Hitbox) != Vector2.Zero)
                 {
-                    targetFound = true;
-                    wall = w;
+                    //targetFound = true;
+                    //wall = w;
+                    wall.isDead = true;
+                    walls.Remove(wall);
+                    break;
                 }
             }
-            if (targetFound)
-            {
-                entities.Remove(wall);
-                walls.Remove(wall);
-            }
+            //if(targetFound)
+            //    walls.Remove(wall);
+            //if (targetFound)
+            //{
+            //    entities.Remove(wall);
+            //    walls.Remove(wall);
+            //}
         }
     }
 }

@@ -11,7 +11,7 @@ namespace SurvivalGame
 {
     class Enemy : Entity
     {
-        public Enemy(Texture2D texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true)
+        public Enemy(Texture2D texture, float x, float y, int width, int height, int speed, bool collision)
         {
             if(height == 0)
                 Hitbox = new Circle(x, y, width);
