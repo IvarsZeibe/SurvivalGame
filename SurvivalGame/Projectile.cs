@@ -10,10 +10,8 @@ namespace SurvivalGame
 {
     class Projectile : Entity
     {
-        Point Size;
         public int Damage { get; set; }
         int Range { get; set; }
-        public float Rotation { get; set; }
         List<double> RelativCoord { get; set; }
         List<double> StartingCoord { get; set; }
         public Projectile(Texture2D texture, float speed, Vector2 source, Vector2 target, int damage)
@@ -22,12 +20,10 @@ namespace SurvivalGame
             StartingCoord = new List<double>() { source.X, source.Y };
             RelativCoord = new List<double>() { 0, 0 };
             Range = 300;
-            Size = new Point(10, 2);
 
             Texture = texture;
             Speed = speed;
-            X = source.X;
-            Y = source.Y;
+            Hitbox = new Rect(source.X, source.Y, 10, 2);
             Damage = damage;
 
             double yEdge = (source.Y - target.Y);
@@ -40,9 +36,6 @@ namespace SurvivalGame
         }
         public void Update(GameTime gameTime)
         {
-            //Force = Mass * Speed;
-            Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
-            Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
 
             if (XMovement > 0)
             {
@@ -59,14 +52,6 @@ namespace SurvivalGame
             {
                 isDead = true;
             }
-        }
-        public bool Detect(Entity entity)
-        {
-            if (this.Rect.Intersects(entity.Rect))
-            {
-                return true;
-            }
-            return false;
         }
     }
 }

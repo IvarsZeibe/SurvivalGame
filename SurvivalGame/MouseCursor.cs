@@ -11,20 +11,17 @@ namespace SurvivalGame
 {
     class MouseCursor : Entity
     {
-        Point Size;
         public MouseCursor(Texture2D texture)
         {
+            LayerDepth = 0f;
             Collision = false;
-            Size = new Point(3, 3);
             Texture = texture;
+            Hitbox = new Rect(0, 0, 3, 3);
         }
         public void Update(MouseState mstate)
         {
-            X = mstate.X;
-            Y = mstate.Y;
-
-            Center = new Vector2((float)X + Size.X / 2, (float)Y + Size.Y / 2);
-            Rect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
+            Hitbox.X = mstate.X;
+            Hitbox.Y = mstate.Y;
         }
     }
 }

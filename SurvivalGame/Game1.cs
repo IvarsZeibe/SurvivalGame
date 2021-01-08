@@ -77,8 +77,9 @@ namespace SurvivalGame
             color.A = 100;
             textures.Add("WallGhost", CreateTexture(color));
 
-
             textures.Add("Player", this.Content.Load<Texture2D>("Untitled"));
+
+            textures.Add("Circle", this.Content.Load<Texture2D>("Circle"));
 
             player = new Player(textures["Player"]);
             entities.Add(player);
@@ -87,7 +88,7 @@ namespace SurvivalGame
             //    enemies.Add(new Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500)));
             //}
             mouseCursor = new MouseCursor(textures["MouseCursor"]);
-            //entities.Add(mouseCursor);
+            entities.Add(mouseCursor);
 
             base.Initialize();
         }
@@ -170,54 +171,18 @@ namespace SurvivalGame
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.ForestGreen);
-
             // TODO: Add your drawing code here
-            spriteBatch.Begin();
 
-            foreach (var projectile in projectiles)
+            spriteBatch.Begin(SpriteSortMode.BackToFront);
+
+            foreach(var entity in entities)
             {
-                spriteBatch.Draw(projectile.Texture, projectile.Rect, null, Color.White, projectile.Rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0);
+                spriteBatch.Draw(entity.Texture, entity.Drawing, null, Color.White, entity.Rotation, Vector2.Zero, SpriteEffects.None, entity.LayerDepth);
             }
-
-            //spriteBatch.Draw(player.Texture, player.Rect, Color.White
-            //spriteBatch.Draw(player.Texture, new Rectangle((int)player.Hitbox.Left, (int)player.Hitbox.Top, player.Hitbox.Width, player.Hitbox.Height), Color.White);
-            spriteBatch.Draw(player.Texture, new Vector2((float)player.X, (float)player.Y), scale: new Vector2(2f, 1f));
-
-
-            //spriteBatch.Draw(player.Texture, new Vector2((float)player.X, (float)player.Y), null, Color.White, 0, Vector2.Zero, new Vector2(player.Size.X / player.Texture.Width, player.Size.Y / player.Texture.Height), SpriteEffects.None, 0);
-
-            foreach (var enemy in enemies)
-            {
-                //spriteBatch.Draw(enemy.Texture, enemy.Rect, Color.White);
-                spriteBatch.Draw(enemy.Texture, new Rectangle((int)enemy.Hitbox.Left, (int)enemy.Hitbox.Top, enemy.Hitbox.Width, enemy.Hitbox.Height), Color.White);
-                //spriteBatch.Draw(enemy.Texture, new Rectangle((int)enemy.X + (enemy.Size.X / 2), (int)enemy.Y + (enemy.Size.Y / 2), enemy.Size.X, enemy.Size.Y), Color.White);
-            }
-            foreach (var wall in walls)
-            {
-                spriteBatch.Draw(wall.Texture, new Rectangle((int)wall.Hitbox.Left, (int)wall.Hitbox.Top, wall.Hitbox.Width, wall.Hitbox.Height), Color.White);
-            }
-            foreach (var sword in swords)
-            {
-                //spriteBatch.Draw(sword.Texture, sword.DrawRect, null, Color.White, sword.Rotation, new Vector2(0f, 0f), SpriteEffects.None, 0);
-                spriteBatch.Draw(sword.Texture, new Rectangle((int)sword.Drawing.X, (int)sword.Drawing.Y, sword.Drawing.Width, sword.Drawing.Height), null, Color.White, sword.Rotation, new Vector2(0f, 0f), SpriteEffects.None, 0);
-                //spriteBatch.Draw(sword.Texture, new Rectangle((int)sword.Hitbox.Left, (int)sword.Hitbox.Top, sword.Hitbox.Width, sword.Hitbox.Height), Color.White);
-            }
-
-            spriteBatch.Draw(mouseCursor.Texture, mouseCursor.Rect, Color.White);
-
 
             spriteBatch.End();
             base.Draw(gameTime);
         }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -231,8 +196,8 @@ namespace SurvivalGame
         }
         void OnKeyDown(List<string> keysPressed, GameTime gameTime)
         {
-            //keysPressed = new key
-            //keyHistory = all pressed keys
+            ///keysPressed = new key
+            ///keyHistory = all pressed keys
             if (keysPressed.Contains("LeftButton"))
             {
                 MakeWall();
@@ -260,26 +225,18 @@ namespace SurvivalGame
             }
             if (keyHistory.Contains(Keys.D.ToString()))
             {
-                //MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
-                //MoveV6(player, 'x', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
                 player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
             }
-            if (keyHistory.Contains(Keys.A.ToString()))
+            else if (keyHistory.Contains(Keys.A.ToString()))
             {
-                //MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'x');
-                //MoveV6(player, 'x', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
                 player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
             }
             if (keyHistory.Contains(Keys.S.ToString()))
             {
-                //MoveV5(player, player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                //MoveV6(player, 'y', player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
                 player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
             }
-            if (keyHistory.Contains(Keys.W.ToString()))
+            else if (keyHistory.Contains(Keys.W.ToString()))
             {
-                //MoveV5(player, -player.Speed * gameTime.ElapsedGameTime.TotalSeconds, 'y');
-                //MoveV6(player, 'y', -player.Speed * gameTime.ElapsedGameTime.TotalSeconds);
                 player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
             }
             timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -288,7 +245,7 @@ namespace SurvivalGame
                 if (bulletType == 0 && timeSinceLastShot > rateOfFire)
                 {
 
-                    Projectile projectile = new Projectile(textures["Bullet"], 500f, player.Center, mouseCursor.Center, 100);
+                    Projectile projectile = new Projectile(textures["Bullet"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 100);
                     projectiles.Add(projectile);
                     entities.Add(projectile);
 
@@ -296,28 +253,19 @@ namespace SurvivalGame
                 }
                 else if (bulletType == 1 && timeSinceLastShot > rateOfFire)
                 {
-                    Projectile projectile = new Projectile(textures["Flame"], 300f, player.Center, mouseCursor.Center, 20);
+                    Projectile projectile = new Projectile(textures["Flame"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 200);
                     projectiles.Add(projectile);
                     entities.Add(projectile);
 
                     timeSinceLastShot = 0f;
                 }
             }
-            //if (keyHistory.Contains(Keys.Space.ToString()) && timeSinceLastShot > rateOfFire)
-            //{
-            //    timeSinceLastShot = 0f;
-            //    double yEdge = (player.Center.Y - mouseCursor.Center.Y);
-            //    double xEdge = (player.Center.X - mouseCursor.Center.X);
-            //    Bullet bullet = new Bullet(textures["Bullet"], 500f, player.Center.X, player.Center.Y, (float)Math.Atan2(yEdge, xEdge), new Vector2((float)xEdge, (float)yEdge));
-            //    bullets.Add(bullet);
-            //    entities.Add(bullet);
-            //}
             timeSinceSwordAttack += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyHistory.Contains(Keys.V.ToString()) && timeSinceSwordAttack > swordCooldown)
             {
                 timeSinceSwordAttack = 0f;
-                double yEdge = (player.Y - mouseCursor.Center.Y);
-                double xEdge = (player.X - mouseCursor.Center.X);
+                double yEdge = (player.Y - mouseCursor.Y);
+                double xEdge = (player.X - mouseCursor.X);
                 Sword sword = new Sword(textures["Sword"], player, (float)Math.Atan2(yEdge, xEdge));
                 swords.Add(sword);
                 entities.Add(sword);
@@ -412,7 +360,7 @@ namespace SurvivalGame
                 else if (ent is Enemy)
                 {
                     Enemy enemy = ent as Enemy;
-                    enemy.Update(gameTime);
+                    enemy.Update();
                     enemy.Movement(enemy.Hitbox.X - player.Hitbox.X, enemy.Hitbox.Y - player.Hitbox.Y);
                     //MoveV5(enemy, enemy.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
 
@@ -423,7 +371,7 @@ namespace SurvivalGame
 
                     foreach (var projectile in projectiles)
                     {
-                        if (enemy.Rect.Intersects(projectile.Rect))
+                        if (enemy.Hitbox.CollisionDetect(projectile.Hitbox) != Vector2.Zero)
                         {
                             enemy.DamageEntity(projectile.Damage, "Projectile");
                             projectile.isDead = true;
@@ -431,8 +379,7 @@ namespace SurvivalGame
                     }
                     foreach (var sword in swords)
                     {
-                        //if (enemy.Rect.Intersects(sword.Rect) && !sword.hitEntities.Contains(enemy))
-                        if(sword.Hitbox.CollisionDetect(sword.Hitbox, enemy.Hitbox) != Vector2.Zero && !sword.hitEntities.Contains(enemy))
+                        if(sword.Hitbox.CollisionDetect(enemy.Hitbox) != Vector2.Zero && !sword.hitEntities.Contains(enemy))
                         {
                             enemy.DamageEntity(sword.Damage, "Sword");
                             sword.hitEntities.Add(enemy);
@@ -445,10 +392,12 @@ namespace SurvivalGame
                     Projectile projectile = ent as Projectile;
                     //MoveV5(projectile, projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, 'x');
                     //MoveV5(projectile, projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, 'y');
+                    projectile.Move(projectile.XMovement * gameTime.ElapsedGameTime.TotalSeconds, true, entities);
+                    projectile.Move(projectile.YMovement * gameTime.ElapsedGameTime.TotalSeconds, false, entities);
                     projectile.Update(gameTime);
                     foreach (var wall in walls)
                     {
-                        if (projectile.Detect(wall) && wall.Collision)
+                        if (projectile.Hitbox.CollisionDetect(wall.Hitbox) != Vector2.Zero && wall.Collision)
                         {
                             projectile.isDead = true;
                         }
@@ -507,17 +456,22 @@ namespace SurvivalGame
 
         void SpawnEnemy(GameTime gameTime)
         {
-            if (timeSinceEnemySpawn > enemySpawnRate && enemies.Count < 1)
+            if (timeSinceEnemySpawn > enemySpawnRate && enemies.Count < 100 )
             {
                 int i = 0;
                 while (i < 10)
                 {
+                    Enemy enemy;
                     bool suitableSpot = true;
-                    var enemy = new Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35));
+                    if(rand.Next(2) == 1)
+                        enemy = new Enemy(textures["Circle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25));
+                    else
+                        enemy = new Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35));
+
                     enemy.Update();
                     foreach (var entity in entities)
                     {
-                        if (enemy != entity && enemy.Hitbox.CollisionDetect(enemy.Hitbox, entity.Hitbox) != Vector2.Zero)
+                        if (enemy != entity && enemy.Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero)
                         {
                             suitableSpot = false;
                             break;
@@ -536,30 +490,17 @@ namespace SurvivalGame
         }
         void MakeWall()
         {
-            //var enemy = new Enemy(textures["Enemy"], mstate.X, mstate.Y, rand.Next(19, 21), rand.Next(19, 21));
-            //enemy.Hitbox.Left = mstate.X;
-            //enemy.Hitbox.Top = mstate.Y;
-            //enemy.Update();
-            //foreach (var e in enemies)
-            //{
-            //    if (enemy.Rect.Intersects(e.Rect) && e.Collision)
-            //    {
-            //        enemy.Texture = textures["Player"];
-            //        enemy.Collision = false;
-            //    }
-            //}
-            //enemies.Add(enemy);
-            //entities.Add(enemy);
-
             bool success = false;
             if (timeSinceWallPlacement > wallPlacementCooldown)
             {
                 var wall = new Wall(textures["Wall"], mstate.X, mstate.Y);
                 wall.Update();
                 bool suitableSpot = true;
-                foreach (var w in walls)
+                foreach (var w in entities)
                 {
-                    if (wall.Hitbox.CollisionDetect(wall.Hitbox, w.Hitbox) != Vector2.Zero)
+                    if (w is MouseCursor)
+                        continue;
+                    if (wall.Hitbox.CollisionDetect(w.Hitbox) != Vector2.Zero)
                     {
                         suitableSpot = false;
                     }
@@ -584,7 +525,7 @@ namespace SurvivalGame
             bool intersects = false;
             foreach (var w in walls)
             {
-                if (!w.Collision && wallGhost.Hitbox.CollisionDetect(wallGhost.Hitbox, w.Hitbox) != Vector2.Zero)
+                if (!w.Collision && wallGhost.Hitbox.CollisionDetect(w.Hitbox) != Vector2.Zero)
                 {
                     intersects = true;
                 }
@@ -601,7 +542,7 @@ namespace SurvivalGame
             bool targetFound = false;
             foreach (var w in walls)
             {
-                if (w.Collision && w.Rect.Contains(mstate.X, mstate.Y))
+                if (w.Collision && w.Hitbox.CollisionDetect(mouseCursor.Hitbox) != Vector2.Zero)
                 {
                     targetFound = true;
                     wall = w;

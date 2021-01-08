@@ -2,7 +2,7 @@
 
 namespace SurvivalGame
 {
-#if WINDOWS || LINUX
+//#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -18,5 +18,5 @@ namespace SurvivalGame
                 game.Run();
         }
     }
-#endif
+//#endif
 }

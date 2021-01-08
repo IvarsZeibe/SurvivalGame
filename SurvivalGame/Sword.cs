@@ -8,114 +8,86 @@ using System.Threading.Tasks;
 
 namespace SurvivalGame
 {
-    class Sword:Entity
+    class Sword : Entity
     {
         public List<Entity> hitEntities = new List<Entity>();
-        //public Rectangle DrawRect;
-        //Point Hitbox { get; set; }
-        public Hitbox Drawing { get; set; }
         float StartingRotation { get; set; }
-        public float Rotation { get; set; }
-        int Direction { get; set; }
+        Direction Direction { get; set; }
         Entity Player { get; set; }
         float timeAlive;
         float timeTillDeath = 0.2f;
         public int Damage { get; set; }
+        public override Rectangle Drawing
+        {
+            get => new Rectangle((int)Player.Hitbox.X, (int)Player.Hitbox.Y, 150, 2);
+            //get => new Rectangle((int)Hitbox.Left, (int)Hitbox.Top, Hitbox.Width, Hitbox.Width);
+        }
         public Sword(Texture2D texture, Entity player, float rotation)
         {
             Damage = 100;
             Collision = false;
             Mass = 1f;
-            //Hitbox = new Point(80, 60);
-            Hitbox = new Rect(player.Hitbox.X, player.Hitbox.Y, 150, 120);
-            //Size = new Point(150, 2);
-            Drawing = new Rect(player.Hitbox.X, player.Hitbox.Y, 150, 2);
+            Hitbox = new Circle(player.Hitbox.X, player.Hitbox.Y, 150);
+            //Hitbox = new Rect(player.Hitbox.X, player.Hitbox.Y, 150, 150);
             Texture = texture;
             Player = player;
+
             //right
             if(rotation >= -0.8 && rotation < 0.8)
             {
                 StartingRotation = -2.4f;
-                Direction = 0;
+                Direction = Direction.Left;
             }
             //down
             else if (rotation >= 0.8 && rotation < 2.4)
             {
                 StartingRotation = -0.8f;
-                Direction = 1;
+                Direction = Direction.Down;
             }
             //up
             else if (rotation >= -2.4 && rotation < -0.8)
             {
                 StartingRotation = 2.4f;
-                Direction = 2;
+                Direction = Direction.Up;
             }
             //right
             else if (rotation >= 2.4 || rotation < -2.4)
             {
                 StartingRotation = 0.8f;
-                Direction = 3;
+                Direction = Direction.Right;
             }
             Rotation = StartingRotation;
+            UpdateCoord();
         }
+
         public void Update(GameTime gameTime)
         {
-            //Force = Mass * Speed;
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            //Hitbox.X = Player.X;
-            //Hitbox.Y = Player.Y;
             Rotation = timeAlive * -1.8f / timeTillDeath + StartingRotation;
-            //DrawRect = new Rectangle((int)X, (int)Y, Size.X, Size.Y);
             if (timeAlive > timeTillDeath)
             {
                 isDead = true;
             }
+            UpdateCoord();
+        }
+        private void UpdateCoord()
+        {
             switch (Direction)
             {
-                case 3:
-                    //Drawing.X = Player.Hitbox.X;
+                case Direction.Right:
                     Hitbox.Left = Player.Hitbox.X;
-                    //Rect = new Rectangle(Player.Rect.Right, (int)Y - Hitbox.X / 2, Hitbox.Y, Size.X);
                     break;
-                case 2:
-                    //Drawing.Y = Player.Hitbox.X;
+                case Direction.Up:
                     Hitbox.Top = Player.Hitbox.Y;
-                    //Rect = new Rectangle((int)X - Hitbox.X / 2, Player.Rect.Bottom, Hitbox.X, Hitbox.Y);
                     break;
-                case 1:
-                    //Drawing.Y = Player.Hitbox.X;
+                case Direction.Down:
                     Hitbox.Bottom = Player.Hitbox.Y;
-                    //Rect = new Rectangle((int)X - Hitbox.X / 2, Player.Rect.Top - Hitbox.Y, Hitbox.X, Hitbox.Y);
                     break;
-                case 0:
-                    //Drawing.X = Player.Hitbox.X;
+                case Direction.Left:
                     Hitbox.Right = Player.Hitbox.X;
-                    //Rect = new Rectangle(Player.Rect.Left - Hitbox.Y, (int)Y - Hitbox.X / 2, Hitbox.Y, Size.X);
                     break;
             }
-            Drawing.X = Player.Hitbox.X;
-            Drawing.Y = Player.Hitbox.Y;
-            ////right
-            //else if (Rotation >= -0.8 && Rotation < 0.8)
-            //{
-            //    Rect = new Rectangle(Player.Rect.Right, (int)Y - Hitbox.X / 2, Hitbox.Y, Hitbox.X);
-            //}
-            ////down
-            //else if (Rotation >= 0.8 && Rotation < 2.4)
-            //{
-            //    Rect = new Rectangle((int)X - Hitbox.X / 2, Player.Rect.Bottom, Hitbox.X, Hitbox.Y);
-            //}
-            ////up
-            //else if (Rotation >= -2.4 && Rotation < -0.8)
-            //{
-            //    Rect = new Rectangle((int)X - Hitbox.X / 2, Player.Rect.Top - Hitbox.Y, Hitbox.X, Hitbox.Y);
-            //}
-            ////left
-            //else if (Rotation >= 2.4 || Rotation < -2.4)
-            //{
-            //    Rect = new Rectangle(Player.Rect.Left - Hitbox.Y, (int)Y - Hitbox.X / 2, Hitbox.Y, Size.X);
-            //}
+
         }
     }
 }
