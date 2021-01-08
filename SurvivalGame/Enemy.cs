@@ -11,7 +11,8 @@ namespace SurvivalGame
 {
     class Enemy : Entity
     {
-        public Enemy(Texture2D texture, float x, float y, int width, int height, int speed, bool collision)
+        private Entity Target { get; set; }
+        public Enemy(Texture2D texture, float x, float y, int width, int height, int speed, bool collision, Entity target)
         {
             if(height == 0)
                 Hitbox = new Circle(x, y, width);
@@ -22,12 +23,45 @@ namespace SurvivalGame
             Speed = speed;
             Health = 300;
             Texture = texture;
-
+            Target = target;
         }
-        public void Movement(double xedge, double yedge)
+        public override void Update(GameTime gameTime)
         {
-            XMovement = -xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
-            YMovement = -yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
+            Movement();
+            Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
+            Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
+
+            foreach (var projectile in EntityTracker.Projectiles)
+            {
+                if (CollidesWith(projectile))
+                {
+                    DamageEntity(projectile.Damage, "Projectile");
+                    projectile.isDead = true;
+                }
+            }
+            foreach (var sword in EntityTracker.Swords)
+            {
+                if (sword.CollidesWith(this) && !sword.hitEntities.Contains(this))
+                {
+                    DamageEntity(sword.Damage, "Sword");
+                    sword.hitEntities.Add(this);
+                }
+            }
+        }
+        private void Movement()
+        {
+            if (Target == null)
+            {
+                XMovement = 0;
+                YMovement = 0;
+            }
+            else
+            {
+                double xedge = Hitbox.X - Target.Hitbox.X;
+                double yedge = Hitbox.Y - Target.Hitbox.Y;
+                XMovement = -xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
+                YMovement = -yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
+            }
 
         }
         public override bool DamageEntity(int damage, string source)

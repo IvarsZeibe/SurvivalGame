@@ -34,8 +34,10 @@ namespace SurvivalGame
             XMovement = -relativeMouse.X / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
             YMovement = -relativeMouse.Y / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
         }
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
+            Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
+            Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
 
             if (XMovement > 0)
             {
@@ -51,6 +53,14 @@ namespace SurvivalGame
             if (RelativCoord[0] * RelativCoord[0] + RelativCoord[1] * RelativCoord[1] > Range * Range)
             {
                 isDead = true;
+            }
+
+            foreach (var wall in EntityTracker.Walls)
+            {
+                if (CollidesWith(wall) && wall.Collision)
+                {
+                    isDead = true;
+                }
             }
         }
     }

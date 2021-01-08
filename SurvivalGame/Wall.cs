@@ -22,7 +22,7 @@ namespace SurvivalGame
             Hitbox = new Rect(x, y, 50, 50);
 
         }
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(ghost && timeAlive > 0.1)

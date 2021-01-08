@@ -60,7 +60,7 @@ namespace SurvivalGame
             UpdateCoord();
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
             Rotation = timeAlive * -1.8f / timeTillDeath + StartingRotation;

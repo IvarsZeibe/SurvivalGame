@@ -56,13 +56,17 @@ namespace SurvivalGame
         {
             get => new Rectangle((int)Hitbox.Left, (int)Hitbox.Top, Hitbox.Width, Hitbox.Height);
         }
-        public virtual void Update() { }
+        //public virtual void Update() { }
+        public virtual void Update(GameTime gameTime) { }
         public virtual bool DamageEntity(int damage, string source)
         {
             Health -= damage;
             return true;
         }
-
+        public bool CollidesWith(Entity entity)
+        {
+            return Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero;
+        }
         public float Move(double movement, bool xDirection, List<(Entity movedEntity, float maxMovement)> movedEntities = null, float movementDecreaseTotal = 0f, float mass = 0)
         {
             bool first = false;
@@ -175,11 +179,8 @@ namespace SurvivalGame
                         tupl.movedEntity.Hitbox.Y -= movmentDecrease;
                         tupl.movedEntity.Hitbox.Y = Math.Round(tupl.movedEntity.Hitbox.Y, 2);
                     }
-                    tupl.movedEntity.Update();
-
                 }
                 return 0f;
-
             }
             else
             {

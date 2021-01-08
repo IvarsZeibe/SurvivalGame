@@ -18,8 +18,9 @@ namespace SurvivalGame
             Texture = texture;
             Hitbox = new Rect(0, 0, 3, 3);
         }
-        public void Update(MouseState mstate)
+        public override void Update(GameTime gameTime)
         {
+            MouseState mstate = Mouse.GetState();
             Hitbox.X = mstate.X;
             Hitbox.Y = mstate.Y;
         }
