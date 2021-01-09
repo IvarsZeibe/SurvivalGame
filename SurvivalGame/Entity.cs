@@ -11,35 +11,23 @@ namespace SurvivalGame
     enum Direction { Left, Right, Up, Down};
     class Entity
     {
+        public Texture2D Texture { get; set; }
+        public Hitbox Hitbox { get; set; }
         public bool Collision { get; set; }
         public int Health { get; set; }
-        public Texture2D Texture { get; set; }
-        public float Mass { get; set; }
-        public double XMovement { get; set; }
-        public double YMovement { get; set; }
-        public Hitbox Hitbox { get; set; }
-        public bool isDead = false;
+        public int Mass { get; set; }
+        public Color Color { get; set; } = Color.White;
+        public bool IsDead { get; set; } = false;
 
-        float speed;
+        protected float speed;
         public float Speed 
         { 
             get => speed;
             set { speed = 1 / value; } 
         }
 
-        protected float rotation = 0f;
-        public float Rotation
-        {
-            get => rotation;
-            set => rotation = value;
-        }
-
-        protected float layerDepth = 0.5f;
-        public float LayerDepth
-        {
-            get => layerDepth;
-            set => layerDepth = value;
-        }
+        public float Rotation { get; set; } = 0f;
+        public float LayerDepth { get; set; } = 0.5f;
 
         public float X 
         {
@@ -52,11 +40,12 @@ namespace SurvivalGame
             get => (float)Hitbox.Y;
             set => Hitbox.Y = value;
         }
+        protected double XMovement { get; set; }
+        protected double YMovement { get; set; }
         public virtual Rectangle Drawing
         {
             get => new Rectangle((int)Hitbox.Left, (int)Hitbox.Top, Hitbox.Width, Hitbox.Height);
         }
-        //public virtual void Update() { }
         public virtual void Update(GameTime gameTime) { }
         public virtual bool DamageEntity(int damage, string source)
         {

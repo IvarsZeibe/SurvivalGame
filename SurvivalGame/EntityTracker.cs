@@ -36,12 +36,20 @@ namespace SurvivalGame
         private static List<Entity> DeadEntities { get; set; } = new List<Entity>();
         public static void UpdateEntities(GameTime gameTime)
         {
-            foreach (Entity entity in Entities)
+            //foreach (Entity entity in Entities)
+            //{
+            //    entity.Update(gameTime);
+            //    if (entity.isDead)
+            //        DeadEntities.Add(entity);
+            //}
+            for (int i = 0; i < Entities.Count; i++)
             {
-                entity.Update(gameTime);
-                if (entity.isDead)
-                    DeadEntities.Add(entity);
+                Entities[i].Update(gameTime);
+                if (Entities[i].IsDead)
+                    DeadEntities.Add(Entities[i]);
+
             }
+            
             foreach (var deadEntity in DeadEntities)
             {
                 Entities.Remove(deadEntity);
@@ -60,9 +68,10 @@ namespace SurvivalGame
                 return player;
             }
 
-            public static Enemy Enemy(Texture2D texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null)
+            public static Enemy Enemy(Texture2D texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null)
             {
-                Enemy enemy = new Enemy(texture, x, y, width, height, speed, collision, target);
+                Enemy enemy = new Enemy(texture, x, y, width, height, speed, collision, target, color);
+                //Enemy enemy = new Enemy() { Texture = texture ??  };
                 Entities.Add(enemy);
                 //Enemies.Add(enemy);
                 return enemy;

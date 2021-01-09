@@ -10,27 +10,27 @@ namespace SurvivalGame
 {
     class Sword : Entity
     {
-        public List<Entity> hitEntities = new List<Entity>();
+        public List<Entity> immuneEntities = new List<Entity>();
         float StartingRotation { get; set; }
         Direction Direction { get; set; }
-        Entity Player { get; set; }
+        Entity Owner { get; set; }
         float timeAlive;
         float timeTillDeath = 0.2f;
         public int Damage { get; set; }
         public override Rectangle Drawing
         {
-            get => new Rectangle((int)Player.Hitbox.X, (int)Player.Hitbox.Y, 150, 2);
-            //get => new Rectangle((int)Hitbox.Left, (int)Hitbox.Top, Hitbox.Width, Hitbox.Width);
+            get => new Rectangle((int)Owner.Hitbox.X, (int)Owner.Hitbox.Y, Hitbox.Width, 2);
+            //get => new Rectangle((int)Hitbox.Left, (int)Hitbox.Top, Hitbox.Width, Hitbox.Height);
         }
-        public Sword(Texture2D texture, Entity player, float rotation)
+        public Sword(Texture2D texture, Entity owner, float rotation)
         {
             Damage = 100;
             Collision = false;
-            Mass = 1f;
-            Hitbox = new Circle(player.Hitbox.X, player.Hitbox.Y, 150);
+            Mass = 1;
+            Hitbox = new Circle(owner.Hitbox.X, owner.Hitbox.Y, (owner.Hitbox.Width + owner.Hitbox.Height) / 2);
             //Hitbox = new Rect(player.Hitbox.X, player.Hitbox.Y, 150, 150);
             Texture = texture;
-            Player = player;
+            Owner = owner;
 
             //right
             if(rotation >= -0.8 && rotation < 0.8)
@@ -62,11 +62,12 @@ namespace SurvivalGame
 
         public override void Update(GameTime gameTime)
         {
+            UpdateSize();
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
             Rotation = timeAlive * -1.8f / timeTillDeath + StartingRotation;
             if (timeAlive > timeTillDeath)
             {
-                isDead = true;
+                IsDead = true;
             }
             UpdateCoord();
         }
@@ -75,19 +76,22 @@ namespace SurvivalGame
             switch (Direction)
             {
                 case Direction.Right:
-                    Hitbox.Left = Player.Hitbox.X;
+                    Hitbox.Left = Owner.Hitbox.X;
                     break;
                 case Direction.Up:
-                    Hitbox.Top = Player.Hitbox.Y;
+                    Hitbox.Top = Owner.Hitbox.Y;
                     break;
                 case Direction.Down:
-                    Hitbox.Bottom = Player.Hitbox.Y;
+                    Hitbox.Bottom = Owner.Hitbox.Y;
                     break;
                 case Direction.Left:
-                    Hitbox.Right = Player.Hitbox.X;
+                    Hitbox.Right = Owner.Hitbox.X;
                     break;
             }
-
+        }
+        private void UpdateSize()
+        {
+            (Hitbox as Circle).Diameter = (Owner.Hitbox.Width + Owner.Hitbox.Height) / 2;
         }
     }
 }

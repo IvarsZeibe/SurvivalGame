@@ -27,7 +27,7 @@ namespace SurvivalGame
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(ghost && timeAlive > 0.1)
             {
-                isDead = true;
+                IsDead = true;
             }
         }
     }

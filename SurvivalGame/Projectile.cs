@@ -10,58 +10,62 @@ namespace SurvivalGame
 {
     class Projectile : Entity
     {
+        public List<Entity> immuneEntities = new List<Entity>();
         public int Damage { get; set; }
         int Range { get; set; }
-        List<double> RelativCoord { get; set; }
-        List<double> StartingCoord { get; set; }
+        //List<double> RelativCoord { get; set; }
+        //List<double> StartingCoord { get; set; }
+        Vector2 StartingCoord { get; set; }
         public Projectile(Texture2D texture, float speed, Vector2 source, Vector2 target, int damage)
         {
-            Collision = false;
-            StartingCoord = new List<double>() { source.X, source.Y };
-            RelativCoord = new List<double>() { 0, 0 };
-            Range = 300;
+            this.Texture = texture;
+            this.Hitbox = new Rect(source.X, source.Y, 10, 2);
+            this.Collision = false;
+            this.Range = 300;
+            this.Speed = speed;
+            this.StartingCoord = new Vector2(X, Y);
+            this.Damage = damage;
+            this.LayerDepth = 0.8f;
 
-            Texture = texture;
-            Speed = speed;
-            Hitbox = new Rect(source.X, source.Y, 10, 2);
-            Damage = damage;
-
-            double yEdge = (source.Y - target.Y);
-            double xEdge = (source.X - target.X);
-            Rotation = (float)Math.Atan2(yEdge, xEdge);
-
-            Vector2 relativeMouse = new Vector2((float)xEdge, (float)yEdge);
-            XMovement = -relativeMouse.X / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
-            YMovement = -relativeMouse.Y / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
+            Movment(target);
         }
+        //public Projectile(Texture2D texture, float x, float y, int diameter, bool collision, int health, int mass, Color color, float speed = 0f, float rotation = 0f, float layerDepth = 0.5f)
+        //{
+        //    this.Texture = texture;
+        //    this.Hitbox = new Circle(x, y, diameter);
+        //    this.Collision = collision;
+        //    this.Health = health;
+        //    this.Mass = mass;
+        //    this.Color = color;
+        //    this.Speed = speed;
+        //    this.Rotation = rotation;
+        //    this.LayerDepth = layerDepth;
+        //}
         public override void Update(GameTime gameTime)
         {
             Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
             Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
 
-            if (XMovement > 0)
-            {
-                RelativCoord[0] = X - StartingCoord[0];
-            }
-            else RelativCoord[0] = StartingCoord[0] - X;
-            if (YMovement > 0)
-            {
-                RelativCoord[1] = Y - StartingCoord[1];
-            }
-            else RelativCoord[1] = StartingCoord[1] - Y;
-
-            if (RelativCoord[0] * RelativCoord[0] + RelativCoord[1] * RelativCoord[1] > Range * Range)
-            {
-                isDead = true;
-            }
+            if((StartingCoord.X - X ) * (StartingCoord.X - X) + (StartingCoord.Y - Y) * (StartingCoord.Y - Y) > Range * Range)
+                IsDead = true;
 
             foreach (var wall in EntityTracker.Walls)
             {
                 if (CollidesWith(wall) && wall.Collision)
                 {
-                    isDead = true;
+                    IsDead = true;
                 }
             }
+        }
+        private void Movment(Vector2 target)
+        {
+            double yEdge = (Y - target.Y);
+            double xEdge = (X - target.X);
+            this.Rotation = (float)Math.Atan2(yEdge, xEdge);
+
+            Vector2 relativeMouse = new Vector2((float)xEdge, (float)yEdge);
+            XMovement = -relativeMouse.X / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
+            YMovement = -relativeMouse.Y / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
         }
     }
 }

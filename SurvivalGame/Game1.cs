@@ -25,18 +25,13 @@ namespace SurvivalGame
 
         List<string> keyHistory = new List<string>();
         //List<string> mouseKeyHistory = new List<string>();
-        Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
+        public static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
 
         Player player;
         //Enemy enemy;
         MouseCursor mouseCursor;
 
-        float rateOfFire = 0.2f;
-        float timeSinceLastShot = 9999999f;
-        int bulletType = 0;
-        float swordCooldown = 0.3f;
-        float timeSinceSwordAttack = 9999999f;
-        float enemySpawnRate = .1f;
+        float enemySpawnRate = 1f;
         float timeSinceEnemySpawn = 999999f;
         float wallPlacementCooldown = 0.3f;
         float timeSinceWallPlacement = 999999f;
@@ -60,22 +55,23 @@ namespace SurvivalGame
         {
             // TODO: Add your initialization logic here
             //textures.Add("Player", CreateTexture(Color.Red));
-            textures.Add("Enemy", CreateTexture(Color.Black));
-            textures.Add("MouseCursor", CreateTexture(Color.White));
-            textures.Add("Bullet", CreateTexture(Color.Orange));
-            textures.Add("Flame", CreateTexture(Color.DarkOrange));
-            textures.Add("Wall", CreateTexture(Color.SaddleBrown));
-            textures.Add("Sword", CreateTexture(Color.White));
-            var color = Color.SaddleBrown;
-            color.A = 100;
-            textures.Add("WallGhost", CreateTexture(color));
+            //textures.Add("Enemy", CreateTexture(Color.White));
+            //textures.Add("MouseCursor", CreateTexture(Color.White));
+            //textures.Add("Bullet", CreateTexture(Color.Orange));
+            //textures.Add("Flame", CreateTexture(Color.DarkOrange));
+            //textures.Add("Wall", CreateTexture(Color.SaddleBrown));
+            //textures.Add("Sword", CreateTexture(Color.White));
+            //var color = Color.SaddleBrown;
+            //color.A = 100;
+            //textures.Add("WallGhost", CreateTexture(color));
 
-            textures.Add("Player", this.Content.Load<Texture2D>("Untitled"));
+            //textures.Add("Player", this.Content.Load<Texture2D>("Untitled"));
 
             textures.Add("Circle", this.Content.Load<Texture2D>("Circle"));
+            textures.Add("Rectangle", CreateTexture(Color.White));
 
-            player = EntityTracker.Add.Player(textures["Player"]);
-            mouseCursor = EntityTracker.Add.MouseCursor(textures["MouseCursor"]);
+            player = EntityTracker.Add.Player(textures["Circle"]);
+            mouseCursor = EntityTracker.Add.MouseCursor(textures["Rectangle"]);
 
             base.Initialize();
         }
@@ -154,7 +150,7 @@ namespace SurvivalGame
 
             foreach(var entity in EntityTracker.Entities)
             {
-                spriteBatch.Draw(entity.Texture, entity.Drawing, null, Color.White, entity.Rotation, Vector2.Zero, SpriteEffects.None, entity.LayerDepth);
+                spriteBatch.Draw(entity.Texture, entity.Drawing, null, entity.Color, entity.Rotation, Vector2.Zero, SpriteEffects.None, entity.LayerDepth);
             }
 
             spriteBatch.End();
@@ -173,74 +169,60 @@ namespace SurvivalGame
         }
         void OnKeyDown(List<string> keysPressed, GameTime gameTime)
         {
-            ///keysPressed = new key
-            ///keyHistory = all pressed keys
-            if (keysPressed.Contains("LeftButton"))
+            foreach (string key in keyHistory)
             {
-                MakeWall();
-            }
-            if (keyHistory.Contains("RightButton"))
-            {
-                DeleteWall();
-            }
-            if (keysPressed.Contains(Keys.D1.ToString()))
-            {
-                if (bulletType == 0)
+                switch (key)
                 {
-                    bulletType = 1;
-                    rateOfFire = 0.02f;
-                }
-                else
-                {
-                    bulletType = 0;
-                    rateOfFire = 0.2f;
-                }
-            }
-            if (keysPressed.Contains(Keys.F11.ToString()))
-            {
-                graphics.ToggleFullScreen();
-            }
-            if (keyHistory.Contains(Keys.D.ToString()))
-            {
-                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
-            }
-            else if (keyHistory.Contains(Keys.A.ToString()))
-            {
-                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
-            }
-            if (keyHistory.Contains(Keys.S.ToString()))
-            {
-                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
-            }
-            else if (keyHistory.Contains(Keys.W.ToString()))
-            {
-                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
-            }
-            timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (keyHistory.Contains(Keys.Space.ToString()))
-            {
-                if (bulletType == 0 && timeSinceLastShot > rateOfFire)
-                {
+                    case "LeftButton":
+                        if (keysPressed.Contains("LeftButton"))
+                            MakeWall();
+                        break;
 
-                    Projectile projectile = EntityTracker.Add.Projectile(textures["Bullet"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 100);
+                    case "RightButton":
+                        DeleteWall();
+                        break;
 
-                    timeSinceLastShot = 0f;
-                }
-                else if (bulletType == 1 && timeSinceLastShot > rateOfFire)
-                {
-                    Projectile projectile = EntityTracker.Add.Projectile(textures["Flame"], 500f, new Vector2(player.X, player.Y), new Vector2(mouseCursor.X, mouseCursor.Y), 200);
+                    case "D1":
+                        if (keysPressed.Contains("D1"))
+                        {
+                            if (player.Primary == Player.Weapon.Pistol)
+                                player.Primary = Player.Weapon.Minigun;
+                            else
+                                player.Primary = Player.Weapon.Pistol;
+                        }
+                        break;
 
-                    timeSinceLastShot = 0f;
-                }
-            }
-            timeSinceSwordAttack += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (keyHistory.Contains(Keys.V.ToString()) && timeSinceSwordAttack > swordCooldown)
-            {
-                timeSinceSwordAttack = 0f;
-                double yEdge = (player.Y - mouseCursor.Y);
-                double xEdge = (player.X - mouseCursor.X);
+                    case "F11":
+                        if (keysPressed.Contains("F11"))
+                            graphics.ToggleFullScreen();
+                        break;
 
-                Sword sword = EntityTracker.Add.Sword(textures["Sword"], player, (float)Math.Atan2(yEdge, xEdge));
+                    case "D":
+                        player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
+                        break;
+
+                    case "A":
+                        player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
+                        break;
+
+                    case "S":
+                        player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
+                        break;
+
+                    case "W":
+                        player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
+                        break;
+
+                    case "Space":
+                        player.PrimaryAttack();
+                        break;
+
+                    case "V":
+                        player.SecondaryAttack();
+                        break;
+                    default:
+                        break;
+                } 
             }
         }
         void OnKeyUp(List<string> keysReleased, GameTime gameTime)
@@ -331,9 +313,9 @@ namespace SurvivalGame
                     Enemy enemy;
                     bool suitableSpot = true;
                     if(rand.Next(2) == 1)
-                        enemy = EntityTracker.Add.Enemy(textures["Circle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), target: player);
+                        enemy = EntityTracker.Add.Enemy(textures["Circle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), target: player, color: Color.DarkSlateGray);
                     else
-                        enemy = EntityTracker.Add.Enemy(textures["Enemy"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35), target: player);
+                        enemy = EntityTracker.Add.Enemy(textures["Rectangle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35), target: player, color: Color.DarkGray);
 
 
                     foreach (var entity in EntityTracker.Entities)
@@ -347,8 +329,9 @@ namespace SurvivalGame
                     if (!suitableSpot)
                     {
                         EntityTracker.Entities.Remove(enemy);
-                        break;
                     }
+                    else
+                        break;
                     i++;
                 }
                 timeSinceEnemySpawn = 0f;
@@ -359,7 +342,7 @@ namespace SurvivalGame
             bool success = true;
             if (timeSinceWallPlacement > wallPlacementCooldown)
             {
-                var wall = EntityTracker.Add.Wall(textures["Wall"], mstate.X, mstate.Y);
+                var wall = EntityTracker.Add.Wall(textures["Rectangle"], mstate.X, mstate.Y);
 
                 bool suitableSpot = true;
                 foreach (var entity in EntityTracker.Entities)
@@ -411,7 +394,7 @@ namespace SurvivalGame
                 {
                     //targetFound = true;
                     //wall = w;
-                    wall.isDead = true;
+                    wall.IsDead = true;
                     break;
                 }
             }
