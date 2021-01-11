@@ -39,7 +39,7 @@ namespace SurvivalGame
             PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
             SecondaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            foreach (var projectile in EntityTracker.Projectiles)
+            foreach (var projectile in /*EntityTracker.Projectiles*/EntityTracker.GetEntities<Projectile>())
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
                 {
@@ -48,7 +48,7 @@ namespace SurvivalGame
                     projectile.IsDead = true;
                 }
             }
-            foreach (var sword in EntityTracker.Swords)
+            foreach (var sword in EntityTracker.GetEntities<Sword>())
             {
                 if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
                 {

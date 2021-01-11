@@ -11,6 +11,12 @@ namespace SurvivalGame
 {
     class Enemy : Entity
     {
+        public enum Type
+        {
+            RandomaRectangle,
+            RandomCircle,
+            Custom
+        }
         public enum Weapon
         {
             Pistol,
@@ -80,7 +86,7 @@ namespace SurvivalGame
             else
                 SecondaryAttack();
 
-            foreach (var projectile in EntityTracker.Projectiles)
+            foreach (var projectile in EntityTracker.GetEntities<Projectile>())
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
                 {
@@ -89,7 +95,7 @@ namespace SurvivalGame
                     projectile.IsDead = true;
                 }
             }
-            foreach (var sword in EntityTracker.Swords)
+            foreach (var sword in EntityTracker.GetEntities<Sword>())
             {
                 if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
                 {
@@ -137,6 +143,10 @@ namespace SurvivalGame
                     if (PrimaryCooldown > PrimaryRateOfFire)
                     {
                         EntityTracker.Add.Projectile(Game1.textures["Rectangle"], 500f, new Vector2(X, Y), new Vector2(Target.X, Target.Y), 200).immuneEntities.Add(this);
+                        //p.immuneEntities.Add(this);
+                        //Random rand = new Random();
+                        //p.SetPrecision((float)(rand.NextDouble() + 0.5));
+                        //p.Precision = 0.1f;
 
                         PrimaryCooldown = 0;
                     }

@@ -12,24 +12,38 @@ namespace SurvivalGame
         /// Entities list
         /// Sub lists
         /// </summary>
-        public static List<Entity> Entities { get; } = new List<Entity>();
-        public static List<Projectile> Projectiles
-        {
-            get => Entities.FindAll(delegate (Entity entity) { return entity is Projectile; }).ConvertAll(element => (Projectile)element);
-        }
-        public static List<Enemy> Enemies
-        {
-            get => Entities.FindAll(delegate (Entity entity) { return entity is Enemy; }).ConvertAll(element => (Enemy)element);
-        }
-        public static List<Wall> Walls
-        {
-            get => Entities.FindAll(delegate (Entity entity) { return entity is Wall; }).ConvertAll(element => (Wall)element);
-        }
-        public static List<Sword> Swords
-        {
-            get => Entities.FindAll(delegate (Entity entity) { return entity is Sword; }).ConvertAll(element => (Sword)element);
-        }
 
+        public static List<IDrawing> Drawings { get; } = new List<IDrawing>();
+        //public static IEnumerable<T> DrawingsGet<T>() where T : IDrawing
+        //{
+        //    return Drawings.FindAll(delegate (IDrawing drawing) { return drawing is T; }).ConvertAll(element => element as T);
+        //}
+        public static List<IDrawingText> DrawingsText { get; } = new List<IDrawingText>();
+
+        public static List<Entity> Entities { get; } = new List<Entity>();
+        public static List<Chat> UI { get; } = new List<Chat>();
+        public static List<T> GetEntities<T>() where T : Entity
+        {
+            return Entities.FindAll(delegate (Entity entity) { return entity is T; }).ConvertAll(element => element as T);
+        }
+        //public static List<Projectile> Projectiles
+        //{
+        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Projectile; }).ConvertAll(element => (Projectile)element);
+        //}
+        //public static List<Enemy> Enemies
+        //{
+        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Enemy; }).ConvertAll(element => (Enemy)element);
+        //}
+        //public static List<Wall> Walls
+        //{
+        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Wall; }).ConvertAll(element => (Wall)element);
+        //}
+        //public static List<Sword> Swords
+        //{
+        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Sword; }).ConvertAll(element => (Sword)element);
+        //}
+
+        //public static bool AreEntitiesActive = true;
         /// <summary>
         /// Update
         /// </summary>
@@ -42,19 +56,26 @@ namespace SurvivalGame
             //    if (entity.isDead)
             //        DeadEntities.Add(entity);
             //}
-            for (int i = 0; i < Entities.Count; i++)
-            {
-                Entities[i].Update(gameTime);
-                if (Entities[i].IsDead)
-                    DeadEntities.Add(Entities[i]);
+            //if (AreEntitiesActive)
+            //{
+                for (int i = 0; i < Entities.Count; i++)
+                {
+                    Entities[i].Update(gameTime);
+                    if (Entities[i].IsDead)
+                        DeadEntities.Add(Entities[i]);
 
-            }
-            
-            foreach (var deadEntity in DeadEntities)
+                }
+                foreach (var deadEntity in DeadEntities)
+                {
+                    Entities.Remove(deadEntity);
+                }
+                DeadEntities.Clear();
+            //}
+            for (int i = 0; i < Drawings.Count; i++)
             {
-                Entities.Remove(deadEntity);
+                Drawings[i].Update(gameTime);
             }
-            DeadEntities.Clear();
+
         }
         /// <summary>
         /// Creates new entitie

@@ -4,10 +4,12 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
+    <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Chat.spritefont</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Circle.png</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Untitled.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>

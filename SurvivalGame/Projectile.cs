@@ -10,6 +10,13 @@ namespace SurvivalGame
 {
     class Projectile : Entity
     {
+        //Vector2 Target { get; set; }
+        //private float precision = 1f;
+        //public void SetPrecision(float precision)
+        //{
+        //    this.precision = precision;
+        //    Movement(Target);
+        //}
         public List<Entity> immuneEntities = new List<Entity>();
         public int Damage { get; set; }
         int Range { get; set; }
@@ -26,8 +33,8 @@ namespace SurvivalGame
             this.StartingCoord = new Vector2(X, Y);
             this.Damage = damage;
             this.LayerDepth = 0.8f;
-
-            Movment(target);
+            //this.Target = target;
+            Movement(target);
         }
         //public Projectile(Texture2D texture, float x, float y, int diameter, bool collision, int health, int mass, Color color, float speed = 0f, float rotation = 0f, float layerDepth = 0.5f)
         //{
@@ -49,7 +56,7 @@ namespace SurvivalGame
             if((StartingCoord.X - X ) * (StartingCoord.X - X) + (StartingCoord.Y - Y) * (StartingCoord.Y - Y) > Range * Range)
                 IsDead = true;
 
-            foreach (var wall in EntityTracker.Walls)
+            foreach (var wall in EntityTracker.GetEntities<Wall>())
             {
                 if (CollidesWith(wall) && wall.Collision)
                 {
@@ -57,10 +64,10 @@ namespace SurvivalGame
                 }
             }
         }
-        private void Movment(Vector2 target)
+        private void Movement(Vector2 target)
         {
-            double yEdge = (Y - target.Y);
-            double xEdge = (X - target.X);
+            double yEdge = (Y - target.Y)/* * precision*/;
+            double xEdge = (X - target.X)/* * precision*/;
             this.Rotation = (float)Math.Atan2(yEdge, xEdge);
 
             Vector2 relativeMouse = new Vector2((float)xEdge, (float)yEdge);
