@@ -6,8 +6,31 @@ using System.Text;
 
 namespace SurvivalGame
 {
-    class Chat : IDrawing
+    class Chat : IDrawing, IUpdate
     {
+        private Vector2 TextPosition { get; set; }
+        TextBox ActiveText { get; set; }
+        List<TextBox> WrittenText { get; set; } = new List<TextBox>();
+
+        private bool updateEnabled = false;
+        public bool UpdateEnabled
+        {
+            get => updateEnabled;
+            set
+            {
+                if (value && !updateEnabled)
+                {
+                    EntityTracker.ObjectsWithUpdate.Add(this);
+                    updateEnabled = true;
+                }
+                else if (!value && updateEnabled)
+                {
+                    EntityTracker.ObjectsWithUpdate.Remove(this);
+                    updateEnabled = false;
+                }
+            }
+        }
+
         public TextureName Texture { get; set; }
         public Vector2 Position { get; set; }
         public Color Color { get; set; }
@@ -25,62 +48,107 @@ namespace SurvivalGame
             }
         }
         public float LayerDepth { get; set; }
-        TextBox TextBox { get; set; }
+        private bool isDrawn = false;
+        public bool IsDrawn
+        {
+            get => isDrawn;
+            set
+            {
+                if (value && !isDrawn)
+                {
+                    EntityTracker.Drawings.Add(this);
+                    isDrawn = true;
+                    foreach(var line in WrittenText)
+                    {
+                        line.IsDrawn = true;
+                    }
+                    NewLine();
+                }
+                else if (!value && isDrawn)
+                {
+                    EntityTracker.Drawings.Remove(this);
+                    isDrawn = false;
+                    foreach (var line in WrittenText)
+                    {
+                        line.IsDrawn = false;
+                    }
+                }
+            }
+        }
+
         public Chat(GraphicsDeviceManager graphics)
         {
-            EntityTracker.Drawings.Add(this);
-
             this.Texture = TextureName.Rectangle;
-            this.Position = new Vector2(100, graphics.PreferredBackBufferHeight - 100);
+            this.Scale = new Vector2(500, 170);
+            this.Position = new Vector2(100, graphics.PreferredBackBufferHeight - 400);
+            this.TextPosition = new Vector2(this.Position.X, this.Position.Y + GetHeight());
             this.Color = new Color(0,0,0,100);
             this.Rotation = 0f;
-            this.Scale = new Vector2(500, 50);
             this.LayerDepth = 0.2f;
-            this.Texture = TextureName.Rectangle;
-            this.TextBox = new TextBox()
+
+            EntityTracker.ObjectsWithUpdate.Add(this);
+            
+        }
+        public void NewLine()
+        {
+            UpdateEnabled = true;
+            if (ActiveText != null && ActiveText.Text.Length > 0)
+            {
+                WrittenText.Add(ActiveText);
+                if(WrittenText.Count > 6)
+                {
+                    WrittenText[0].IsDrawn = false;
+                    WrittenText.RemoveAt(0);
+                }
+                foreach(var line in WrittenText)
+                {
+                    line.Position = new Vector2(line.Position.X, line.Position.Y - line.GetHeight());
+                }
+            }
+            this.ActiveText = new TextBox()
             {
                 SpriteFont = SpriteFontName.Chat,
                 Text = new StringBuilder("You can write here"),
-                Position = this.Position,
+                Position = new Vector2(this.TextPosition.X, this.TextPosition.Y - Globals.SpriteFonts[SpriteFontName.Chat].MeasureString("A").Y),
                 Color = Color.White,
                 Rotation = 0f,
-                //Scale = new Vector2(8,20),
+                //Scale = new Vector2(80,150),
                 LayerDepth = this.LayerDepth - 0.1f,
-                IsActive = true
+                IsDrawn = true
             };
         }
         public void Update(GameTime gameTime)
         {
-            if (TextBox.IsActive)
+            if (ActiveText != null)
             {
-                TextBox.Input(gameTime);
-                //EntityTracker.AreEntitiesActive = false;
-                Globals.IsTextBoxActive = true;
+                if(ActiveText.Input(gameTime, this))
+                    Globals.IsUserWriting = true;
+                else
+                {
+                    if (this.isDrawn)
+                    {
+                        NewLine();
+                    }
+                    else
+                    {
+                        ActiveText = null;
+                        Globals.IsUserWriting = false;
+
+                        UpdateEnabled = false;
+                    }
+                }
             }
             else
-                Globals.IsTextBoxActive = false;
-                //EntityTracker.AreEntitiesActive = true;
-
-
+                Globals.IsUserWriting = false;
         }
-        //public StringBuilder Text { get; set; } = new StringBuilder();
-        //public SpriteFont Font { get; set; }
-        //public Vector2 TextPosition { get; set; }
 
-        //UI(Texture2D texture, GraphicsDeviceManager graphics)
-        //{
-        //    this.Texture = texture;
-        //    this.Hitbox = new Rect(10, graphics.PreferredBackBufferHeight - 10, 500, 20);
-        //    //    this.Collision = collision;
-        //    //    this.Health = health;
-        //    //    this.Mass = mass;
-        //    Color color = Color.Black;
-        //    color.A = 50;
-        //    this.Color = color;
-        //    //    this.Speed = speed;
-        //    this.Rotation = 0;
-        //    this.LayerDepth = 0.1f;
-        //}
-
+        private float GetWidth()
+        {
+            return (Globals.Textures[this.Texture].Width * Scale.X);
+        }
+        private float GetHeight()
+        {
+            return (Globals.Textures[this.Texture].Height * Scale.Y);
+        }
     }
 }

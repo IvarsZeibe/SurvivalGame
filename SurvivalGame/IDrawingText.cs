@@ -14,5 +14,6 @@ namespace SurvivalGame
         float Rotation { get; set; }
         Vector2 Scale { get; set; }
         float LayerDepth { get; set; }
+        public bool IsDrawn { get; set; }
     }
 }

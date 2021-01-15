@@ -27,6 +27,7 @@ namespace SurvivalGame
         public static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
 
         Player player;
+        Chat chat;
         //Enemy enemy;
         MouseCursor mouseCursor;
 
@@ -73,6 +74,7 @@ namespace SurvivalGame
 
             player = EntityTracker.Add.Player(textures["Circle"]);
             mouseCursor = EntityTracker.Add.MouseCursor(textures["Rectangle"]);
+            chat = new Chat(graphics);
 
             base.Initialize();
         }
@@ -170,7 +172,8 @@ namespace SurvivalGame
             }
             foreach(var drawing in EntityTracker.Drawings)
             {
-                spriteBatch.Draw(Globals.Textures[drawing.Texture], drawing.Position, null, drawing.Color, drawing.Rotation, Vector2.Zero, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
+                if(drawing.IsDrawn)
+                    spriteBatch.Draw(Globals.Textures[drawing.Texture], drawing.Position, null, drawing.Color, drawing.Rotation, Vector2.Zero, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
             }
             foreach(var text in EntityTracker.DrawingsText)
             {
@@ -231,7 +234,7 @@ namespace SurvivalGame
         }
         void OnKeyDown(/*List<string> keysPressed,*/ GameTime gameTime)
         {
-            if (!Globals.IsTextBoxActive)
+            if (!Globals.IsUserWriting)
             {
                 foreach(var key in Globals.PressedKeyboardKeys)
                 {
@@ -274,8 +277,10 @@ namespace SurvivalGame
                         case Keys.F11:
                             graphics.ToggleFullScreen();
                             break;
-                        case Keys.Enter:
-                            new Chat(graphics);
+                        case Keys.T:
+                            //chat.IsDrawn = true; ;
+                            //EntityTracker.ObjectsWithUpdate.Add(chat);
+                            chat.NewLine();
                             break;
                     }
                 }

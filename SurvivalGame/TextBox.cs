@@ -9,51 +9,79 @@ namespace SurvivalGame
 {
     class TextBox : IDrawingText
     {
-        public SpriteFontName SpriteFont { get; set; }
-        public StringBuilder Text { get; set; }
-        public Vector2 Position { get; set; }
-        public Color Color { get; set; }
-        public float Rotation { get; set; }
-        private Vector2 scale = new Vector2(1,1);
-        public Vector2 Scale
-        {
-            get => scale;
-            set
-            {
-                scale = new Vector2(value.X / (Globals.SpriteFonts[SpriteFont].MeasureString(Text).X / Text.Length), value.Y / Globals.SpriteFonts[SpriteFont].MeasureString(Text).Y);
-            }
-        }
-        public float LayerDepth { get; set; }
-
-        public bool IsActive { get; set; }
         private bool isFirstTime = true;
         private float timeSinceLastCharacter = 0f;
         private readonly float HeldCharacterCooldown = 0.5f;
         private Keys LastCharacter;
         private Index index = ^0;
-
         private TextPointer Pointer;
+
+
+        public SpriteFontName SpriteFont { get; set; }
+        public StringBuilder Text { get; set; }
+        public Vector2 Position { get; set; }
+        public Color Color { get; set; }
+        public float Rotation { get; set; }
+        private Vector2 scale = new Vector2(1, 1);
+        public Vector2 Scale
+        {
+            get => scale;
+            set
+            {
+                float textureWidth = Globals.SpriteFonts[SpriteFont].MeasureString(Text).X;
+                float textureHeight = Globals.SpriteFonts[SpriteFont].MeasureString(Text).Y;
+                scale = new Vector2(value.X / (textureWidth / Text.Length), value.Y / textureHeight);
+            }
+        }
+        public float LayerDepth { get; set; }
+        public bool IsDead { get; set; } = false;
+
+        private bool isDrawn = false;
+        public bool IsDrawn
+        {
+            get => isDrawn;
+            set
+            {
+                if (value && !isDrawn)
+                {
+                    EntityTracker.DrawingsText.Add(this);
+                    isDrawn = true;
+                }
+                else if (!value && isDrawn)
+                {
+                    EntityTracker.DrawingsText.Remove(this);
+                    isDrawn = false;
+                }
+            }
+        }
         public TextBox()
         {
-            EntityTracker.DrawingsText.Add(this);
+            IsDrawn = true;
         }
-        public void Input(GameTime gameTime)
+        public bool Input(GameTime gameTime, Chat chat)
         {
             if (Globals.NewKeyboardKeys.Count > 0)
             {
-                LastCharacter = Globals.NewKeyboardKeys[Globals.NewKeyboardKeys.Count - 1];
+                LastCharacter = Globals.NewKeyboardKeys[^1];
                 timeSinceLastCharacter = 0f;
             }
-            if (Globals.NewKeyboardKeys.Count > 0 || 
+            if (Globals.NewKeyboardKeys.Count > 0 ||
                 (timeSinceLastCharacter > HeldCharacterCooldown && Globals.PressedKeyboardKeys.Contains(LastCharacter)))
             {
                 switch (LastCharacter)
                 {
                     case Keys.Enter:
+                        //IsDrawn = false;
+                        Pointer.IsDrawn = false;
+                        Pointer = null;
+                        return false;
+                    case Keys.T:
                         if (!isFirstTime)
                         {
-                            IsActive = false;
-                            Pointer.IsActive = false;
+                            IsDrawn = false;
+                            Pointer.IsDrawn = false;
+                            chat.IsDrawn = false;
+                            return false;
                         }
                         break;
                     case Keys.Back:
@@ -76,6 +104,9 @@ namespace SurvivalGame
                     case Keys.Right:
                         if (index.Value > 0)
                             index = ^(index.Value - 1);
+                        break;
+                    case Keys.Space:
+                        Text.Insert(index.GetOffset(Text.Length), " ");
                         break;
                     case Keys n when (int)n >= 65 && (int)n <= 90:
                         if (!Globals.PressedKeyboardKeys.Contains(Keys.RightShift))
@@ -105,41 +136,61 @@ namespace SurvivalGame
             }
             else
                 Pointer.Update(gameTime, index.GetOffset(Text.Length), Text);
+
+            return true;
+        }
+
+        public float GetHeight()
+        {
+            return Globals.SpriteFonts[SpriteFont].MeasureString(Text).Y;
+        }
+        public float GetWidth()
+        {
+            return Globals.SpriteFonts[SpriteFont].MeasureString(Text).X;
         }
     }
+
+
     class TextPointer : IDrawingText
     {
+        private readonly float BlinkCooldown = 0.5f;
+        float TimeSinceBlink { get; set; } = 0f;
+
         public SpriteFontName SpriteFont { get; set; }
-        public StringBuilder Text { get; set; }
+        public StringBuilder Text { get; set; } = new StringBuilder("|");
         public Vector2 ParentPosition { get; set; }
         public Vector2 Position { get; set; }
         public Color Color { get; set; }
         public float Rotation { get; set; }
         public Vector2 Scale { get; set; } = new Vector2(1, 1);
         public float LayerDepth { get; set; }
-        float TimeSinceBlink { get; set; } = 0f;
-        private readonly float BlinkCooldown = 0.5f;
-        bool visiable = true;
-        public bool IsActive { get; set; } = true;
-        public void Update(GameTime gameTime, Index index, StringBuilder text)
+        private bool isDrawn = false;
+        public bool IsDrawn
         {
-            TimeSinceBlink += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Text = new StringBuilder("|");
-            string txt = text.ToString();
-            Position = new Vector2(ParentPosition.X + Globals.SpriteFonts[SpriteFont].MeasureString(txt[0..index]).X - 3, ParentPosition.Y - 2);
-
-            if (TimeSinceBlink > BlinkCooldown)
+            get => isDrawn;
+            set
             {
-                if (visiable)
-                {
-                    EntityTracker.DrawingsText.Remove(this);
-                    visiable = false;
-                }
-                else
+                if (value && !isDrawn)
                 {
                     EntityTracker.DrawingsText.Add(this);
-                    visiable = true;
+                    isDrawn = true;
                 }
+                else if (!value && isDrawn)
+                {
+                    EntityTracker.DrawingsText.Remove(this);
+                    isDrawn = false;
+                }
+            }
+        }
+        public void Update(GameTime gameTime, Index index, StringBuilder text)
+        {
+            float textWidthTillPointer = Globals.SpriteFonts[SpriteFont].MeasureString(text.ToString(0, index.GetOffset(text.Length))).X;
+            Position = new Vector2(ParentPosition.X + (textWidthTillPointer - 3) * Scale.X, ParentPosition.Y - 2);
+
+            TimeSinceBlink += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (TimeSinceBlink > BlinkCooldown)
+            {
+                IsDrawn = !IsDrawn;
                 TimeSinceBlink = 0f;
             }
         }

@@ -14,11 +14,8 @@ namespace SurvivalGame
         /// </summary>
 
         public static List<IDrawing> Drawings { get; } = new List<IDrawing>();
-        //public static IEnumerable<T> DrawingsGet<T>() where T : IDrawing
-        //{
-        //    return Drawings.FindAll(delegate (IDrawing drawing) { return drawing is T; }).ConvertAll(element => element as T);
-        //}
         public static List<IDrawingText> DrawingsText { get; } = new List<IDrawingText>();
+        public static List<IUpdate> ObjectsWithUpdate { get; } = new List<IUpdate>();
 
         public static List<Entity> Entities { get; } = new List<Entity>();
         public static List<Chat> UI { get; } = new List<Chat>();
@@ -26,38 +23,12 @@ namespace SurvivalGame
         {
             return Entities.FindAll(delegate (Entity entity) { return entity is T; }).ConvertAll(element => element as T);
         }
-        //public static List<Projectile> Projectiles
-        //{
-        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Projectile; }).ConvertAll(element => (Projectile)element);
-        //}
-        //public static List<Enemy> Enemies
-        //{
-        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Enemy; }).ConvertAll(element => (Enemy)element);
-        //}
-        //public static List<Wall> Walls
-        //{
-        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Wall; }).ConvertAll(element => (Wall)element);
-        //}
-        //public static List<Sword> Swords
-        //{
-        //    get => Entities.FindAll(delegate (Entity entity) { return entity is Sword; }).ConvertAll(element => (Sword)element);
-        //}
-
-        //public static bool AreEntitiesActive = true;
         /// <summary>
         /// Update
         /// </summary>
         private static List<Entity> DeadEntities { get; set; } = new List<Entity>();
         public static void UpdateEntities(GameTime gameTime)
         {
-            //foreach (Entity entity in Entities)
-            //{
-            //    entity.Update(gameTime);
-            //    if (entity.isDead)
-            //        DeadEntities.Add(entity);
-            //}
-            //if (AreEntitiesActive)
-            //{
                 for (int i = 0; i < Entities.Count; i++)
                 {
                     Entities[i].Update(gameTime);
@@ -70,10 +41,9 @@ namespace SurvivalGame
                     Entities.Remove(deadEntity);
                 }
                 DeadEntities.Clear();
-            //}
-            for (int i = 0; i < Drawings.Count; i++)
+            for (int i = 0; i < ObjectsWithUpdate.Count; i++)
             {
-                Drawings[i].Update(gameTime);
+                ObjectsWithUpdate[i].Update(gameTime);
             }
 
         }
