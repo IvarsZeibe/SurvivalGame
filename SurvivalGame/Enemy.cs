@@ -11,6 +11,35 @@ namespace SurvivalGame
 {
     class Enemy : Entity
     {
+        private float PrimaryRateOfFire;
+        private float PrimaryCooldown = 0f;
+        private float SecondaryRateOfFire;
+        private float SecondaryCooldown = 0f;
+        private int defaultWidth;
+        private int defaultHeight;
+        private int minSize = 10;
+        public Enemy() { }
+        public Enemy(TextureName texture, float x, float y, int width, int height, int speed, bool collision, Entity target, Color? color)
+        {
+            //this.Texture = texture;
+            if (height == 0)
+                this.Hitbox = new Circle(x, y, width);
+            else
+                this.Hitbox = new Rect(x, y, width, height);
+            defaultWidth = width;
+            defaultHeight = height;
+            this.Mass = 5;
+            this.Collision = collision;
+            this.Speed = speed;
+            this.MaxHealth = 100;
+            this.Health = 100;
+            this.Target = target;
+            //if (color != null)
+            //    Color = (Color)color;
+            CreateHealthBar();
+            Drawing = new Drawing(texture, new Vector2(x, y), color ?? Color.White, 0, new Vector2(width, height), isDrawn: true);
+            
+        }
         public enum Type
         {
             RandomaRectangle,
@@ -23,54 +52,9 @@ namespace SurvivalGame
             //Minigun,
             Sword
         }
-        private float PrimaryRateOfFire;
-        private float PrimaryCooldown = 0f;
-        private float SecondaryRateOfFire;
-        private float SecondaryCooldown = 0f;
         public Weapon Primary { get; set; } = Weapon.Pistol;
         public Weapon Secondary { get; set; } = Weapon.Sword;
         private Entity Target { get; set; }
-
-        public Enemy() { }
-        public Enemy(Texture2D texture, float x, float y, int width, int height, int speed, bool collision, Entity target, Color? color)
-        {
-            this.Texture = texture;
-            if (height == 0)
-                this.Hitbox = new Circle(x, y, width);
-            else
-                 this.Hitbox = new Rect(x, y, width, height);
-            this.Mass = 5;
-            this.Collision = collision;
-            this.Speed = speed;
-            this.Health = 300;
-            this.Target = target;
-            if (color != null)
-                Color = (Color)color;
-        }
-        //public Enemy(Texture2D texture, float x, float y, int width, int height, bool collision, int health, int mass, Color color, float speed = 0f, float rotation = 0f, float layerDepth = 0.5f)
-        //{
-        //    this.Texture = texture;
-        //    this.Hitbox = new Rect(x, y, width, height);
-        //    this.Collision = collision;
-        //    this.Health = health;
-        //    this.Mass = mass;
-        //    this.Color = color;
-        //    this.Speed = speed;
-        //    this.Rotation = rotation;
-        //    this.LayerDepth = layerDepth;
-        //}
-        //public Enemy(Texture2D texture, float x, float y, int diameter, bool collision, int health, int mass, Color color, float speed = 0f, float rotation = 0f, float layerDepth = 0.5f)
-        //{
-        //    this.Texture = texture;
-        //    this.Hitbox = new Circle(x, y, diameter);
-        //    this.Collision = collision;
-        //    this.Health = health;
-        //    this.Mass = mass;
-        //    this.Color = color;
-        //    this.Speed = speed;
-        //    this.Rotation = rotation;
-        //    this.LayerDepth = layerDepth;
-        //}
         public override void Update(GameTime gameTime)
         {
             PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -80,11 +64,14 @@ namespace SurvivalGame
             Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
             Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
 
-            double distanceFromTarget = Math.Sqrt((X - Target.X) * (X - Target.X) + (Y - Target.Y) * (Y - Target.Y));
-            if (distanceFromTarget > 100)
-                PrimaryAttack();
-            else
-                SecondaryAttack();
+            if (!Target.IsDead)
+            {
+                double distanceFromTarget = Math.Sqrt((X - Target.X) * (X - Target.X) + (Y - Target.Y) * (Y - Target.Y));
+                if (distanceFromTarget > 100)
+                    PrimaryAttack();
+                else
+                    SecondaryAttack();
+            }
 
             foreach (var projectile in EntityTracker.GetEntities<Projectile>())
             {
@@ -92,7 +79,7 @@ namespace SurvivalGame
                 {
                     DamageEntity(projectile.Damage, "Projectile");
                     projectile.immuneEntities.Add(this);
-                    projectile.IsDead = true;
+                    projectile.Kill();
                 }
             }
             foreach (var sword in EntityTracker.GetEntities<Sword>())
@@ -103,10 +90,17 @@ namespace SurvivalGame
                     sword.immuneEntities.Add(this);
                 }
             }
+
+            Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
+            Drawing.Scale = new Vector2(Hitbox.Width, Hitbox.Height);
+        }
+        private void CreateHealthBar()
+        {
+            new HealthBar(this);
         }
         private void Movement()
         {
-            if (Target == null)
+            if (Target.IsDead)
             {
                 XMovement = 0;
                 YMovement = 0;
@@ -123,14 +117,16 @@ namespace SurvivalGame
         public override bool DamageEntity(int damage, string source)
         {
             Health -= damage;
-            if (Health / 100 != (Health + damage) / 100) 
+            if (Hitbox is Circle)
+                Hitbox.Width = (int)((defaultWidth - minSize) * ((float)Health / MaxHealth)) + minSize;
+            else
             {
-                Hitbox.Width = (int)(Hitbox.Width * 0.8);
-                Hitbox.Height = (int)(Hitbox.Height * 0.8);
+                Hitbox.Width = (int)((defaultWidth - minSize) * ((float)Health / MaxHealth)) + minSize;
+                Hitbox.Height = (int)((defaultHeight - minSize) * ((float)Health / MaxHealth)) + minSize;
             }
             if (Health <= 0)
             {
-                IsDead = true;
+                Kill();
             }
             return true;
         }
@@ -139,10 +135,10 @@ namespace SurvivalGame
             switch (Primary)
             {
                 case Weapon.Pistol:
-                    PrimaryRateOfFire = 0.3f;
+                    PrimaryRateOfFire = 0.6f;
                     if (PrimaryCooldown > PrimaryRateOfFire)
                     {
-                        EntityTracker.Add.Projectile(Game1.textures["Rectangle"], 500f, new Vector2(X, Y), new Vector2(Target.X, Target.Y), 200).immuneEntities.Add(this);
+                        EntityTracker.Add.Projectile(TextureName.Rectangle, 500f, new Vector2(X, Y), new Vector2(Target.X, Target.Y), 10).immuneEntities.Add(this);
                         //p.immuneEntities.Add(this);
                         //Random rand = new Random();
                         //p.SetPrecision((float)(rand.NextDouble() + 0.5));
@@ -151,16 +147,6 @@ namespace SurvivalGame
                         PrimaryCooldown = 0;
                     }
                     break;
-                //case Weapon.Minigun:
-                //    PrimaryRateOfFire = 0.1f;
-                //    if (PrimaryCooldown > PrimaryRateOfFire)
-                //    {
-                //        MouseState mstate = Mouse.GetState();
-                //        EntityTracker.Add.Projectile(Game1.textures["Flame"], 500f, new Vector2(X, Y), new Vector2(mstate.X, mstate.Y), 200);
-
-                //        PrimaryCooldown = 0;
-                //    }
-                //    break;
             }
         }
         public void SecondaryAttack()
@@ -173,7 +159,7 @@ namespace SurvivalGame
                     {
                         double yEdge = (Y - Target.Y);
                         double xEdge = (X - Target.X);
-                        EntityTracker.Add.Sword(Game1.textures["Rectangle"], this, (float)Math.Atan2(yEdge, xEdge)).immuneEntities.Add(this);
+                        EntityTracker.Add.Sword(TextureName.Rectangle, this, (float)Math.Atan2(yEdge, xEdge), 5).immuneEntities.Add(this);
 
                         SecondaryCooldown = 0;
                     }

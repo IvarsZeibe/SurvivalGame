@@ -9,5 +9,6 @@ namespace SurvivalGame
     {
         void Update(GameTime gameTime);
         bool UpdateEnabled { get; set; }
+        public bool IsDead { get; set; }
     }
 }

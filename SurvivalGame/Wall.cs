@@ -13,13 +13,16 @@ namespace SurvivalGame
 
         bool ghost;
         float timeAlive;
-        public Wall(Texture2D texture, double x, double y, bool collision = true)
+        public Wall(TextureName texture, double x, double y, bool collision = true)
         {
             Mass = 19;
-            Texture = texture;
-            Collision = collision;
-            ghost = !collision;
+            this.Collision = collision;
+            this.ghost = !collision;
             Hitbox = new Rect(x, y, 50, 50);
+            Color color = Color.SaddleBrown;
+            if (ghost)
+                color = Color.SandyBrown;
+            Drawing = new Drawing(texture, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), color, 0f, new Vector2(50, 50), isDrawn: true);
 
         }
         public override void Update(GameTime gameTime)
@@ -27,7 +30,7 @@ namespace SurvivalGame
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(ghost && timeAlive > 0.1)
             {
-                IsDead = true;
+                Kill();
             }
         }
     }

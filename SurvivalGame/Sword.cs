@@ -17,19 +17,19 @@ namespace SurvivalGame
         float timeAlive;
         float timeTillDeath = 0.2f;
         public int Damage { get; set; }
-        public override Rectangle Drawing
+        //public override Rectangle Drawing
+        //{
+        //    get => new Rectangle((int)Owner.Hitbox.X, (int)Owner.Hitbox.Y, Hitbox.Width, 2);
+        //    //get => new Rectangle((int)Hitbox.Left, (int)Hitbox.Top, Hitbox.Width, Hitbox.Height);
+        //}
+        public Sword(TextureName texture, Entity owner, float rotation, int damage)
         {
-            get => new Rectangle((int)Owner.Hitbox.X, (int)Owner.Hitbox.Y, Hitbox.Width, 2);
-            //get => new Rectangle((int)Hitbox.Left, (int)Hitbox.Top, Hitbox.Width, Hitbox.Height);
-        }
-        public Sword(Texture2D texture, Entity owner, float rotation)
-        {
-            Damage = 100;
+            Damage = damage;
             Collision = false;
             Mass = 1;
             Hitbox = new Circle(owner.Hitbox.X, owner.Hitbox.Y, (owner.Hitbox.Width + owner.Hitbox.Height) / 2);
             //Hitbox = new Rect(player.Hitbox.X, player.Hitbox.Y, 150, 150);
-            Texture = texture;
+            //Texture = texture;
             Owner = owner;
 
             //right
@@ -56,20 +56,24 @@ namespace SurvivalGame
                 StartingRotation = 0.8f;
                 Direction = Direction.Right;
             }
-            Rotation = StartingRotation;
+            //Rotation = StartingRotation;
             UpdateCoord();
+
+            Drawing = new Drawing(texture, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.White, StartingRotation,
+                new Vector2((float)Hitbox.Width, 2f), 0.5f, true);
         }
 
         public override void Update(GameTime gameTime)
         {
             UpdateSize();
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Rotation = timeAlive * -1.8f / timeTillDeath + StartingRotation;
             if (timeAlive > timeTillDeath)
             {
-                IsDead = true;
+                Kill();
             }
             UpdateCoord();
+            Drawing.Position = new Vector2((float)Hitbox.X, (float)Hitbox.Y);
+            Drawing.Rotation = timeAlive * -1.8f / timeTillDeath + StartingRotation;
         }
         private void UpdateCoord()
         {

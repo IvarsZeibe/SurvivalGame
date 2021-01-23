@@ -11,18 +11,20 @@ namespace SurvivalGame
 {
     class MouseCursor : Entity
     {
-        public MouseCursor(Texture2D texture)
+        public MouseCursor()
         {
-            LayerDepth = 0f;
+            //LayerDepth = 0f;
             Collision = false;
-            Texture = texture;
+            //Texture = texture;
             Hitbox = new Rect(0, 0, 3, 3);
+            Drawing = new Drawing(TextureName.Rectangle, new Vector2(0, 0), Color.White, 0f, new Vector2(3, 3), isDrawn: true);
         }
         public override void Update(GameTime gameTime)
         {
             MouseState mstate = Mouse.GetState();
             Hitbox.X = mstate.X;
             Hitbox.Y = mstate.Y;
+            Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
         }
     }
 }

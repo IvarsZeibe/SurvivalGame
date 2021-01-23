@@ -15,23 +15,17 @@ namespace SurvivalGame
     /// </summary>
     public class Game1 : Game
     {
-        /*public static */GraphicsDeviceManager graphics;
+        GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        KeyboardState kstate;
         MouseState mstate;
 
         Random rand = new Random();
-        Point defaultRes = new Point(800, 480);
-
-        //List<string> mouseKeyHistory = new List<string>();
-        public static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
 
         Player player;
         Chat chat;
-        //Enemy enemy;
         MouseCursor mouseCursor;
 
-        float enemySpawnRate = 1f;
+        float enemySpawnRate = 2f;
         float timeSinceEnemySpawn = 999999f;
         float wallPlacementCooldown = 0.3f;
         float timeSinceWallPlacement = 999999f;
@@ -43,6 +37,7 @@ namespace SurvivalGame
             Content.RootDirectory = "Content";
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1200;
+            Globals.graphics = graphics;
         }
 
         /// <summary>
@@ -53,27 +48,12 @@ namespace SurvivalGame
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            //textures.Add("Player", CreateTexture(Color.Red));
-            //textures.Add("Enemy", CreateTexture(Color.White));
-            //textures.Add("MouseCursor", CreateTexture(Color.White));
-            //textures.Add("Bullet", CreateTexture(Color.Orange));
-            //textures.Add("Flame", CreateTexture(Color.DarkOrange));
-            //textures.Add("Wall", CreateTexture(Color.SaddleBrown));
-            //textures.Add("Sword", CreateTexture(Color.White));
-            //var color = Color.SaddleBrown;
-            //color.A = 100;
-            //textures.Add("WallGhost", CreateTexture(color));
+            Globals.Textures.Add(TextureName.Rectangle, Utilities.CreateTexture(Color.White, GraphicsDevice));
+            Globals.Textures.Add(TextureName.Circle, Content.Load<Texture2D>("Circle"));
+            Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
 
-            //textures.Add("Player", this.Content.Load<Texture2D>("Untitled"));
-
-            textures.Add("Circle", this.Content.Load<Texture2D>("Circle"));
-            textures.Add("Rectangle", CreateTexture(Color.White));
-            Globals.Textures.Add(TextureName.Rectangle, CreateTexture(Color.White));
-            Globals.SpriteFonts.Add(SpriteFontName.Chat, this.Content.Load<SpriteFont>("Chat"));
-
-            player = EntityTracker.Add.Player(textures["Circle"]);
-            mouseCursor = EntityTracker.Add.MouseCursor(textures["Rectangle"]);
+            player = EntityTracker.Add.Player();
+            mouseCursor = EntityTracker.Add.MouseCursor();
             chat = new Chat(graphics);
 
             base.Initialize();
@@ -99,17 +79,6 @@ namespace SurvivalGame
             // TODO: Unload any non ContentManager content here
         }
 
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -120,40 +89,27 @@ namespace SurvivalGame
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            kstate = Keyboard.GetState();
             mstate = Mouse.GetState();
             // TODO: Add your update logic here
 
             UpdateKeys();
-
-
-            Utility.DetectKeyReleased(kstate, mstate);
-            foreach (var key in Utility.DetectKeyPressed(kstate, mstate))
-            {
-
-                Utility.newKeys.Add(key);
-            }
-
             OnKeyDown(gameTime);
-            OnKeyUp(Utility.newKeys, gameTime);
 
             timeSinceWallPlacement += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             EntityTracker.UpdateEntities(gameTime);
 
-            timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Globals.Updatables = Globals.Updatables.Where(o => !o.IsDead).ToList();
+            foreach (var updatable in Globals.Updatables)
+            {
+                if (updatable.UpdateEnabled)
+                    updatable.Update(gameTime);
+            }
+
             SpawnEnemy(gameTime);
 
-            foreach(var i in Utility.DetectKeyPressed(kstate, mstate))
-            {
-                Utility.keyHistory.Add(i);
-            }
-            Utility.newKeys.Clear();
             base.Update(gameTime);
         }
-
-
-
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -166,23 +122,25 @@ namespace SurvivalGame
 
             spriteBatch.Begin(SpriteSortMode.BackToFront);
 
-            foreach(var entity in EntityTracker.Entities)
+            foreach (var drawing in Globals.Drawings)
             {
-                spriteBatch.Draw(entity.Texture, entity.Drawing, null, entity.Color, entity.Rotation, Vector2.Zero, SpriteEffects.None, entity.LayerDepth);
-            }
-            foreach(var drawing in EntityTracker.Drawings)
-            {
-                if(drawing.IsDrawn)
+                if (drawing.IsDrawn)
                     spriteBatch.Draw(Globals.Textures[drawing.Texture], drawing.Position, null, drawing.Color, drawing.Rotation, Vector2.Zero, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
             }
-            foreach(var text in EntityTracker.DrawingsText)
+            foreach (var drawingText in Globals.DrawingTexts)
             {
-                spriteBatch.DrawString(Globals.SpriteFonts[text.SpriteFont], text.Text, text.Position, text.Color, text.Rotation, Vector2.Zero, text.Scale, SpriteEffects.None, text.LayerDepth);
+                if (drawingText.IsDrawn)
+                    spriteBatch.DrawString(Globals.SpriteFonts[drawingText.SpriteFont], drawingText.Text, drawingText.Position, drawingText.Color, drawingText.Rotation, Vector2.Zero, drawingText.Scale, SpriteEffects.None, drawingText.LayerDepth);
             }
 
             spriteBatch.End();
             base.Draw(gameTime);
         }
+
+
+
+
+
 
         void UpdateKeys()
         {
@@ -224,14 +182,13 @@ namespace SurvivalGame
 
             Globals.NewMouseKeys = Globals.PressedMouseKeys.Except(oldList).ToList();
         }
-
-        Texture2D CreateTexture(Color color)
-        {
-            Texture2D texture = new Texture2D(GraphicsDevice, 1, 1);
-            Color[] data = new Color[1] { color };
-            texture.SetData(data);
-            return texture;
-        }
+        //Texture2D CreateTexture(Color color)
+        //{
+        //    Texture2D texture = new Texture2D(GraphicsDevice, 1, 1);
+        //    Color[] data = new Color[1] { color };
+        //    texture.SetData(data);
+        //    return texture;
+        //}
         void OnKeyDown(/*List<string> keysPressed,*/ GameTime gameTime)
         {
             if (!Globals.IsUserWriting)
@@ -241,26 +198,30 @@ namespace SurvivalGame
                     switch (key)
                     {
                         case Keys.D:
-                            player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
+                            if(!player.IsDead)
+                                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
                             break;
                         case Keys.A:
-                            player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
+                            if (!player.IsDead)
+                                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
                             break;
-
                         case Keys.S:
-                            player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
+                            if (!player.IsDead)
+                                player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
                             break;
-
                         case Keys.W:
-                            player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
+                            if (!player.IsDead)
+                                player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
                             break;
 
                         case Keys.Space:
-                            player.PrimaryAttack();
+                            if (!player.IsDead)
+                                player.PrimaryAttack();
                             break;
 
                         case Keys.V:
-                            player.SecondaryAttack();
+                            if (!player.IsDead)
+                                player.SecondaryAttack();
                             break;
                     }
                 }
@@ -269,10 +230,46 @@ namespace SurvivalGame
                     switch (key)
                     {
                         case Keys.D1:
-                            if (player.Primary == Player.Weapon.Pistol)
-                                player.Primary = Player.Weapon.Minigun;
-                            else
-                                player.Primary = Player.Weapon.Pistol;
+                            //if (player.Primary.Name == "pistol")
+                            //{
+                            //    player.Primary.Cooldown = 0.1f;
+                            //    player.Primary.Name = "mini";
+                            //}
+                            //else
+                            //{
+                            //    player.Primary.Cooldown = 0.3f;
+                            //    player.Primary.Name = "pistol";
+                            //}
+                            //player.Primary = player.Hotbar.Get(0);
+                            player.Hotbar.Selected = 0;
+                            break;
+                        case Keys.D2:
+                            //player.Primary = player.Hotbar.Get(1);
+                            player.Hotbar.Selected = 1;
+                            break;
+                        case Keys.D3:
+                            player.Hotbar.Selected = 2;
+                            break;
+                        case Keys.D4:
+                            player.Hotbar.Selected = 3;
+                            break;
+                        case Keys.D5:
+                            player.Hotbar.Selected = 4;
+                            break;
+                        case Keys.D6:
+                            player.Hotbar.Selected = 5;
+                            break;
+                        case Keys.D7:
+                            player.Hotbar.Selected = 6;
+                            break;
+                        case Keys.D8:
+                            player.Hotbar.Selected = 7;
+                            break;
+                        case Keys.D9:
+                            player.Hotbar.Selected = 8;
+                            break;
+                        case Keys.D0:
+                            player.Hotbar.Selected = 9;
                             break;
                         case Keys.F11:
                             graphics.ToggleFullScreen();
@@ -302,151 +299,13 @@ namespace SurvivalGame
                             break;
                     }
                 }
-                //foreach (string key in Utility.keyHistory)
-                //{
-                //    switch (key)
-                //    {
-                //        case "LeftButton":
-                //            if (keysPressed.Contains("LeftButton"))
-                //                MakeWall();
-                //            break;
-
-                //        case "RightButton":
-                //            DeleteWall();
-                //            break;
-
-                //        case "D1":
-                //            if (keysPressed.Contains("D1"))
-                //            {
-                //                if (player.Primary == Player.Weapon.Pistol)
-                //                    player.Primary = Player.Weapon.Minigun;
-                //                else
-                //                    player.Primary = Player.Weapon.Pistol;
-                //            }
-                //            break;
-
-                //        case "F11":
-                //            if (keysPressed.Contains("F11"))
-                //                graphics.ToggleFullScreen();
-                //            break;
-
-                //        case "D":
-                //            player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
-                //            break;
-
-                //        case "A":
-                //            player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
-                //            break;
-
-                //        case "S":
-                //            player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
-                //            break;
-
-                //        case "W":
-                //            player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
-                //            break;
-
-                //        case "Space":
-                //            player.PrimaryAttack();
-                //            break;
-
-                //        case "V":
-                //            player.SecondaryAttack();
-                //            break;
-                //        case "Enter":
-                //            if (keysPressed.Contains("Enter"))
-                //            {
-                //                new Chat(graphics);
-                //                //new TextBox(CreateTexture(Color.Black), null, graphics);
-                //            }
-                //            break;
-                //        default:
-                //            break;
-                //    }
-                //}
             }
         }
-        void OnKeyUp(List<string> keysReleased, GameTime gameTime)
-        {
-
-        }
-        //List<string> DetectKeyPressed(KeyboardState kstate, MouseState mstate)
-        //{
-        //    List<string> keysPressed = new List<string>();
-        //    foreach (Keys key in kstate.GetPressedKeys())
-        //    {
-        //        if (!keyHistory.Contains(key.ToString()))
-        //        {
-        //            keysPressed.Add(key.ToString());
-        //            keyHistory.Add(key.ToString());
-        //        }
-        //    }
-        //    if (mstate.LeftButton.ToString() == "Pressed")
-        //    {
-        //        if (!keyHistory.Contains("LeftButton"))
-        //        {
-        //            keysPressed.Add("LeftButton");
-        //            keyHistory.Add("LeftButton");
-        //        }
-        //    }
-        //    if (mstate.RightButton.ToString() == "Pressed")
-        //    {
-        //        if (!keyHistory.Contains("RightButton"))
-        //        {
-        //            keysPressed.Add("RightButton");
-        //            keyHistory.Add("RightButton");
-        //        }
-        //    }
-        //    return keysPressed;
-        //}
-        //List<string> DetectKeyReleased(KeyboardState kstate, MouseState mstate)
-        //{
-        //    List<string> keysReleased = new List<string>();
-        //    foreach (string key in keyHistory)
-        //    {
-        //        bool keyFound = false;
-        //        foreach (Keys k in kstate.GetPressedKeys())
-        //        {
-        //            if (key == k.ToString())
-        //            {
-        //                keyFound = true;
-        //            }
-        //        }
-        //        if (key == "LeftButton")
-        //        {
-        //            keyFound = false;
-        //            if (!(mstate.LeftButton.ToString() == "Released"))
-        //            {
-        //                keyFound = true;
-        //            }
-        //        }
-        //        if (key == "RightButton")
-        //        {
-        //            keyFound = false;
-        //            if (!(mstate.RightButton.ToString() == "Released"))
-        //            {
-        //                keyFound = true;
-        //            }
-        //        }
-        //        if (!keyFound)
-        //        {
-        //            keysReleased.Add(key);
-        //        }
-        //    }
-
-        //    foreach (string key in keysReleased)
-        //    {
-        //        if (keyHistory.Contains(key))
-        //        {
-        //            keyHistory.Remove(key);
-        //        }
-        //    }
-        //    return keysReleased;
-        //}
 
         void SpawnEnemy(GameTime gameTime)
         {
-            if (timeSinceEnemySpawn > enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < 100 )
+            timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (timeSinceEnemySpawn > enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < 10 )
             {
                 int i = 0;
                 while (i < 10)
@@ -454,9 +313,9 @@ namespace SurvivalGame
                     Enemy enemy;
                     bool suitableSpot = true;
                     if(rand.Next(2) == 1)
-                        enemy = EntityTracker.Add.Enemy(textures["Circle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), target: player, color: Color.DarkSlateGray);
+                        enemy = EntityTracker.Add.Enemy(TextureName.Circle, rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), target: player, color: Color.DarkSlateGray);
                     else
-                        enemy = EntityTracker.Add.Enemy(textures["Rectangle"], rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35), target: player, color: Color.DarkGray);
+                        enemy = EntityTracker.Add.Enemy(TextureName.Rectangle, rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35), target: player, color: Color.DarkGray);
 
 
                     foreach (var entity in EntityTracker.Entities)
@@ -469,7 +328,8 @@ namespace SurvivalGame
                     }
                     if (!suitableSpot)
                     {
-                        EntityTracker.Entities.Remove(enemy);
+                        //EntityTracker.Entities.Remove(enemy);
+                        enemy.Kill();
                     }
                     else
                         break;
@@ -480,10 +340,9 @@ namespace SurvivalGame
         }
         void MakeWall()
         {
-            bool success = true;
             if (timeSinceWallPlacement > wallPlacementCooldown)
             {
-                var wall = EntityTracker.Add.Wall(textures["Rectangle"], mstate.X, mstate.Y);
+                var wall = EntityTracker.Add.Wall(TextureName.Rectangle, mstate.X, mstate.Y);
 
                 bool suitableSpot = true;
                 foreach (var entity in EntityTracker.Entities)
@@ -497,21 +356,16 @@ namespace SurvivalGame
                 }
                 if (!suitableSpot)
                 {
-                    EntityTracker.Entities.Remove(wall);
-
-                    timeSinceWallPlacement = 0f;
-
-                    success = false;
+                    wall.Kill();
+                    MakeGhost();
                 }
-            }
-            if (!success)
-            {
-                MakeGhost();
+                else
+                    timeSinceWallPlacement = 0f;
             }
         }
         void MakeGhost()
         {
-            var wallGhost = EntityTracker.Add.Wall(textures["Rectangle"], mstate.X, mstate.Y, false);
+            var wallGhost = EntityTracker.Add.Wall(TextureName.Rectangle, mstate.X, mstate.Y, false);
 
             bool intersects = false;
             foreach (var w in EntityTracker.GetEntities<Wall>())
@@ -528,24 +382,14 @@ namespace SurvivalGame
         }
         void DeleteWall()
         {
-            //Wall wall = null;
             foreach (var wall in EntityTracker.GetEntities<Wall>())
             {
                 if (wall.Collision && wall.CollidesWith(mouseCursor))
                 {
-                    //targetFound = true;
-                    //wall = w;
-                    wall.IsDead = true;
+                    wall.Kill();
                     break;
                 }
             }
-            //if(targetFound)
-            //    walls.Remove(wall);
-            //if (targetFound)
-            //{
-            //    entities.Remove(wall);
-            //    walls.Remove(wall);
-            //}
         }
     }
 }
