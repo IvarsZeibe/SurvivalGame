@@ -17,7 +17,7 @@ namespace SurvivalGame
                     new Color(0, 0, 0, 100),
                     0f,
                     new Vector2(300,30),
-                    0.5f,
+                    0.35f,
                     isDrawn
                 );
             for (int i = 0; i < 10; i++)
@@ -55,7 +55,7 @@ namespace SurvivalGame
             {
                 float height = Drawing.Scale.Y;
                 float width = Drawing.Scale.X / 10;
-                ItemDrawings[index] = new Drawing(item.TextureName, Drawing.Position + new Vector2(width * index, 0), item.Color, 0f, new Vector2(width, height), 0.4f);
+                ItemDrawings[index] = new Drawing(item.TextureName, Drawing.Position + new Vector2(width * index, 0), item.Color, 0f, new Vector2(width, height), 0.3f);
                 return true;
             }
             return false;

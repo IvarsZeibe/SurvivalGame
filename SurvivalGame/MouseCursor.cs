@@ -17,7 +17,7 @@ namespace SurvivalGame
             Collision = false;
             //Texture = texture;
             Hitbox = new Rect(0, 0, 3, 3);
-            Drawing = new Drawing(TextureName.Rectangle, new Vector2(0, 0), Color.White, 0f, new Vector2(3, 3), isDrawn: true);
+            Drawing = new Drawing(TextureName.Rectangle, new Vector2(0, 0), Color.White, 0f, new Vector2(3, 3), 0.01f, true);
         }
         public override void Update(GameTime gameTime)
         {

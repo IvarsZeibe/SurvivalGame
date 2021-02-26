@@ -29,7 +29,7 @@ namespace SurvivalGame
                 Color = new Color(0, 0, 0, 100),
                 Rotation = 0f,
                 Scale = new Vector2(500, 170),
-                LayerDepth = 0.2f,
+                LayerDepth = 0.35f,
                 IsDrawn = false
             };
             this.TextPosition = new Vector2(this.Position.X, this.Position.Y + GetHeight());
@@ -96,7 +96,7 @@ namespace SurvivalGame
                     Position = new Vector2(this.TextPosition.X, this.TextPosition.Y - Globals.SpriteFonts[SpriteFontName.Aerial16].MeasureString("A").Y),
                     Color = Color.White,
                     Rotation = 0f,
-                    LayerDepth = Drawing.LayerDepth - 0.1f,
+                    LayerDepth = 0.2f,
                     IsDrawn = true
                 }
             };

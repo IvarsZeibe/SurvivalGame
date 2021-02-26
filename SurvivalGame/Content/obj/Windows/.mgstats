@@ -1,0 +1,5 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Chat.spritefont","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Chat.xnb","FontDescriptionProcessor","SpriteFontContent",2008,37905,0.414108
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Circle.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Circle.xnb","TextureProcessor","Texture2DContent",54771,16777301,0.7523343
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Pistoltem.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Pistoltem.xnb","TextureProcessor","Texture2DContent",3886,1048661,0.0560116
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Untitled.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Untitled.xnb","TextureProcessor","Texture2DContent",17208,262229,0.0210054

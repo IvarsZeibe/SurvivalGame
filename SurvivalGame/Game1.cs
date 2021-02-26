@@ -25,7 +25,7 @@ namespace SurvivalGame
         Chat chat;
         MouseCursor mouseCursor;
 
-        float enemySpawnRate = 2f;
+        float enemySpawnRate = 1f;
         float timeSinceEnemySpawn = 999999f;
         float wallPlacementCooldown = 0.3f;
         float timeSinceWallPlacement = 999999f;
@@ -50,6 +50,8 @@ namespace SurvivalGame
         {
             Globals.Textures.Add(TextureName.Rectangle, Utilities.CreateTexture(Color.White, GraphicsDevice));
             Globals.Textures.Add(TextureName.Circle, Content.Load<Texture2D>("Circle"));
+            Globals.Textures.Add(TextureName.PistolItem, Content.Load<Texture2D>("PistolItem"));
+            Globals.Textures.Add(TextureName.SwordItem, Content.Load<Texture2D>("SwordItem"));
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
 
             player = EntityTracker.Add.Player();
@@ -218,11 +220,6 @@ namespace SurvivalGame
                             if (!player.IsDead)
                                 player.PrimaryAttack();
                             break;
-
-                        case Keys.V:
-                            if (!player.IsDead)
-                                player.SecondaryAttack();
-                            break;
                     }
                 }
                 foreach(var key in Globals.NewKeyboardKeys)
@@ -230,21 +227,9 @@ namespace SurvivalGame
                     switch (key)
                     {
                         case Keys.D1:
-                            //if (player.Primary.Name == "pistol")
-                            //{
-                            //    player.Primary.Cooldown = 0.1f;
-                            //    player.Primary.Name = "mini";
-                            //}
-                            //else
-                            //{
-                            //    player.Primary.Cooldown = 0.3f;
-                            //    player.Primary.Name = "pistol";
-                            //}
-                            //player.Primary = player.Hotbar.Get(0);
                             player.Hotbar.Selected = 0;
                             break;
                         case Keys.D2:
-                            //player.Primary = player.Hotbar.Get(1);
                             player.Hotbar.Selected = 1;
                             break;
                         case Keys.D3:
@@ -275,8 +260,6 @@ namespace SurvivalGame
                             graphics.ToggleFullScreen();
                             break;
                         case Keys.T:
-                            //chat.IsDrawn = true; ;
-                            //EntityTracker.ObjectsWithUpdate.Add(chat);
                             chat.NewLine();
                             break;
                     }
@@ -305,7 +288,7 @@ namespace SurvivalGame
         void SpawnEnemy(GameTime gameTime)
         {
             timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (timeSinceEnemySpawn > enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < 10 )
+            if (timeSinceEnemySpawn > enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < 20 )
             {
                 int i = 0;
                 while (i < 10)

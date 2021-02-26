@@ -11,7 +11,9 @@ namespace SurvivalGame
     {
         None = 0,
         Rectangle,
-        Circle
+        Circle,
+        PistolItem,
+        SwordItem
     }
     enum SpriteFontName
     {

@@ -29,7 +29,7 @@ namespace SurvivalGame
     }
     class Pistol : IItem
     {
-        public Pistol(float damage = 10f, float cooldown = 0.3f, string name = "pistol", Color? color = null)
+        public Pistol(float damage = 20f, float cooldown = 0.3f, string name = "pistol", Color? color = null)
         {
             Damage = damage;
             Cooldown = cooldown;
@@ -40,12 +40,35 @@ namespace SurvivalGame
         public string Name { get; set; }
         public float Damage { get; }
         public float Cooldown { get; set; }
-        public TextureName TextureName { get; } = TextureName.Rectangle;
+        public TextureName TextureName { get; } = TextureName.PistolItem;
         public Color Color { get; set; } = Color.Black;
         public void OnUse(Entity owner)
         {
             MouseState mstate = Mouse.GetState();
-            EntityTracker.Add.Projectile(TextureName.Rectangle, 500f, new Vector2(owner.X, owner.Y), new Vector2(mstate.X, mstate.Y), 20).immuneEntities.Add(owner);
+            EntityTracker.Add.Projectile(TextureName.Rectangle, 500f, new Vector2(owner.X, owner.Y), new Vector2(mstate.X, mstate.Y), (int)Damage).immuneEntities.Add(owner);
+        }
+    }
+    class SwordItem : IItem
+    {
+        public SwordItem(float damage = 30f, float cooldown = 0.3f, string name = "sword", Color? color = null)
+        {
+            Damage = damage;
+            Cooldown = cooldown;
+            Name = name;
+            color ??= Color.White;
+            Color = (Color)color;
+        }
+        public string Name { get; set; }
+        public float Damage { get; }
+        public float Cooldown { get; set; }
+        public TextureName TextureName { get; } = TextureName.SwordItem;
+        public Color Color { get; set; } = Color.Black;
+        public void OnUse(Entity owner)
+        {
+            MouseState mstate = Mouse.GetState();
+            double yEdge = (owner.Y - mstate.Y);
+            double xEdge = (owner.X - mstate.X);
+            EntityTracker.Add.Sword(TextureName.Rectangle, owner, (float)Math.Atan2(yEdge, xEdge), (int)Damage).immuneEntities.Add(owner);
         }
     }
 }

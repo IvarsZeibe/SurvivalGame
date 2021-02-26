@@ -40,7 +40,7 @@ namespace SurvivalGame
         //        scale = new Vector2(value.X / textureWidth, value.Y / textureHeight);
         //    }
         //}
-        public float LayerDepth { get; set; } = 0.5f;
+        public float LayerDepth { get; set; } = 0.2f;
         public bool IsDrawn { get; set; } = false;
         public bool IsDead { get; set; } = false;
     }

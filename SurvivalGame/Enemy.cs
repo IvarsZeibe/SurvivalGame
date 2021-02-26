@@ -21,7 +21,6 @@ namespace SurvivalGame
         public Enemy() { }
         public Enemy(TextureName texture, float x, float y, int width, int height, int speed, bool collision, Entity target, Color? color)
         {
-            //this.Texture = texture;
             if (height == 0)
                 this.Hitbox = new Circle(x, y, width);
             else
@@ -34,10 +33,8 @@ namespace SurvivalGame
             this.MaxHealth = 100;
             this.Health = 100;
             this.Target = target;
-            //if (color != null)
-            //    Color = (Color)color;
             CreateHealthBar();
-            Drawing = new Drawing(texture, new Vector2(x, y), color ?? Color.White, 0, new Vector2(width, height), isDrawn: true);
+            Drawing = new Drawing(texture, new Vector2(x, y), color ?? Color.White, 0, new Vector2(width, height), 0.4f, true);
             
         }
         public enum Type
@@ -77,7 +74,7 @@ namespace SurvivalGame
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
                 {
-                    DamageEntity(projectile.Damage, "Projectile");
+                    DamageSelf(projectile.Damage, "Projectile");
                     projectile.immuneEntities.Add(this);
                     projectile.Kill();
                 }
@@ -86,7 +83,7 @@ namespace SurvivalGame
             {
                 if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
                 {
-                    DamageEntity(sword.Damage, "Sword");
+                    DamageSelf(sword.Damage, "Sword");
                     sword.immuneEntities.Add(this);
                 }
             }
@@ -114,7 +111,7 @@ namespace SurvivalGame
             }
 
         }
-        public override bool DamageEntity(int damage, string source)
+        public override bool DamageSelf(int damage, string source)
         {
             Health -= damage;
             if (Hitbox is Circle)

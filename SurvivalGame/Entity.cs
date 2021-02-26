@@ -39,7 +39,7 @@ namespace SurvivalGame
             set => Hitbox.Y = value;
         }
         public virtual void Update(GameTime gameTime) { }
-        public virtual bool DamageEntity(int damage, string source)
+        public virtual bool DamageSelf(int damage, string source)
         {
             Health -= damage;
             return true;

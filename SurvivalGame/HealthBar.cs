@@ -21,7 +21,7 @@ namespace SurvivalGame
                 Color.Red,
                 0f,
                 maxScale,
-                0.1f,
+                0.36f,
                 true
             );
             //Drawing.Position = Drawing.Position - new Vector2(Drawing.Scale.X / 2, 0);

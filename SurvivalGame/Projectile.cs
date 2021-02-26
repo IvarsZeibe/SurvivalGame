@@ -32,7 +32,7 @@ namespace SurvivalGame
             this.Speed = speed;
             this.StartingCoord = new Vector2(X, Y);
             this.Damage = damage;
-            Drawing = new Drawing(texture, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Yellow, 0, new Vector2(10, 2), isDrawn: true);
+            Drawing = new Drawing(texture, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Yellow, 0, new Vector2(10, 2), 0.5f, true);
             Movement(target);
         }
         public override void Update(GameTime gameTime)

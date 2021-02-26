@@ -1,0 +1,7 @@
+mouse cursor = 0.01
+border, letters = 0.2
+items in hotbar = 0.3
+ui elements = 0.35
+healthbar = 0.36
+mobs = 0.4
+projectiles = 0.5
