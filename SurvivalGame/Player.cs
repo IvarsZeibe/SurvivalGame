@@ -12,9 +12,10 @@ namespace SurvivalGame
     class Player : Entity
     {
         private float PrimaryCooldown = 0f;
+        private float SecondaryCooldown = 0f;
 
         private readonly float startingRadius;
-        private readonly int minRadius = 30;
+        //private readonly int minRadius = 30;
         public Player()
         {
             this.Mass = 10;
@@ -22,8 +23,8 @@ namespace SurvivalGame
             this.Speed = 1 / 200f;
             this.Hitbox = new Circle(100, 100, 100);
             startingRadius = 100;
-            this.MaxHealth = 2000;
-            this.Health = 2000;
+            this.MaxHealth = 200000;
+            this.Health = 200000;
             CreateHealthBar();
             Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Red, 0f,
                 new Vector2(100, 100), 0.4f, true);
@@ -31,25 +32,16 @@ namespace SurvivalGame
             Hotbar.Add(new Pistol(), 0);
             Hotbar.Add(new Pistol(5, 0.1f, "mini"), 1);
             Hotbar.Add(new SwordItem(), 2);
+            Hotbar.Add(new BlockItem(), 3);
             Hotbar.Selected = 0;
         }
-        //public enum Weapon
-        //{
-        //    Pistol,
-        //    Minigun,
-        //    Sword
-        //}
-
-        public IItem Primary { get => Hotbar.Get(Hotbar.Selected); }
-        //public Weapon Secondary { get; set; } = Weapon.Sword;
-
+        public IItem EquipedItem { get => Hotbar.Get(Hotbar.Selected); }
         public Hotbar Hotbar;
 
         public override void Update(GameTime gameTime)
         {
             PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //SecondaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
+            SecondaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
             foreach (var projectile in EntityTracker.GetEntities<Projectile>())
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
@@ -71,32 +63,24 @@ namespace SurvivalGame
             if (IsDead)
                 Globals.Drawings.Remove(Drawing);
         }
-        public void PrimaryAttack()
+        public void UsePrimary()
         {
-            if (PrimaryCooldown > Primary.Cooldown)
+            if (PrimaryCooldown > EquipedItem.Cooldown)
             {
-                Primary.OnUse(this);
-                PrimaryCooldown = 0;
+                EquipedItem.OnPrimaryUse(this);
+                if (EquipedItem.Successful)
+                    PrimaryCooldown = 0;
             }
         }
-        //public void SecondaryAttack()
-        //{
-        //    switch (Secondary)
-        //    {
-        //        case Weapon.Sword:
-        //            SecondaryRateOfFire = 0.3f;
-        //            if (SecondaryCooldown > SecondaryRateOfFire)
-        //            {
-        //                MouseState mstate = Mouse.GetState();
-        //                double yEdge = (Y - mstate.Y);
-        //                double xEdge = (X - mstate.X);
-        //                EntityTracker.Add.Sword(TextureName.Rectangle, this, (float)Math.Atan2(yEdge, xEdge), 30).immuneEntities.Add(this);
-
-        //                SecondaryCooldown = 0;
-        //            }
-        //            break;
-        //    }
-        //}
+        public void UseSecondary()
+        {
+            if (SecondaryCooldown > EquipedItem.Cooldown)
+            {
+                EquipedItem.OnSecondaryUse(this);
+                if (EquipedItem.Successful)
+                    SecondaryCooldown = 0;
+            }
+        }
         public override bool DamageSelf(int damage, string source)
         {
             Health -= damage;

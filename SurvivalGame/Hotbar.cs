@@ -7,6 +7,7 @@ namespace SurvivalGame
 {
     class Hotbar
     {
+        private int padding = 3;
         public Hotbar(Entity owner, bool isDrawn = true)
         {
             Owner = owner;
@@ -29,7 +30,7 @@ namespace SurvivalGame
         private Entity Owner { get; }
         public Drawing Drawing { get; set; }
         public List<Drawing> ItemDrawings { get; } = new List<Drawing>();
-        public List<Drawing> SelectedItemFrame { get; set; } = new List<Drawing>();
+        public List<Drawing> SelectedItemBorder { get; set; } = new List<Drawing>();
         private int selected;
         public int Selected
         {
@@ -40,11 +41,11 @@ namespace SurvivalGame
             set
             {
                 selected = value;
-                foreach (var drawing in SelectedItemFrame)
+                foreach (var drawing in SelectedItemBorder)
                     Globals.Drawings.Remove(drawing);
                 float height = Drawing.Scale.Y;
                 float width = Drawing.Scale.X / 10;
-                SelectedItemFrame = Utilities.CreateEmptyRectDrawings(Drawing.Position + new Vector2(width * selected, 0), Color.Black, new Vector2(width, height));
+                SelectedItemBorder = Utilities.CreateEmptyRectDrawings(Drawing.Position + new Vector2(width * selected, 0), Color.Black, new Vector2(width, height));
             }
         }
         public Inventory Inventory { get; set; } = new Inventory(10);
@@ -53,9 +54,9 @@ namespace SurvivalGame
             //return Inventory.Add(item);
             if (Inventory.Add(item, index))
             {
-                float height = Drawing.Scale.Y;
-                float width = Drawing.Scale.X / 10;
-                ItemDrawings[index] = new Drawing(item.TextureName, Drawing.Position + new Vector2(width * index, 0), item.Color, 0f, new Vector2(width, height), 0.3f);
+                float height = Drawing.Scale.Y - 2*padding;
+                float width = Drawing.Scale.X / 10 - 2*padding;
+                ItemDrawings[index] = new Drawing(item.TextureName, Drawing.Position + new Vector2((width + padding * 2) * index + padding, padding), item.Color, 0f, new Vector2(width, height), 0.3f);
                 return true;
             }
             return false;

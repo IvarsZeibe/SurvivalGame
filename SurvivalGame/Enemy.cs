@@ -11,8 +11,8 @@ namespace SurvivalGame
 {
     class Enemy : Entity
     {
-        private float PrimaryRateOfFire;
-        private float PrimaryCooldown = 0f;
+        protected float PrimaryRateOfFire;
+        protected float PrimaryCooldown = 0f;
         private float SecondaryRateOfFire;
         private float SecondaryCooldown = 0f;
         private int defaultWidth;
@@ -51,7 +51,7 @@ namespace SurvivalGame
         }
         public Weapon Primary { get; set; } = Weapon.Pistol;
         public Weapon Secondary { get; set; } = Weapon.Sword;
-        private Entity Target { get; set; }
+        protected Entity Target { get; set; }
         public override void Update(GameTime gameTime)
         {
             PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;

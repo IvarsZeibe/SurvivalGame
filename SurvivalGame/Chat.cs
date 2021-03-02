@@ -69,6 +69,10 @@ namespace SurvivalGame
             {
                 if (ActiveText.DrawingText.Text.Length > 0)
                 {
+                    if(ActiveText.DrawingText.Text[0] == '/')
+                    {
+                        ActiveText.DrawingText.Text = Globals.Command.CreateCommand(ActiveText.DrawingText.Text);
+                    }
                     WrittenText.Add(ActiveText);
                     if (WrittenText.Count > 6)
                     {
@@ -104,11 +108,11 @@ namespace SurvivalGame
 
         private float GetWidth()
         {
-            return (Globals.Textures[Drawing.Texture].Width);
+            return (Globals.Textures[Drawing.Texture.ToString()].Width);
         }
         private float GetHeight()
         {
-            return (Globals.Textures[Drawing.Texture].Height * Drawing.Scale.Y);
+            return (Globals.Textures[Drawing.Texture.ToString()].Height * Drawing.Scale.Y);
         }
     }
 }

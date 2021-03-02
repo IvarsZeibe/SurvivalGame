@@ -20,6 +20,7 @@ namespace SurvivalGame
             this.Scale = scale;
             this.LayerDepth = layerDepth;
             this.IsDrawn = isDrawn;
+
             Globals.Drawings.Add(this);
         }
         //public Drawing(TextureName texture, Vector2 position, Color color, float rotation, Point scale, float layerDepth = 0.5f, bool isDrawn = false)
@@ -46,7 +47,7 @@ namespace SurvivalGame
                 //if (Texture == TextureName.Rectangle)
                 //    scale = value;
                 //else
-                    scale = new Vector2((float)value.X / Globals.Textures[Texture].Width, (float)value.Y / Globals.Textures[Texture].Height);
+                    scale = new Vector2((float)value.X / Globals.Textures[Texture.ToString()].Width, (float)value.Y / Globals.Textures[Texture.ToString()].Height);
             }
         }
         public float LayerDepth { get; set; } = 0.5f;

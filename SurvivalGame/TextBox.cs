@@ -80,6 +80,12 @@ namespace SurvivalGame
                         case Keys n when (int)n >= 48 && (int)n <= 57:
                             DrawingText.Text.Insert(index.GetOffset(DrawingText.Text.Length), n.ToString()[1]);
                             break;
+                        case Keys.OemQuestion:
+                            if (!Globals.PressedKeyboardKeys.Contains(Keys.RightShift))
+                                DrawingText.Text.Insert(index.GetOffset(DrawingText.Text.Length), '/');
+                            else
+                                DrawingText.Text.Insert(index.GetOffset(DrawingText.Text.Length), '?');
+                            break;
                     }
 
                 }

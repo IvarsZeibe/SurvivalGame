@@ -30,7 +30,7 @@ namespace SurvivalGame
     }
     class Globals
     {
-        public static Dictionary<TextureName, Texture2D> Textures = new Dictionary<TextureName, Texture2D>();
+        public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
         public static Dictionary<SpriteFontName, SpriteFont> SpriteFonts = new Dictionary<SpriteFontName, SpriteFont>();
 
         public static GraphicsDeviceManager graphics { get; set; }
@@ -47,5 +47,7 @@ namespace SurvivalGame
 
         public static List<MouseKey> PressedMouseKeys = new List<MouseKey>();
         public static List<MouseKey> NewMouseKeys = new List<MouseKey>();
+
+        public static Command Command;
     }
 }

@@ -50,6 +50,15 @@ namespace SurvivalGame
                     Kill();
                 }
             }
+            foreach (var slime in EntityTracker.GetEntities<SlimeEnemy>())
+            {
+                if (CollidesWith(slime) && !immuneEntities.Contains(this))
+                {
+                    slime.DamageSelf(Damage, "Projectile");
+                    immuneEntities.Add(this);
+                    Kill();
+                }
+            }
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
         }
         private void Movement(Vector2 target)

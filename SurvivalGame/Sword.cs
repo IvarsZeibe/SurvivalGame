@@ -62,7 +62,14 @@ namespace SurvivalGame
             UpdateCoord();
             Drawing.Position = new Vector2((float)Hitbox.X, (float)Hitbox.Y);
             Drawing.Rotation = timeAlive * -1.8f / timeTillDeath + StartingRotation;
-
+            foreach (var slime in EntityTracker.GetEntities<SlimeEnemy>())
+            {
+                if(Hitbox.CollisionDetect(slime.Hitbox) != Vector2.Zero && !immuneEntities.Contains(slime))
+                {
+                    slime.DamageSelf(Damage, "Sword");
+                    immuneEntities.Add(slime);
+                }
+            }
         }
         private void UpdateCoord()
         {
