@@ -66,7 +66,7 @@ namespace SurvivalGame
             {
                 if(Hitbox.CollisionDetect(slime.Hitbox) != Vector2.Zero && !immuneEntities.Contains(slime))
                 {
-                    slime.DamageSelf(Damage, "Sword");
+                    slime.DamageSelf(Damage, this);
                     immuneEntities.Add(slime);
                 }
             }

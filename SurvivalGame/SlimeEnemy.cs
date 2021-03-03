@@ -49,7 +49,7 @@ namespace SurvivalGame
             AttackCooldownLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (AttackArea.CollisionDetect(Target.Hitbox) != Vector2.Zero && AttackCooldownLeft <= 0f)
             {
-                Target.DamageSelf(Damage, "Slime");
+                Target.DamageSelf(Damage, this);
                 AttackCooldownLeft = AttackCooldown;
             }
 
@@ -91,8 +91,19 @@ namespace SurvivalGame
         {
             if (Target.IsDead)
             {
-                XMovement = 0;
-                YMovement = 0;
+                if(EntityTracker.GetEntities<Player>().Count > 0)
+                {
+                    Target = EntityTracker.GetEntities<Player>()[0];
+                }
+                else
+                {
+                    Random rand = new Random();
+                    if (rand.Next(1) == 1)
+                        Target = new NoBrainEntity(X, Y);
+                    else
+                        Target = new NoBrainEntity();
+
+                }
             }
             else
             {
@@ -103,12 +114,15 @@ namespace SurvivalGame
             }
 
         }
-        public override bool DamageSelf(int damage, string source)
+        public override bool DamageSelf(int damage, Entity source)
         {
-            Health -= damage;
+            if(source is Player)
+                Health -= damage;
             //Hitbox.Width = (int)((defaultWidth - minSize) * ((float)Health / MaxHealth)) + minSize;
             if (Health <= 0)
             {
+                if (source is Player)
+                    Globals.HUD.pointsUI.Points += 1;
                 Kill();
             }
             return true;

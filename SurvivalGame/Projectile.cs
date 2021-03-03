@@ -10,23 +10,15 @@ namespace SurvivalGame
 {
     class Projectile : Entity
     {
-        //Vector2 Target { get; set; }
-        //private float precision = 1f;
-        //public void SetPrecision(float precision)
-        //{
-        //    this.precision = precision;
-        //    Movement(Target);
-        //}
         public List<Entity> immuneEntities = new List<Entity>();
         public int Damage { get; set; }
         int Range { get; set; }
-        //List<double> RelativCoord { get; set; }
-        //List<double> StartingCoord { get; set; }
         Vector2 StartingCoord { get; set; }
-        public Projectile(TextureName texture, float speed, Vector2 source, Vector2 target, int damage)
+        public Projectile(Entity _owner, TextureName texture, float speed, Vector2 source, Vector2 target, int damage)
         {
+            owner = _owner;
             //this.Texture = texture;
-            this.Hitbox = new Rect(source.X, source.Y, 10, 2);
+            this.Hitbox = new Circle(source.X, source.Y, 2);
             this.Collision = false;
             this.Range = 600;
             this.Speed = speed;
@@ -54,7 +46,7 @@ namespace SurvivalGame
             {
                 if (CollidesWith(slime) && !immuneEntities.Contains(this))
                 {
-                    slime.DamageSelf(Damage, "Projectile");
+                    slime.DamageSelf(Damage, owner);
                     immuneEntities.Add(this);
                     Kill();
                 }

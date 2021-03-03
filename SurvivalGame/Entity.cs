@@ -16,6 +16,7 @@ namespace SurvivalGame
             EntityTracker.Entities.Add(this);
         }
         public Drawing Drawing;
+        public Entity owner = null;
         public Hitbox Hitbox { get; set; }
         public bool Collision { get; set; }
         public int Health { get; set; }
@@ -43,7 +44,7 @@ namespace SurvivalGame
             set => Hitbox.Y = value;
         }
         public virtual void Update(GameTime gameTime) { }
-        public virtual bool DamageSelf(int damage, string source)
+        public virtual bool DamageSelf(int damage, Entity source)
         {
             Health -= damage;
             return true;

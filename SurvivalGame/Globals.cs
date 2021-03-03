@@ -49,5 +49,6 @@ namespace SurvivalGame
         public static List<MouseKey> NewMouseKeys = new List<MouseKey>();
 
         public static Command Command;
+        public static HUD HUD;
     }
 }

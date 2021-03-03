@@ -24,11 +24,14 @@ namespace SurvivalGame
         Player player;
         Chat chat;
         MouseCursor mouseCursor;
+        HUD hud;
 
         public float enemySpawnRate = 2f;
         float timeSinceEnemySpawn = 999999f;
         float wallPlacementCooldown = 0.3f;
         float timeSinceWallPlacement = 999999f;
+        float respawnCooldown = 10f;
+        float timeTillRespawn = -100f;
 
 
         public Game1()
@@ -57,6 +60,7 @@ namespace SurvivalGame
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
 
             //player = EntityTracker.Add.Player();
+            Globals.HUD = new HUD();
             player = new Player();
             mouseCursor = new MouseCursor();
             chat = new Chat(graphics);
@@ -109,6 +113,7 @@ namespace SurvivalGame
             OnKeyDown(gameTime);
 
             Globals.Command.DoCommand(this);
+            Globals.HUD.Update(gameTime);
 
             timeSinceWallPlacement += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -121,6 +126,24 @@ namespace SurvivalGame
                     updatable.Update(gameTime);
             }
             SpawnEnemy(gameTime);
+
+            if (player.IsDead)
+            {
+                if(timeTillRespawn <= -100)
+                {
+                    timeTillRespawn = respawnCooldown;
+                }
+                else if (timeTillRespawn < 0)
+                {
+                    player = new Player();
+                    timeTillRespawn = -100;
+                }
+                else
+                {
+                    timeTillRespawn -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+            }
+
 
             base.Update(gameTime);
         }

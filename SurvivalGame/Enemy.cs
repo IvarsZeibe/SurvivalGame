@@ -74,7 +74,7 @@ namespace SurvivalGame
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
                 {
-                    DamageSelf(projectile.Damage, "Projectile");
+                    DamageSelf(projectile.Damage, projectile.owner);
                     projectile.immuneEntities.Add(this);
                     projectile.Kill();
                 }
@@ -83,7 +83,7 @@ namespace SurvivalGame
             {
                 if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
                 {
-                    DamageSelf(sword.Damage, "Sword");
+                    DamageSelf(sword.Damage, this);
                     sword.immuneEntities.Add(this);
                 }
             }
@@ -99,8 +99,19 @@ namespace SurvivalGame
         {
             if (Target.IsDead)
             {
-                XMovement = 0;
-                YMovement = 0;
+                if (EntityTracker.GetEntities<Player>().Count > 0)
+                {
+                    Target = EntityTracker.GetEntities<Player>()[0];
+                }
+                else
+                {
+                    Random rand = new Random();
+                    if (rand.Next(1) == 1)
+                        Target = new NoBrainEntity(X, Y);
+                    else
+                        Target = new NoBrainEntity();
+
+                }
             }
             else
             {
@@ -111,9 +122,10 @@ namespace SurvivalGame
             }
 
         }
-        public override bool DamageSelf(int damage, string source)
+        public override bool DamageSelf(int damage, Entity source)
         {
-            Health -= damage;
+            if(source is Player)
+                Health -= damage;
             if (Hitbox is Circle)
                 Hitbox.Width = (int)((defaultWidth - minSize) * ((float)Health / MaxHealth)) + minSize;
             else
@@ -123,6 +135,8 @@ namespace SurvivalGame
             }
             if (Health <= 0)
             {
+                if(source is Player)
+                    Globals.HUD.pointsUI.Points += 1;
                 Kill();
             }
             return true;
@@ -135,7 +149,7 @@ namespace SurvivalGame
                     PrimaryRateOfFire = 0.6f;
                     if (PrimaryCooldown > PrimaryRateOfFire)
                     {
-                        new Projectile(TextureName.Rectangle, 500f, new Vector2(X, Y), new Vector2(Target.X, Target.Y), 10).immuneEntities.Add(this);
+                        new Projectile(this, TextureName.Rectangle, 500f, new Vector2(X, Y), new Vector2(Target.X, Target.Y), 10).immuneEntities.Add(this);
                         //p.immuneEntities.Add(this);
                         //Random rand = new Random();
                         //p.SetPrecision((float)(rand.NextDouble() + 0.5));
