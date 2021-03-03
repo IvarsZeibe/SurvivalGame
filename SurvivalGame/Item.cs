@@ -16,6 +16,7 @@ namespace SurvivalGame
         public bool Successful { get; set; }
         public void OnPrimaryUse(Entity owner) { }
         public void OnSecondaryUse(Entity owner) { }
+        public Hitbox Hitbox { get; set; }
     }
     class EmptyItem : IItem
     {
@@ -25,6 +26,7 @@ namespace SurvivalGame
         public TextureName TextureName { get; } = TextureName.Rectangle;
         public Color Color { get; set; } = Color.Transparent;
         public bool Successful { get; set; } = true;
+        public Hitbox Hitbox { get; set; } = new Rect(0, 0, 0, 0);
 
     }
     class Pistol : IItem
@@ -43,10 +45,11 @@ namespace SurvivalGame
         public TextureName TextureName { get; } = TextureName.PistolItem;
         public Color Color { get; set; } = Color.Black;
         public bool Successful { get; set; } = true;
+        public Hitbox Hitbox { get; set; }
         public void OnPrimaryUse(Entity owner)
         {
             MouseState mstate = Mouse.GetState();
-            EntityTracker.Add.Projectile(TextureName.Rectangle, 500f, new Vector2(owner.X, owner.Y), new Vector2(mstate.X, mstate.Y), (int)Damage).immuneEntities.Add(owner);
+            new Projectile(TextureName.Rectangle, 500f, new Vector2(owner.X, owner.Y), new Vector2(mstate.X, mstate.Y), (int)Damage).immuneEntities.Add(owner);
         }
     }
     class SwordItem : IItem
@@ -65,12 +68,13 @@ namespace SurvivalGame
         public TextureName TextureName { get; } = TextureName.SwordItem;
         public Color Color { get; set; } = Color.Black;
         public bool Successful { get; set; } = true;
+        public Hitbox Hitbox { get; set; }
         public void OnPrimaryUse(Entity owner)
         {
             MouseState mstate = Mouse.GetState();
             double yEdge = (owner.Y - mstate.Y);
             double xEdge = (owner.X - mstate.X);
-            EntityTracker.Add.Sword(TextureName.SwordItem, owner, (float)Math.Atan2(yEdge, xEdge), (int)Damage).immuneEntities.Add(owner);
+            new Sword(TextureName.Rectangle, owner, (float)Math.Atan2(yEdge, xEdge), (int)Damage).immuneEntities.Add(owner);
         }
     }
     class BlockItem : IItem
@@ -87,6 +91,7 @@ namespace SurvivalGame
         public TextureName TextureName { get; } = TextureName.Rectangle;
         public Color Color { get; set; } = Color.Black;
         public bool Successful { get; set; }
+        public Hitbox Hitbox { get; set; }
         public void OnPrimaryUse(Entity owner)
         {
             MakeWall();
@@ -98,7 +103,7 @@ namespace SurvivalGame
         private MouseState mstate { get => Mouse.GetState(); }
         void MakeWall()
         {
-            var wall = EntityTracker.Add.Wall(TextureName.Rectangle, mstate.X, mstate.Y);
+            var wall = new Wall(TextureName.Rectangle, mstate.X, mstate.Y);
 
             bool suitableSpot = true;
             foreach (var entity in EntityTracker.Entities)
@@ -123,7 +128,7 @@ namespace SurvivalGame
         }
         void MakeGhost()
         {
-            var wallGhost = EntityTracker.Add.Wall(TextureName.Rectangle, mstate.X, mstate.Y, false);
+            var wallGhost = new Wall(TextureName.Rectangle, mstate.X, mstate.Y, false);
 
             bool intersects = false;
             foreach (var w in EntityTracker.GetEntities<Wall>())

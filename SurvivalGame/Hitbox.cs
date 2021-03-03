@@ -115,6 +115,12 @@ namespace SurvivalGame
                 return new Vector2(offsetX, offsetY);
             }
         }
+        public float Distance(Hitbox h2)
+        {
+            double distanceX = Math.Round(Math.Abs(this.X - h2.X), 2);
+            double distanceY = Math.Round(Math.Abs(this.Y - h2.Y), 2);
+            return (float)Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
+        }
         public static Rect operator +(Hitbox h1, Hitbox h2)
         {
             Rect result = new Rect(h1.X + h2.X, h1.Y + h2.Y, h1.Width + h2.Width, h1.Height + h2.Height);

@@ -116,9 +116,8 @@ namespace SurvivalGame
 
         public override void Kill()
         {
-            Globals.Drawings.Remove(Drawing);
+            base.Kill();
             Globals.Drawings.Remove(Shadow);
-            IsDead = true;
         }
     }
 }

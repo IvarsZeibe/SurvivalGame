@@ -14,6 +14,8 @@ namespace SurvivalGame
         private float PrimaryCooldown = 0f;
         private float SecondaryCooldown = 0f;
 
+        private readonly int radius = 100;
+
         private readonly float startingRadius;
         //private readonly int minRadius = 30;
         public Player()
@@ -21,7 +23,7 @@ namespace SurvivalGame
             this.Mass = 10;
             this.Collision = true;
             this.Speed = 1 / 200f;
-            this.Hitbox = new Circle(100, 100, 100);
+            this.Hitbox = new Circle(Globals.graphics.PreferredBackBufferWidth / 2 - radius/2, Globals.graphics.PreferredBackBufferHeight / 2 - radius / 2, 100);
             startingRadius = 100;
             this.MaxHealth = 200000;
             this.Health = 200000;

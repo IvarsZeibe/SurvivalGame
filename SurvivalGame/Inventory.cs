@@ -15,7 +15,7 @@ namespace SurvivalGame
                 Content.Add(new EmptyItem());
             }
         }
-        private int SlotMax { get; }
+        public int SlotMax { get; }
         public bool Add(IItem item, int index)
         {
             if (index < SlotMax)
@@ -42,6 +42,13 @@ namespace SurvivalGame
                 return Content[index];
             else
                 return null;
+        }
+        public IEnumerator<IItem> GetEnumerator()
+        {
+            foreach (var item in Content)
+            {
+                yield return item;
+            }
         }
     }
 }

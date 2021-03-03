@@ -25,7 +25,7 @@ namespace SurvivalGame
         Chat chat;
         MouseCursor mouseCursor;
 
-        public float enemySpawnRate = 1f;
+        public float enemySpawnRate = 2f;
         float timeSinceEnemySpawn = 999999f;
         float wallPlacementCooldown = 0.3f;
         float timeSinceWallPlacement = 999999f;
@@ -56,8 +56,9 @@ namespace SurvivalGame
             //Globals.Textures.Add(TextureName.Circle.ToString(), Content.Load<Texture2D>("Circle"));
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
 
-            player = EntityTracker.Add.Player();
-            mouseCursor = EntityTracker.Add.MouseCursor();
+            //player = EntityTracker.Add.Player();
+            player = new Player();
+            mouseCursor = new MouseCursor();
             chat = new Chat(graphics);
             Globals.Command = new Command(this);
         }
@@ -119,14 +120,7 @@ namespace SurvivalGame
                 if (updatable.UpdateEnabled)
                     updatable.Update(gameTime);
             }
-
             SpawnEnemy(gameTime);
-            //timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //if (timeSinceEnemySpawn > enemySpawnRate)
-            //{
-            //    EntityTracker.Entities.Add(new SlimeEnemy(300, 300, player));
-            //    timeSinceEnemySpawn = 0f;
-            //}
 
             base.Update(gameTime);
         }
@@ -202,13 +196,6 @@ namespace SurvivalGame
 
             Globals.NewMouseKeys = Globals.PressedMouseKeys.Except(oldList).ToList();
         }
-        //Texture2D CreateTexture(Color color)
-        //{
-        //    Texture2D texture = new Texture2D(GraphicsDevice, 1, 1);
-        //    Color[] data = new Color[1] { color };
-        //    texture.SetData(data);
-        //    return texture;
-        //}
         void OnKeyDown(GameTime gameTime)
         {
             if (!Globals.IsUserWriting && this.IsActive)
@@ -232,6 +219,12 @@ namespace SurvivalGame
                         case Keys.W:
                             if (!player.IsDead)
                                 player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
+                            break;
+                        case Keys.Space:
+                            if (!player.IsDead)
+                            {
+                                player.UsePrimary();
+                            }
                             break;
                     }
                 }
@@ -281,10 +274,6 @@ namespace SurvivalGame
                 {
                     switch (button)
                     {
-                        case MouseKey.LeftButton:
-                            if (!player.IsDead)
-                                player.UsePrimary();
-                            break;
                         case MouseKey.RightButton:
                             if (!player.IsDead)
                                 player.UseSecondary();
@@ -293,24 +282,43 @@ namespace SurvivalGame
                 }
                 foreach(var button in Globals.NewMouseKeys)
                 {
+                    switch (button)
+                    {
+                        case MouseKey.LeftButton:
+                            for (int i = 0; i < player.Hotbar.Inventory.SlotMax; i++)
+                            {
+                                if (mouseCursor.Hitbox.CollisionDetect(player.Hotbar.Get(i).Hitbox) != Vector2.Zero)
+                                {
+                                    player.Hotbar.Add(mouseCursor.CursorSlot.Add(player.Hotbar.Get(i)), i);
+                                    break;
+                                }
+                            }
+                            break;
+                    }
                 }
             }
         }
         void SpawnEnemy(GameTime gameTime)
         {
             timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (timeSinceEnemySpawn > enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count  < 20 )
+            if (1 / timeSinceEnemySpawn < enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < 20)
             {
-                if(rand.Next(4) < 1)
+                if (rand.Next(4) < 1)
                 {
                     for (int i = 0; i < 10; i++)
                     {
                         Enemy enemy;
                         bool suitableSpot = true;
                         if (rand.Next(2) == 1)
-                            enemy = EntityTracker.Add.Enemy(TextureName.Circle, rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), target: player, color: Color.DarkSlateGray);
+                            enemy = new Enemy(TextureName.Circle,
+                                rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
+                                rand.Next(0, Globals.graphics.PreferredBackBufferHeight),
+                                rand.Next(15, 25), target: player, color: Color.DarkSlateGray);
                         else
-                            enemy = EntityTracker.Add.Enemy(TextureName.Rectangle, rand.Next(0, 500), rand.Next(0, 500), rand.Next(15, 25), rand.Next(25, 35), target: player, color: Color.DarkGray);
+                            enemy = new Enemy(TextureName.Rectangle,
+                                rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
+                                rand.Next(0, Globals.graphics.PreferredBackBufferHeight),
+                                rand.Next(15, 25), rand.Next(25, 35), target: player, color: Color.DarkGray);
 
 
                         foreach (var entity in EntityTracker.Entities)
@@ -321,6 +329,8 @@ namespace SurvivalGame
                                 break;
                             }
                         }
+                        if (enemy.Hitbox.Distance(player.Hitbox) < 200)
+                            suitableSpot = false;
                         if (!suitableSpot)
                         {
                             EntityTracker.Entities.Remove(enemy);
@@ -336,8 +346,10 @@ namespace SurvivalGame
                     {
                         SlimeEnemy slime;
                         bool suitableSpot = true;
-                        slime = new SlimeEnemy(rand.Next(0, 500), rand.Next(0, 500), player);
-                        EntityTracker.Entities.Add(slime);
+                        slime = new SlimeEnemy(
+                            rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
+                            rand.Next(0, Globals.graphics.PreferredBackBufferHeight),
+                            player);
                         foreach (var e in EntityTracker.Entities)
                         {
                             if (slime != e && slime.CollidesWith(e))
@@ -346,6 +358,8 @@ namespace SurvivalGame
                                 break;
                             }
                         }
+                        if (slime.Hitbox.Distance(player.Hitbox) < 200)
+                            suitableSpot = false;
                         if (!suitableSpot)
                         {
                             EntityTracker.Entities.Remove(slime);
@@ -355,61 +369,8 @@ namespace SurvivalGame
                             break;
                     }
                 }
-                
+
                 timeSinceEnemySpawn = 0f;
-            }
-        }
-        void MakeWall()
-        {
-            if (timeSinceWallPlacement > wallPlacementCooldown)
-            {
-                var wall = EntityTracker.Add.Wall(TextureName.Rectangle, mstate.X, mstate.Y);
-
-                bool suitableSpot = true;
-                foreach (var entity in EntityTracker.Entities)
-                {
-                    if (entity is MouseCursor)
-                        continue;
-                    if (wall.CollidesWith(entity) && entity != wall)
-                    {
-                        suitableSpot = false;
-                    }
-                }
-                if (!suitableSpot)
-                {
-                    wall.Kill();
-                    MakeGhost();
-                }
-                else
-                    timeSinceWallPlacement = 0f;
-            }
-        }
-        void MakeGhost()
-        {
-            var wallGhost = EntityTracker.Add.Wall(TextureName.Rectangle, mstate.X, mstate.Y, false);
-
-            bool intersects = false;
-            foreach (var w in EntityTracker.GetEntities<Wall>())
-            {
-                if (!w.Collision && wallGhost.CollidesWith(w) && w != wallGhost)
-                {
-                    intersects = true;
-                }
-            }
-            if (intersects)
-            {
-                EntityTracker.Entities.Remove(wallGhost);
-            }
-        }
-        void DeleteWall()
-        {
-            foreach (var wall in EntityTracker.GetEntities<Wall>())
-            {
-                if (wall.Collision && wall.CollidesWith(mouseCursor))
-                {
-                    wall.Kill();
-                    break;
-                }
             }
         }
     }

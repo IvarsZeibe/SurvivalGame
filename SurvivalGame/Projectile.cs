@@ -28,7 +28,7 @@ namespace SurvivalGame
             //this.Texture = texture;
             this.Hitbox = new Rect(source.X, source.Y, 10, 2);
             this.Collision = false;
-            this.Range = 300;
+            this.Range = 600;
             this.Speed = speed;
             this.StartingCoord = new Vector2(X, Y);
             this.Damage = damage;

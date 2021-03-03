@@ -19,7 +19,7 @@ namespace SurvivalGame
         private int defaultHeight;
         private int minSize = 10;
         public Enemy() { }
-        public Enemy(TextureName texture, float x, float y, int width, int height, int speed, bool collision, Entity target, Color? color)
+        public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null)
         {
             if (height == 0)
                 this.Hitbox = new Circle(x, y, width);
@@ -135,7 +135,7 @@ namespace SurvivalGame
                     PrimaryRateOfFire = 0.6f;
                     if (PrimaryCooldown > PrimaryRateOfFire)
                     {
-                        EntityTracker.Add.Projectile(TextureName.Rectangle, 500f, new Vector2(X, Y), new Vector2(Target.X, Target.Y), 10).immuneEntities.Add(this);
+                        new Projectile(TextureName.Rectangle, 500f, new Vector2(X, Y), new Vector2(Target.X, Target.Y), 10).immuneEntities.Add(this);
                         //p.immuneEntities.Add(this);
                         //Random rand = new Random();
                         //p.SetPrecision((float)(rand.NextDouble() + 0.5));
@@ -156,7 +156,7 @@ namespace SurvivalGame
                     {
                         double yEdge = (Y - Target.Y);
                         double xEdge = (X - Target.X);
-                        EntityTracker.Add.Sword(TextureName.Rectangle, this, (float)Math.Atan2(yEdge, xEdge), 5).immuneEntities.Add(this);
+                        new Sword(TextureName.Rectangle, this, (float)Math.Atan2(yEdge, xEdge), 5).immuneEntities.Add(this);
 
                         SecondaryCooldown = 0;
                     }

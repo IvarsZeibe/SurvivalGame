@@ -11,6 +11,10 @@ namespace SurvivalGame
     enum Direction { Left, Right, Up, Down};
     class Entity
     {
+        public Entity()
+        {
+            EntityTracker.Entities.Add(this);
+        }
         public Drawing Drawing;
         public Hitbox Hitbox { get; set; }
         public bool Collision { get; set; }
