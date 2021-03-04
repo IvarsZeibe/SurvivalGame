@@ -31,16 +31,16 @@ namespace SurvivalGame
     }
     class Pistol : IItem
     {
-        public Pistol(Entity _owner,  float damage = 20f, float cooldown = 0.3f, string name = "pistol", Color? color = null)
+        public Pistol(float damage = 20f, float cooldown = 0.3f, string name = "pistol", Color? color = null, float bulletVelocity = 500f)
         {
-            owner = _owner;
             Damage = damage;
             Cooldown = cooldown;
+            this.bulletVelocity = bulletVelocity;
             Name = name;
             color ??= Color.White;
             Color = (Color)color;
         }
-        public Entity owner;
+        float bulletVelocity;
         public string Name { get; set; }
         public float Damage { get; }
         public float Cooldown { get; set; }
@@ -51,7 +51,7 @@ namespace SurvivalGame
         public void OnPrimaryUse(Entity owner)
         {
             MouseState mstate = Mouse.GetState();
-            new Projectile(owner, TextureName.Rectangle, 500f, new Vector2(owner.X, owner.Y), new Vector2(mstate.X, mstate.Y), (int)Damage).immuneEntities.Add(owner);
+            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(mstate.X, mstate.Y), (int)Damage).immuneEntities.Add(owner);
         }
     }
     class SwordItem : IItem

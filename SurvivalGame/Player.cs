@@ -30,8 +30,8 @@ namespace SurvivalGame
             Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Red, 0f,
                 new Vector2(radius, radius), 0.4f, true);
             Hotbar = Globals.HUD.hotbar;
-            Hotbar.Add(new Pistol(this), 0);
-            Hotbar.Add(new Pistol(this, 5, 0.1f, "mini"), 1);
+            Hotbar.Add(new Pistol(), 0);
+            Hotbar.Add(new Pistol(5, 0.1f, "mini"), 1);
             Hotbar.Add(new SwordItem(), 2);
             Hotbar.Add(new BlockItem(), 3);
             Hotbar.Selected = 0;
@@ -47,7 +47,7 @@ namespace SurvivalGame
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
                 {
-                    DamageSelf(projectile.Damage, this);
+                    DamageSelf(projectile.Damage, projectile.owner);
                     projectile.immuneEntities.Add(this);
                     projectile.Kill();
                 }
@@ -56,7 +56,7 @@ namespace SurvivalGame
             {
                 if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
                 {
-                    DamageSelf(sword.Damage, this);
+                    DamageSelf(sword.Damage, sword.owner);
                     sword.immuneEntities.Add(this);
                 }
             }

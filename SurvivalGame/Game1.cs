@@ -25,8 +25,10 @@ namespace SurvivalGame
         Chat chat;
         MouseCursor mouseCursor;
         HUD hud;
+        Levels levels;
 
         public float enemySpawnRate = 2f;
+        public float maxEnemies = 0f;
         float timeSinceEnemySpawn = 999999f;
         float wallPlacementCooldown = 0.3f;
         float timeSinceWallPlacement = 999999f;
@@ -65,6 +67,7 @@ namespace SurvivalGame
             mouseCursor = new MouseCursor();
             chat = new Chat(graphics);
             Globals.Command = new Command(this);
+            levels = new Levels(this);
         }
 
         /// <summary>
@@ -143,7 +146,7 @@ namespace SurvivalGame
                     timeTillRespawn -= (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }
             }
-
+            levels.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -324,7 +327,7 @@ namespace SurvivalGame
         void SpawnEnemy(GameTime gameTime)
         {
             timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (1 / timeSinceEnemySpawn < enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < 20)
+            if (1 / timeSinceEnemySpawn < enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < maxEnemies)
             {
                 if (rand.Next(4) < 1)
                 {

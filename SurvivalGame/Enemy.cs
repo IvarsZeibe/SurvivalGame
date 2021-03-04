@@ -83,7 +83,7 @@ namespace SurvivalGame
             {
                 if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
                 {
-                    DamageSelf(sword.Damage, this);
+                    DamageSelf(sword.Damage, sword.owner);
                     sword.immuneEntities.Add(this);
                 }
             }
