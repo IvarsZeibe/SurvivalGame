@@ -24,14 +24,11 @@ namespace SurvivalGame
         Player player;
         Chat chat;
         MouseCursor mouseCursor;
-        HUD hud;
         Levels levels;
 
         public float enemySpawnRate = 2f;
         public float maxEnemies = 0f;
         float timeSinceEnemySpawn = 999999f;
-        float wallPlacementCooldown = 0.3f;
-        float timeSinceWallPlacement = 999999f;
         float respawnCooldown = 10f;
         float timeTillRespawn = -100f;
 
@@ -118,17 +115,16 @@ namespace SurvivalGame
             Globals.Command.DoCommand(this);
             Globals.HUD.Update(gameTime);
 
-            timeSinceWallPlacement += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             EntityTracker.UpdateEntities(gameTime);
 
             Globals.Updatables = Globals.Updatables.Where(o => !o.IsDead).ToList();
-            foreach (var updatable in Globals.Updatables)
+            for(int i = 0; i < Globals.Updatables.Count; i++)
             {
-                if (updatable.UpdateEnabled)
-                    updatable.Update(gameTime);
+                if (Globals.Updatables[i].UpdateEnabled)
+                    Globals.Updatables[i].Update(gameTime);
             }
-            SpawnEnemy(gameTime);
+            //SpawnEnemy(gameTime);
+            //Globals.Spawner.Update(gameTime);
 
             if (player.IsDead)
             {
@@ -329,7 +325,7 @@ namespace SurvivalGame
             timeSinceEnemySpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (1 / timeSinceEnemySpawn < enemySpawnRate && EntityTracker.GetEntities<Enemy>().Count < maxEnemies)
             {
-                if (rand.Next(4) < 1)
+                if (rand.Next(3) < 1)
                 {
                     for (int i = 0; i < 10; i++)
                     {

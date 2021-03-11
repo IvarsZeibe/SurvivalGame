@@ -5,16 +5,23 @@ using System.Text;
 
 namespace SurvivalGame
 {
-    class SlimeEnemy : Enemy
+    class SlimeEnemy : Entity
     {
         private int Damage;
-        private double JumpSpeedMultiplier = 1;
-        private double JumpProgress = 0;
-        private readonly double JumpCooldown = 1.5;
-        private double JumpCooldownLeft = 0;
-        private float yOffset = 0f;
         private float AttackCooldown = 0.1f;
         private float AttackCooldownLeft = 0f;
+        private bool aggresive = true;
+
+        private double JumpSpeedMultiplier = 1;
+        private double JumpProgress = 0;
+        private double JumpCooldown = 1.5;
+        private double JumpCooldownLeft = 0;
+        private float yOffset = 0f;
+
+        private int detectionRange = 400;
+        private int followRange = 800;
+
+        private Entity Target { get; set; }
         private Hitbox AttackArea;
         private Drawing Shadow;
 
@@ -35,23 +42,16 @@ namespace SurvivalGame
         }
         public override void Update(GameTime gameTime)
         {
-            //PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
             Jump(gameTime);
 
             UpdateMovement();
             Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
             Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
 
-
             this.AttackArea.X = Hitbox.X;
             this.AttackArea.Y = Hitbox.Y;
 
-            AttackCooldownLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (AttackArea.CollisionDetect(Target.Hitbox) != Vector2.Zero && AttackCooldownLeft <= 0f)
-            {
-                Target.DamageSelf(Damage, this);
-                AttackCooldownLeft = AttackCooldown;
-            }
+            TryToAttack(gameTime);
 
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top + yOffset);
             Shadow.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Bottom + 1);
@@ -89,40 +89,82 @@ namespace SurvivalGame
         }
         private void UpdateMovement()
         {
-            if (Target.IsDead)
-            {
-                if(EntityTracker.GetEntities<Player>().Count > 0)
-                {
-                    Target = EntityTracker.GetEntities<Player>()[0];
-                }
-                else
-                {
-                    Random rand = new Random();
-                    if (rand.Next(1) == 1)
-                        Target = new NoBrainEntity(X, Y);
-                    else
-                        Target = new NoBrainEntity();
-
-                }
-            }
-            else
+            CheckForTarget();
+            if(!IsDead)
             {
                 double xedge = Hitbox.X - Target.Hitbox.X;
                 double yedge = Hitbox.Y - Target.Hitbox.Y;
                 XMovement = (-xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed) * JumpSpeedMultiplier);
                 YMovement = (-yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed) * JumpSpeedMultiplier);
+                if (Math.Abs(xedge) < Hitbox.Width)
+                    XMovement = 0;
+                if (Math.Abs(yedge) < Hitbox.Height)
+                    YMovement = 0;
             }
 
+        }
+        protected void CheckForTarget()
+        {
+            if (Target.IsDead)
+            {
+                foreach (var target in EntityTracker.GetEntities<Player>())
+                {
+                    if (Hitbox.Distance(target.Hitbox) < detectionRange)
+                    {
+                        Target = target;
+                        aggresive = true;
+                        return;
+                    }
+                }
+                Random rand = new Random();
+                if (rand.Next(0) == 1)
+                    Target = new NoBrainEntity(X, Y);
+                else
+                {
+                    float xPosition = X + rand.Next(-followRange, followRange);
+                    float yPosition = Y + rand.Next(-followRange, followRange);
+
+                    if (xPosition < 0)
+                        xPosition = X + followRange;
+                    else if (xPosition > Globals.graphics.PreferredBackBufferWidth)
+                        xPosition = X - followRange;
+                    if (yPosition < 0)
+                        yPosition = Y + followRange;
+                    else if (yPosition > Globals.graphics.PreferredBackBufferHeight)
+                        yPosition = Y - followRange;
+
+                    Target = new NoBrainEntity(xPosition, yPosition);
+                }
+                aggresive = false;
+            }
+            else
+            {
+                if (Hitbox.Distance(Target.Hitbox) > followRange)
+                {
+                    Target = new NoBrainEntity(X, Y);
+                    aggresive = false;
+                }
+
+            }
+        }
+        private void TryToAttack(GameTime gameTime)
+        {
+            AttackCooldownLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (AttackArea.CollisionDetect(Target.Hitbox) != Vector2.Zero && AttackCooldownLeft <= 0f)
+            {
+                Target.DamageSelf(Damage, this);
+                AttackCooldownLeft = AttackCooldown;
+            }
         }
         public override bool DamageSelf(int damage, Entity source)
         {
             if(source is Player)
                 Health -= damage;
-            //Hitbox.Width = (int)((defaultWidth - minSize) * ((float)Health / MaxHealth)) + minSize;
             if (Health <= 0)
             {
                 if (source is Player)
-                    Globals.HUD.pointsUI.Points += 1;
+                    Globals.HUD.points += 1;
+                Globals.HUD.enemiesLeft -= 1;
                 Kill();
             }
             return true;

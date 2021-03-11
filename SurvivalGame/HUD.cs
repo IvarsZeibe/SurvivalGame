@@ -7,48 +7,90 @@ namespace SurvivalGame
 {
     partial class HUD
     {
-        public PointsUI pointsUI;
         public Hotbar hotbar;
+
+        Dictionary<string, Drawing> drawings = new Dictionary<string, Drawing>();
+        Dictionary<string, DrawingText> textDrawings = new Dictionary<string, DrawingText>();
+
+        public int points { get; set; } = 0;
+        public int currentWave { get; set; } = 0;
+        int health
+        {
+            get => EntityTracker.GetEntities<Player>().Count > 0 ? EntityTracker.GetEntities<Player>()[0].Health : 0;
+        }
+        public int enemiesLeft { get; set; } = 0;
 
         public HUD()
         {
-            pointsUI = new PointsUI();
+            CreatePointsUI();
+            CreateWaveDisplayUI();
+            CreateHealthUI();
+            CreateEnemiesLeftUI();
             hotbar = new Hotbar();
         }
-        public class PointsUI
+        public void Update(GameTime gameTime)
         {
-            Drawing Drawing { get; set; }
-            DrawingText PointsDrawing { get; set; }
-            public int Points { get; set; } = 0;
-            public PointsUI()
-            {
-                Drawing = new Drawing(
+            textDrawings["PointsUI"].Text = new StringBuilder(points.ToString());
+            textDrawings["WaveDisplayUI"].Text = new StringBuilder("Wave: " + currentWave);
+            textDrawings["HealthUI"].Text = new StringBuilder("Health: " + health);
+            textDrawings["EnemiesLeftUI"].Text = new StringBuilder("Enemies left: " + enemiesLeft);
+        }
+        private void CreatePointsUI()
+        {
+            drawings.Add(
+                "PointsUI",
+               new Drawing(
                     TextureName.Circle,
                     new Vector2(20, Globals.graphics.PreferredBackBufferHeight - 100),
                     Color.Yellow,
                     0f,
-                    new Vector2(20, 20));
-                Globals.Drawings.Add(Drawing);
-
-                PointsDrawing = new DrawingText(
+                    new Vector2(20, 20)));
+            textDrawings.Add(
+                "PointsUI",
+               new DrawingText(
                     SpriteFontName.Aerial16,
-                    new StringBuilder(Points.ToString()),
+                    new StringBuilder(points.ToString()),
                     new Vector2(50, Globals.graphics.PreferredBackBufferHeight - 100),
                     Color.White,
                     0,
-                    new Vector2(1,1),
-                    isDrawn: true
-                    );
-                Globals.DrawingTexts.Add(PointsDrawing);
-            }
-            public void Update(GameTime gameTime)
-            {
-                PointsDrawing.Text = new StringBuilder(Points.ToString());
-            }
+                    new Vector2(1, 1),
+                    isDrawn: true));
         }
-        public void Update(GameTime gameTime)
+        private void CreateWaveDisplayUI()
         {
-            pointsUI.Update(gameTime);
+            textDrawings.Add("WaveDisplayUI",
+                new DrawingText(
+                    SpriteFontName.Aerial16,
+                    new StringBuilder("Wave: " + currentWave),
+                    new Vector2(20, Globals.graphics.PreferredBackBufferHeight - 130),
+                    Color.White,
+                    0,
+                    new Vector2(1, 1),
+                    isDrawn: true));
+        }
+        private void CreateHealthUI()
+        {
+            textDrawings.Add("HealthUI",
+                new DrawingText(
+                    SpriteFontName.Aerial16,
+                    new StringBuilder("Health: " + health),
+                    new Vector2(20, Globals.graphics.PreferredBackBufferHeight - 160),
+                    Color.White,
+                    0,
+                    new Vector2(1, 1),
+                    isDrawn: true));
+        }
+        private void CreateEnemiesLeftUI()
+        {
+            textDrawings.Add("EnemiesLeftUI",
+                new DrawingText(
+                    SpriteFontName.Aerial16,
+                    new StringBuilder("Enemies left: " + enemiesLeft),
+                    new Vector2(20, Globals.graphics.PreferredBackBufferHeight - 190),
+                    Color.White,
+                    0,
+                    new Vector2(1, 1),
+                    isDrawn: true));
         }
     }
 }

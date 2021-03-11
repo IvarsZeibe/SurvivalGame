@@ -30,6 +30,8 @@ namespace SurvivalGame
     }
     class Globals
     {
+        public static Random rand = new Random();
+
         public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
         public static Dictionary<SpriteFontName, SpriteFont> SpriteFonts = new Dictionary<SpriteFontName, SpriteFont>();
 
@@ -50,5 +52,6 @@ namespace SurvivalGame
 
         public static Command Command;
         public static HUD HUD;
+
     }
 }

@@ -13,16 +13,23 @@ namespace SurvivalGame
             this.game1 = game1;
             Level1();
         }
-        string activeLevel;
         delegate void EndCondition();
         EndCondition endCondition;
         void Level1()
         {
-            game1.enemySpawnRate = 0.5f;
-            game1.maxEnemies = 5;
+            Entity player = null;
+            if(EntityTracker.GetEntities<Player>().Count > 0)
+                player = EntityTracker.GetEntities<Player>()[0];
+
+            Spawner slimeSpawner = new SlimeEnemySpawner(player);
+            slimeSpawner.cooldown = 2f;
+            slimeSpawner.maxEnemies = 5;
+            slimeSpawner.type = "world";
+            Globals.HUD.enemiesLeft = 5;
+            Globals.HUD.currentWave = 1;
             endCondition = delegate
             {
-                if (Globals.HUD.pointsUI.Points >= 10)
+                if (Globals.HUD.enemiesLeft <= 0)
                 {
                     Level2();
                 }
@@ -31,18 +38,75 @@ namespace SurvivalGame
         }
         void Level2()
         {
-            game1.enemySpawnRate = 2f;
-            game1.maxEnemies = 30;
+            RemoveWorldSpawners();
+            Entity player = null;
+            if (EntityTracker.GetEntities<Player>().Count > 0)
+                player = EntityTracker.GetEntities<Player>()[0];
+
+            Spawner enemySpawner = new EnemySpawner(player);
+            enemySpawner.cooldown = 2f;
+            enemySpawner.maxEnemies = 6;
+            enemySpawner.type = "world";
+
+            Spawner slimeSpawner = new SlimeEnemySpawner(player);
+            slimeSpawner.cooldown = 5f;
+            slimeSpawner.maxEnemies = 3;
+            slimeSpawner.type = "world";
+
+            Globals.HUD.currentWave = 2;
+            Globals.HUD.enemiesLeft = 20;
             try
             {
-                Globals.HUD.hotbar.Add(new Pistol(25, 0.1f, "mg", bulletVelocity: 1000f), 4);
+                Globals.HUD.hotbar.Add(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f));
+                Globals.HUD.hotbar.Add(new Pistol(10, 0.1f, "mini"));
+                //Globals.HUD.hotbar.Add(new Pistol(25, 0.1f, "mg", bulletVelocity: 1000f));
             }
             catch { }
             endCondition = delegate
             {
-                //if (Globals.HUD.pointsUI.Points >= 40)
-                    //Level2();
+                if (Globals.HUD.enemiesLeft <= 0)
+                    Level3();
             };
+        }
+        void Level3()
+        {
+            RemoveWorldSpawners();
+            Entity player = null;
+            if (EntityTracker.GetEntities<Player>().Count > 0)
+                player = EntityTracker.GetEntities<Player>()[0];
+
+            Spawner enemySpawner = new EnemySpawner(player);
+            enemySpawner.cooldown = 2f;
+            enemySpawner.maxEnemies = 15;
+            enemySpawner.type = "world";
+
+            Spawner slimeSpawner = new SlimeEnemySpawner(player);
+            slimeSpawner.cooldown = 3f;
+            slimeSpawner.maxEnemies = 10;
+            slimeSpawner.type = "world";
+
+            Globals.HUD.currentWave = 3;
+            Globals.HUD.enemiesLeft = 100;
+            try
+            {
+                Globals.HUD.hotbar.Add(new Pistol(50, 0.05f, "mg", bulletVelocity: 1500f));
+            }
+            catch { }
+            endCondition = delegate
+            {
+                
+            };
+        }
+        void RemoveWorldSpawners()
+        {
+            foreach (var o in Globals.Updatables)
+            {
+                if (o is Spawner)
+                {
+                    if ((o as Spawner).type == "world")
+                        o.IsDead = true;
+                }
+            }
         }
         public void Update(GameTime gameTime)
         {

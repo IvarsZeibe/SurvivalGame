@@ -61,8 +61,21 @@ namespace SurvivalGame
             }
             public Inventory Inventory { get; set; } = new Inventory(slotCountHorizontal);
 
-            public bool Add(IItem item, int index)
+            public bool Add(IItem item, int index = -1)
             {
+                if(index == -1)
+                {
+                    for (int i = 0; i < Inventory.SlotMax; i++)
+                    {
+                        if (Inventory.Get(i) is EmptyItem)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index == -1)
+                        return false;
+                }
                 if (Inventory.Add(item, index))
                 {
                     if (ItemDrawings[index] != null)

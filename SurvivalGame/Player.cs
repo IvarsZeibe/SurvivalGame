@@ -16,8 +16,6 @@ namespace SurvivalGame
 
         private readonly int radius = 40;
 
-        private readonly float startingRadius;
-        //private readonly int minRadius = 30;
         public Player()
         {
             this.Mass = 10;
@@ -26,14 +24,13 @@ namespace SurvivalGame
             this.Hitbox = new Circle(Globals.graphics.PreferredBackBufferWidth / 2 - radius/2, Globals.graphics.PreferredBackBufferHeight / 2 - radius / 2, radius);
             this.MaxHealth = 2000;
             this.Health = 2000;
-            CreateHealthBar();
+            new HealthBar(this);
             Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Red, 0f,
                 new Vector2(radius, radius), 0.4f, true);
+
             Hotbar = Globals.HUD.hotbar;
-            Hotbar.Add(new Pistol(), 0);
-            Hotbar.Add(new Pistol(5, 0.1f, "mini"), 1);
-            Hotbar.Add(new SwordItem(), 2);
-            Hotbar.Add(new BlockItem(), 3);
+            Hotbar.Add(new SwordItem());
+            Hotbar.Add(new BlockItem());
             Hotbar.Selected = 0;
         }
         public IItem EquipedItem { get => Hotbar.Get(Hotbar.Selected); }
@@ -91,10 +88,6 @@ namespace SurvivalGame
                 Kill();
             }
             return true;
-        }
-        private void CreateHealthBar()
-        {
-            new HealthBar(this);
         }
     }
 }

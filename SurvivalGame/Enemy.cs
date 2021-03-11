@@ -18,6 +18,10 @@ namespace SurvivalGame
         private int defaultWidth;
         private int defaultHeight;
         private int minSize = 10;
+        private int detectionRange = 400;
+        private int followRange = 800;
+        private bool aggresive = true;
+
         public Enemy() { }
         public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null)
         {
@@ -61,14 +65,7 @@ namespace SurvivalGame
             Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
             Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
 
-            if (!Target.IsDead)
-            {
-                double distanceFromTarget = Math.Sqrt((X - Target.X) * (X - Target.X) + (Y - Target.Y) * (Y - Target.Y));
-                if (distanceFromTarget > 100)
-                    PrimaryAttack();
-                else
-                    SecondaryAttack();
-            }
+            TryToAttack();
 
             foreach (var projectile in EntityTracker.GetEntities<Projectile>())
             {
@@ -97,30 +94,75 @@ namespace SurvivalGame
         }
         private void Movement()
         {
-            if (Target.IsDead)
-            {
-                if (EntityTracker.GetEntities<Player>().Count > 0)
-                {
-                    Target = EntityTracker.GetEntities<Player>()[0];
-                }
-                else
-                {
-                    Random rand = new Random();
-                    if (rand.Next(1) == 1)
-                        Target = new NoBrainEntity(X, Y);
-                    else
-                        Target = new NoBrainEntity();
-
-                }
-            }
-            else
+            CheckForTarget();
+            if(!Target.IsDead)
             {
                 double xedge = Hitbox.X - Target.Hitbox.X;
                 double yedge = Hitbox.Y - Target.Hitbox.Y;
                 XMovement = -xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
                 YMovement = -yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
+                if (Math.Abs(xedge) < Hitbox.Width)
+                    XMovement = 0;
+                if (Math.Abs(yedge) < Hitbox.Height)
+                    YMovement = 0;
             }
 
+        }
+        private void TryToAttack()
+        {
+            if (aggresive && !Target.IsDead)
+            {
+                double distanceFromTarget = Math.Sqrt((X - Target.X) * (X - Target.X) + (Y - Target.Y) * (Y - Target.Y));
+                if (distanceFromTarget > 100)
+                    PrimaryAttack();
+                else
+                    SecondaryAttack();
+
+            }
+        }
+        protected void CheckForTarget()
+        {
+            if(Target.IsDead)
+            {
+                foreach(var target in EntityTracker.GetEntities<Player>())
+                {
+                    if(Hitbox.Distance(target.Hitbox) < detectionRange)
+                    {
+                        Target = target;
+                        aggresive = true;
+                        return;
+                    }
+                }
+                Random rand = new Random();
+                if (rand.Next(0) == 1)
+                    Target = new NoBrainEntity(X, Y);
+                else
+                {
+                    float xPosition = X + rand.Next(-followRange, followRange);
+                    float yPosition = Y + rand.Next(-followRange, followRange);
+
+                    if (xPosition < 0)
+                        xPosition = X + followRange;
+                    else if (xPosition > Globals.graphics.PreferredBackBufferWidth)
+                        xPosition = X - followRange;
+                    if (yPosition < 0)
+                        yPosition = Y + followRange;
+                    else if (yPosition > Globals.graphics.PreferredBackBufferHeight)
+                        yPosition = Y - followRange;
+
+                    Target = new NoBrainEntity(xPosition, yPosition);
+                }
+                aggresive = false;
+            }
+            else
+            {
+                if (Hitbox.Distance(Target.Hitbox) > followRange)
+                {
+                    Target = new NoBrainEntity(X, Y);
+                    aggresive = false;
+                }
+
+            }
         }
         public override bool DamageSelf(int damage, Entity source)
         {
@@ -135,8 +177,9 @@ namespace SurvivalGame
             }
             if (Health <= 0)
             {
-                if(source is Player)
-                    Globals.HUD.pointsUI.Points += 1;
+                if(source is Player) { }
+                    Globals.HUD.points += 1;
+                Globals.HUD.enemiesLeft -= 1;
                 Kill();
             }
             return true;
