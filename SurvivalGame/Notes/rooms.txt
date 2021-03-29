@@ -1,0 +1,12 @@
+slime room
+ 5 slimes
+ 
+empty room
+
+shooter room
+
+mixed room
+ 
+spawn room
+ no waves or enemys
+ background grassy
