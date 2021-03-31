@@ -17,7 +17,8 @@ namespace SurvivalGame
             this.Position = position;
             this.Color = color;
             this.Rotation = rotation;
-            this.Scale = scale;
+            if(scale != Vector2.Zero)
+                this.Scale = scale;
             this.LayerDepth = layerDepth;
             this.IsDrawn = isDrawn;
 

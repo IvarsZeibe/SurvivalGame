@@ -170,7 +170,7 @@ namespace SurvivalGame
                 AttackCooldownLeft = AttackCooldown;
             }
         }
-        public override bool DamageSelf(int damage, Entity source)
+        public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
             if(source is Player)
                 Health -= damage;

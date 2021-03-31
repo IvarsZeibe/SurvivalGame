@@ -91,6 +91,32 @@ namespace SurvivalGame
                     }
                 }
             }
+            foreach(var entity in EntityTracker.Entities)
+            {
+                if(!(entity is SlimeEnemy))
+                {
+                    if (Hitbox.CollidesWith(entity.Hitbox) && !immuneEntities.Contains(entity))
+                    {
+                        entity.DamageSelf(Damage, owner, DamageType.Projectile);
+                        immuneEntities.Add(entity);
+                        switch (Direction)
+                        {
+                            case Direction.Left:
+                                entity.RecievedKnockback += new Vector2(-KnockbackStrenght, 0);
+                                break;
+                            case Direction.Right:
+                                entity.RecievedKnockback += new Vector2(KnockbackStrenght, 0);
+                                break;
+                            case Direction.Up:
+                                entity.RecievedKnockback += new Vector2(0, -KnockbackStrenght);
+                                break;
+                            case Direction.Down:
+                                entity.RecievedKnockback += new Vector2(0, KnockbackStrenght);
+                                break;
+                        }
+                    }
+                }
+            }
         }
         private void UpdateCoord()
         {

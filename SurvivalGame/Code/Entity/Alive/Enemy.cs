@@ -21,7 +21,7 @@ namespace SurvivalGame
         Inventory Inventory = new Inventory(3);
         private HealthBar HealthBar;
 
-        public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null)
+        public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null, bool addToRoom = true) : base(addToRoom)
         {
             if (height == 0)
                 this.Hitbox = new Circle(x, y, width);
@@ -157,7 +157,7 @@ namespace SurvivalGame
 
             }
         }
-        public override bool DamageSelf(int damage, Entity source)
+        public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
             if(source is Player)
                 Health -= damage;

@@ -16,7 +16,7 @@ namespace SurvivalGame
     public class Game1 : Game
     {
         //GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        //SpriteBatch spriteBatch;
 
         Player player;
         Chat chat;
@@ -53,7 +53,7 @@ namespace SurvivalGame
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
 
             //player = EntityTracker.Add.Player();
-            var room = new Room((0, 0), "Spawn", Color.White, TextureName.GrassyBackground);
+            var room = new Room((0, 0), "Spawn", new Color(0, 220, 0), TextureName.GrassyBackground);
             Globals.MouseCursor = new MouseCursor();
             Globals.HUD = new HUD();
             player = new Player();
@@ -63,6 +63,7 @@ namespace SurvivalGame
             //levels = new DefaultLevels(this);
             Globals.MainMenu = new MainMenu();
             input = new Input(this, player, chat);
+            Globals.Map = new Map();
 
             Globals.HUD.hotbar.Add(new SwordItem());
             Globals.shop.AddItemForSale(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f), 3);
@@ -79,7 +80,7 @@ namespace SurvivalGame
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            Globals.spriteBatch = new SpriteBatch(GraphicsDevice);
             // TODO: use this.Content to load your game content here
 
             void addTexture(string fileName)
@@ -148,22 +149,22 @@ namespace SurvivalGame
             GraphicsDevice.Clear(Globals.Rooms[Globals.activeRoomCoords].BackgroundColor);
             // TODO: Add your drawing code here
 
-            spriteBatch.Begin(SpriteSortMode.BackToFront);
+            Globals.spriteBatch.Begin(SpriteSortMode.BackToFront);
 
             foreach (var drawing in Globals.Drawings)
             {
                 if (drawing.IsDrawn)
                 {
-                    spriteBatch.Draw(Globals.Textures[drawing.Texture.ToString()], drawing.Position, null, drawing.Color, drawing.Rotation, Vector2.Zero, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
+                    Globals.spriteBatch.Draw(Globals.Textures[drawing.Texture.ToString()], drawing.Position, null, drawing.Color, drawing.Rotation, Vector2.Zero, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
                 }
             }
             foreach (var drawingText in Globals.DrawingTexts)
             {
                 if (drawingText.IsDrawn)
-                    spriteBatch.DrawString(Globals.SpriteFonts[drawingText.SpriteFont], drawingText.Text, drawingText.Position, drawingText.Color, drawingText.Rotation, Vector2.Zero, drawingText.Scale, SpriteEffects.None, drawingText.LayerDepth);
+                    Globals.spriteBatch.DrawString(Globals.SpriteFonts[drawingText.SpriteFont], drawingText.Text, drawingText.Position, drawingText.Color, drawingText.Rotation, Vector2.Zero, drawingText.Scale, SpriteEffects.None, drawingText.LayerDepth);
             }
 
-            spriteBatch.End();
+            Globals.spriteBatch.End();
             base.Draw(gameTime);
         }
 
@@ -230,11 +231,21 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        if (Globals.rand.Next(2) == 0)
-                            RoomMaker.SlimeRoom(newRoomCoords);
-                        else if (Globals.rand.Next(2) == 0)
-                            RoomMaker.ShooterRoom(newRoomCoords);
-                        else RoomMaker.RandomEmptyRoom(newRoomCoords);
+                        switch (Globals.rand.Next(0,3))
+                        {
+                            case 0:
+                                RoomMaker.SlimeRoom(newRoomCoords);
+                                break;
+                            case 1:
+                                RoomMaker.ShooterRoom(newRoomCoords);
+                                break;
+                            case 2:
+                                RoomMaker.BossRoom(newRoomCoords);
+                                break;
+                            default:
+                                RoomMaker.RandomEmptyRoom(newRoomCoords);
+                                break;
+                        }
                     }
                     else
                     {
@@ -248,6 +259,8 @@ namespace SurvivalGame
                 Globals.Rooms[Globals.activeRoomCoords].Entities.Add(player);
                 Globals.Rooms[Globals.activeRoomCoords].Entities.Add(Globals.MouseCursor);
                 oldRoom.UnLoad();
+
+                Globals.Map.Update();
             }
             else
             {

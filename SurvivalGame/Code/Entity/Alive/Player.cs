@@ -40,6 +40,7 @@ namespace SurvivalGame
         {
             PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
             SecondaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             foreach (var projectile in EntityTracker.GetEntities<Projectile>())
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
@@ -79,7 +80,7 @@ namespace SurvivalGame
                     SecondaryCooldown = 0;
             }
         }
-        public override bool DamageSelf(int damage, Entity source)
+        public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
             Health -= damage;
             //Hitbox.Width = (int)((startingRadius - minRadius) * ((float)Health / MaxHealth)) + minRadius;

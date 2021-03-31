@@ -12,6 +12,12 @@ namespace SurvivalGame
         Game1 Game1;
         Player player;
         Chat chat;
+
+        int OldScrollWheel;
+        int ScrollWheel;
+
+        Vector2 oldMousePos;
+        Vector2 mouseMovment;
         public Input(Game1 game1, Player player, Chat chat)
         {
             Game1 = game1;
@@ -23,6 +29,7 @@ namespace SurvivalGame
         {
             UpdateKeys();
             OnKeyDown(gameTime);
+            OnKeyUp(gameTime);
         }
         void UpdateKeys()
         {
@@ -63,6 +70,14 @@ namespace SurvivalGame
             }
 
             Globals.NewMouseKeys = Globals.PressedMouseKeys.Except(oldList).ToList();
+
+            ScrollWheel = mstate.ScrollWheelValue - OldScrollWheel;
+            OldScrollWheel = mstate.ScrollWheelValue;
+
+            mouseMovment = oldMousePos - new Vector2(mstate.Position.X, mstate.Position.Y);
+            oldMousePos = new Vector2(mstate.Position.X, mstate.Position.Y);
+
+
         }
 
         void OnKeyDown(GameTime gameTime)
@@ -145,6 +160,12 @@ namespace SurvivalGame
                                 else
                                     Globals.shop.Open();
                                 break;
+                            case Keys.M:
+                                if (Globals.Map.IsActive)
+                                    Globals.Map.Close();
+                                else
+                                    Globals.Map.Open();
+                                break;
                         }
                     }
                     switch (key)
@@ -173,6 +194,10 @@ namespace SurvivalGame
                                 if (!player.IsDead)
                                     player.UseSecondary();
                                 break;
+                            case MouseKey.LeftButton:
+                                if(Globals.Map.BeingDragged)
+                                    Globals.Map.Drag(mouseMovment);
+                                break;
                         }
                     }
                 }
@@ -192,6 +217,8 @@ namespace SurvivalGame
                                     }
                                 }
                                 Globals.shop.CheckLeftClickEvent();
+                                if (Globals.Map.Hitbox.CollidesWith(Globals.MouseCursor.Hitbox) && Globals.Map.IsActive)
+                                    Globals.Map.BeingDragged = true;
                                 break;
                             case MouseKey.RightButton:
                                 Globals.shop.CheckRightClickEvent();
@@ -206,6 +233,18 @@ namespace SurvivalGame
                     }
                 }
             }
+            if (ScrollWheel != 0) 
+            {
+                if (Globals.MouseCursor.Hitbox.CollidesWith(Globals.Map.Hitbox))
+                {
+                    Globals.Map.Zoom(ScrollWheel);
+                } 
+            }
+        }
+        void OnKeyUp(GameTime gameTime)
+        {
+            if (!Globals.PressedMouseKeys.Contains(MouseKey.LeftButton))
+                Globals.Map.BeingDragged = false;
         }
     }
 }

@@ -15,7 +15,8 @@ namespace SurvivalGame
         PistolItem,
         SwordItem,
         RPG,
-        GrassyBackground
+        GrassyBackground,
+        Map
     }
     enum SpriteFontName
     {
@@ -38,6 +39,7 @@ namespace SurvivalGame
         public static Dictionary<SpriteFontName, SpriteFont> SpriteFonts = new Dictionary<SpriteFontName, SpriteFont>();
 
         public static GraphicsDeviceManager graphics { get; set; }
+        public static SpriteBatch spriteBatch { get; set; }
         //public static GraphicsDevice GraphicsDevice { get; set; }
 
         public static List<Drawing> Drawings = new List<Drawing>();
@@ -57,6 +59,7 @@ namespace SurvivalGame
         public static MouseCursor MouseCursor;
         public static Shop shop;
         public static MainMenu MainMenu;
+        public static Map Map;
 
         public static Dictionary<(int x, int y), Room> Rooms = new Dictionary<(int x, int y), Room>();
         public static (int x, int y) activeRoomCoords { get; set; } = (0,0);
