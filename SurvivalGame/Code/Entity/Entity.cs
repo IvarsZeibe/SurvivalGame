@@ -36,7 +36,7 @@ namespace SurvivalGame
         public int Mass { get; set; }
         protected double XMovement { get; set; }
         protected double YMovement { get; set; }
-        public Vector2 RecievedKnockback { get; set; } = Vector2.One;
+        public Vector2 RecievedKnockback { get; set; } = Vector2.Zero;
         public bool IsDead { get; set; } = false;
         public bool IsLoaded { get; set; }
         public virtual void Load() { Drawing.IsDrawn = true; }

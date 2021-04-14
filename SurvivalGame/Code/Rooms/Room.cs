@@ -15,7 +15,7 @@ namespace SurvivalGame
         public List<Level> Levels { get; set; } = new List<Level>() {new Level("None", 0) };
         public Level ActiveLevel { get => Levels[activeLevelIndex]; }
         private int activeLevelIndex = 0;
-        public bool LevelsActive = true;
+        public bool CanLeave = true;
         public Room((int x, int y) coords, string name, Color color, TextureName backgroundTexture = TextureName.None)
         {
             Name = name;

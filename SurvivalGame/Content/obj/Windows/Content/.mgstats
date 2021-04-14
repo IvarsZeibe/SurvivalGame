@@ -1,6 +1,8 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Chat.spritefont","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/Chat.xnb","FontDescriptionProcessor","SpriteFontContent",2008,37922,0.2937967
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/GrassyBackground.jpg","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/GrassyBackground.xnb","TextureProcessor","Texture2DContent",198744,9216085,0.4187849
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/PineTree.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/PineTree.xnb","TextureProcessor","Texture2DContent",49634,1048661,0.2604034
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Pistoltem.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/PistolItem.xnb","TextureProcessor","Texture2DContent",6202,1048661,0.1849451
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/RPG.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/RPG.xnb","TextureProcessor","Texture2DContent",10657,1048661,0.2350623
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Sparkles.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/Sparkles.xnb","TextureProcessor","Texture2DContent",34179,1048661,0.2034106
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/SwordItem.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/SwordItem.xnb","TextureProcessor","Texture2DContent",10091,1048661,0.1870619

@@ -108,10 +108,10 @@ namespace SurvivalGame
                                 entity.RecievedKnockback += new Vector2(KnockbackStrenght, 0);
                                 break;
                             case Direction.Up:
-                                entity.RecievedKnockback += new Vector2(0, -KnockbackStrenght);
+                                entity.RecievedKnockback += new Vector2(0, KnockbackStrenght);
                                 break;
                             case Direction.Down:
-                                entity.RecievedKnockback += new Vector2(0, KnockbackStrenght);
+                                entity.RecievedKnockback += new Vector2(0, -KnockbackStrenght);
                                 break;
                         }
                     }

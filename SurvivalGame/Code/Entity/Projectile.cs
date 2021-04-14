@@ -14,7 +14,8 @@ namespace SurvivalGame
         public int Damage { get; set; }
         protected int Range { get; set; }
         protected Vector2 StartingCoord { get; set; }
-        public Projectile(Entity _owner, TextureName texture, float speed, Vector2 source, Vector2 target, int damage)
+        protected Vector2 direction = Vector2.Zero;
+        public Projectile(Entity _owner, TextureName texture, float speed, Vector2 source, Vector2 target, int damage, float angleRad = 0)
         {
             owner = _owner;
             //this.Texture = texture;
@@ -26,42 +27,52 @@ namespace SurvivalGame
             this.Damage = damage;
             Drawing = new Drawing(texture, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Yellow, 0, new Vector2(10, 2), 0.5f, true);
             Movement(target);
+            //direction += directionModifier ?? Vector2.Zero;
+            //direction = Vector2.Transform(direction, Matrix.CreateRotationX(angle));
+            direction = Vector2.Transform(direction, Matrix.CreateRotationZ(angleRad));
+            Drawing.Rotation += angleRad;
         }
         public override void Update(GameTime gameTime)
         {
-            Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
-            Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
+            Move(direction.X * (1/Speed) * gameTime.ElapsedGameTime.TotalSeconds, true);
+            Move(direction.Y * (1/Speed) * gameTime.ElapsedGameTime.TotalSeconds, false);
 
             if((StartingCoord.X - X ) * (StartingCoord.X - X) + (StartingCoord.Y - Y) * (StartingCoord.Y - Y) > Range * Range)
                 Kill();
 
-            foreach (var wall in EntityTracker.GetEntities<Wall>())
+            foreach(var enemy in EntityTracker.Entities)
             {
-                if (CollidesWith(wall) && wall.Collision)
+                if (enemy is Wall)
                 {
-                    Kill();
+                    if (Hitbox.CollidesWith(enemy.Hitbox) && !immuneEntities.Contains(enemy))
+                    {
+                        Kill();
+                        new Sparkles(new Vector2(X, Y));
+                    }
                 }
-            }
-            foreach (var slime in EntityTracker.GetEntities<SlimeEnemy>())
-            {
-                if (CollidesWith(slime) && !immuneEntities.Contains(this))
+                else if (!(enemy is Projectile))
                 {
-                    slime.DamageSelf(Damage, owner);
-                    immuneEntities.Add(this);
-                    Kill();
+                    if (Hitbox.CollidesWith(enemy.Hitbox) && !immuneEntities.Contains(enemy))
+                    {
+                        enemy.DamageSelf(Damage, owner);
+                        immuneEntities.Add(this);
+                        Kill();
+                        new Sparkles(new Vector2(X, Y));
+                    }
                 }
             }
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
         }
         private void Movement(Vector2 target)
         {
-            double yEdge = (Y - target.Y)/* * precision*/;
-            double xEdge = (X - target.X)/* * precision*/;
+            float yEdge = (target.Y - Y)/* * precision*/;
+            float xEdge = (target.X - X)/* * precision*/;
             Drawing.Rotation = (float)Math.Atan2(yEdge, xEdge);
 
-            Vector2 relativeMouse = new Vector2((float)xEdge, (float)yEdge);
-            XMovement = -relativeMouse.X / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
-            YMovement = -relativeMouse.Y / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
+            direction = Vector2.Normalize(new Vector2(xEdge, yEdge));
+            //Vector2 relativeMouse = new Vector2((float)xEdge, (float)yEdge);
+            //XMovement = -relativeMouse.X / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
+            //YMovement = -relativeMouse.Y / ((Math.Abs(relativeMouse.X) + Math.Abs(relativeMouse.Y)) * Speed);
         }
     }
 }

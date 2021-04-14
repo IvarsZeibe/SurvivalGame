@@ -50,7 +50,6 @@ namespace SurvivalGame
 
 
             //Globals.Textures.Add(TextureName.Circle.ToString(), Content.Load<Texture2D>("Circle"));
-            Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
 
             //player = EntityTracker.Add.Player();
             var room = new Room((0, 0), "Spawn", new Color(0, 220, 0), TextureName.GrassyBackground);
@@ -60,17 +59,18 @@ namespace SurvivalGame
             chat = new Chat(Globals.graphics);
             Globals.shop = new Shop();
             Globals.Command = new Command(this);
-            //levels = new DefaultLevels(this);
             Globals.MainMenu = new MainMenu();
             input = new Input(this, player, chat);
             Globals.Map = new Map();
 
             Globals.HUD.hotbar.Add(new SwordItem());
-            Globals.shop.AddItemForSale(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f), 3);
+            //Globals.shop.AddItemForSale(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f), 3); 
+            Globals.shop.AddItemForSale(new Pistol(), 3);
             Globals.shop.AddItemForSale(new Pistol(10, 0.1f, "mini"), 5);
             Globals.shop.AddItemForSale(new SwordItem(40, knockbackStrenght: 5), 3);
             Globals.shop.AddItemForSale(new RPG(_trackEnemy: false), 5);
             Globals.shop.AddItemForSale(new RPG(), 15);
+            Globals.shop.AddItemForSale(new Shotgun(), 15);
         }
 
         /// <summary>
@@ -93,6 +93,9 @@ namespace SurvivalGame
             addTexture("SwordItem");
             addTexture("RPG");
             addTexture("GrassyBackground");
+            addTexture("Sparkles");
+            addTexture("PineTree");
+            Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
         }
 
         /// <summary>
@@ -123,6 +126,7 @@ namespace SurvivalGame
 
             if (!Globals.MainMenu.IsActive)
             {
+                CheckForRoomChange();
                 Globals.Command.DoCommand(this);
                 Globals.HUD.Update(gameTime);
                 //levels.Update(gameTime);
@@ -130,7 +134,6 @@ namespace SurvivalGame
                 EntityTracker.UpdateEntities(gameTime);
                 UpdateUpdatables(gameTime);
                 TryToRespawnPlayer(gameTime);
-                CheckForRoomChange();
 
             }
             Globals.MouseCursor.Update(gameTime);
@@ -201,29 +204,34 @@ namespace SurvivalGame
 
         void CheckForRoomChange()
         {
-            if (Globals.Rooms[Globals.activeRoomCoords].LevelsActive)
+            if (Globals.Rooms[Globals.activeRoomCoords].CanLeave)
             {
+                Vector2 oldPlayerPos;
                 var oldRoom = Globals.Rooms[Globals.activeRoomCoords];
                 (int x, int y) newRoomCoords;
                 if (player.Y < 0)
                 {
                     player.Y = Globals.graphics.PreferredBackBufferHeight;
                     newRoomCoords = (Globals.activeRoomCoords.x, Globals.activeRoomCoords.y + 1);
+                    oldPlayerPos = new Vector2(player.X, 0);
                 }
                 else if (player.Y > Globals.graphics.PreferredBackBufferHeight)
                 {
                     player.Y = 0;
                     newRoomCoords = (Globals.activeRoomCoords.x, Globals.activeRoomCoords.y - 1);
+                    oldPlayerPos = new Vector2(player.X, Globals.graphics.PreferredBackBufferHeight);
                 }
                 else if (player.X > Globals.graphics.PreferredBackBufferWidth)
                 {
                     player.X = 0;
                     newRoomCoords = (Globals.activeRoomCoords.x + 1, Globals.activeRoomCoords.y);
+                    oldPlayerPos = new Vector2(Globals.graphics.PreferredBackBufferWidth, player.Y);
                 }
                 else if (player.X < 0)
                 {
                     player.X = Globals.graphics.PreferredBackBufferWidth;
                     newRoomCoords = (Globals.activeRoomCoords.x - 1, Globals.activeRoomCoords.y);
+                    oldPlayerPos = new Vector2(0, player.Y);
                 }
                 else
                     return;
@@ -231,15 +239,20 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        switch (Globals.rand.Next(0,3))
+                        switch (Globals.rand.Next(0,10))
                         {
                             case 0:
+                            case 1:
+                            case 2:
+                            case 3:
                                 RoomMaker.SlimeRoom(newRoomCoords);
                                 break;
-                            case 1:
+                            case 4:
+                            case 5:
+                            case 6:
                                 RoomMaker.ShooterRoom(newRoomCoords);
                                 break;
-                            case 2:
+                            case 7:
                                 RoomMaker.BossRoom(newRoomCoords);
                                 break;
                             default:
@@ -259,6 +272,29 @@ namespace SurvivalGame
                 Globals.Rooms[Globals.activeRoomCoords].Entities.Add(player);
                 Globals.Rooms[Globals.activeRoomCoords].Entities.Add(Globals.MouseCursor);
                 oldRoom.UnLoad();
+                bool collisionDetected = false;
+                foreach (var entity in EntityTracker.Entities)
+                {
+                    if (entity.CollidesWith(player) && entity != player)
+                    {
+                        collisionDetected = true;
+                        break;
+                    }
+                }
+                if (collisionDetected)
+                {
+                    var generatedRoom = Globals.Rooms[Globals.activeRoomCoords];
+                    Globals.activeRoomCoords = oldRoom.Coords;
+
+                    player.X = oldPlayerPos.X;
+                    player.Y = oldPlayerPos.Y;
+                    generatedRoom.Entities.Remove(player);
+                    generatedRoom.Entities.Remove(Globals.MouseCursor);
+                    generatedRoom.UnLoad();
+                    oldRoom.Load();
+                    oldRoom.Entities.Add(player);
+                    oldRoom.Entities.Add(Globals.MouseCursor);
+                }
 
                 Globals.Map.Update();
             }

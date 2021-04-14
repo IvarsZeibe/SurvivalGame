@@ -39,7 +39,7 @@ namespace SurvivalGame
         public Vector2 Position { get; set; } = Vector2.Zero;
         public Color Color { get; set; } = Color.White;
         public float Rotation { get; set; } = 0f;
-        private Vector2 scale = new Vector2(1,1);
+        public Vector2 scale = new Vector2(1,1);
         public Vector2 Scale
         {
             get => scale;

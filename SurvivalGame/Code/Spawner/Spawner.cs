@@ -27,9 +27,13 @@ namespace SurvivalGame
         public void Update(GameTime gameTime)
         {
             timeSinceSpawn += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            TrySpawn(gameTime);
+            cooldownRandomization = ((float)rand.NextDouble() - 0.5f) * 0.3f;
+            if (timeSinceSpawn > cooldown + cooldownRandomization)
+            {
+                TrySpawn(gameTime);
+            }
         }
-        protected virtual void TrySpawn(GameTime gameTime)
+        public virtual void TrySpawn(GameTime gameTime)
         {
 
         }

@@ -21,7 +21,7 @@ namespace SurvivalGame
                     new Color(0, 0, 0, 100),
                     0f,
                     new Vector2(width, height),
-                    0.35f,
+                    0.11f,
                     isDrawn
                 );
             for (int i = 0; i < 10; i++)
@@ -54,7 +54,7 @@ namespace SurvivalGame
                     Globals.Drawings.Remove(drawing);
                 float height = Drawing.Scale.Y;
                 float width = Drawing.Scale.X / slotCountHorizontal;
-                SelectedItemBorder = Utilities.CreateEmptyRectDrawings(Drawing.Position + new Vector2(width * selected, 0), Color.Black, new Vector2(width, height), isActive);
+                SelectedItemBorder = Utilities.CreateEmptyRectDrawings(Drawing.Position + new Vector2(width * selected, 0), Color.Black, new Vector2(width, height), isActive, depth: 0.1f);
             }
         }
         public Inventory Inventory { get; set; } = new Inventory(slotCountHorizontal);
@@ -81,7 +81,7 @@ namespace SurvivalGame
                 float height = Drawing.Scale.Y - 2 * padding;
                 float width = Drawing.Scale.X / slotCountHorizontal - 2 * padding;
                 Vector2 position = Drawing.Position + new Vector2((width + padding * 2) * index + padding, padding);
-                ItemDrawings[index] = new Drawing(item.TextureName, position, item.Color, 0f, new Vector2(width, height), 0.3f, isActive);
+                ItemDrawings[index] = new Drawing(item.TextureName, position, item.Color, 0f, new Vector2(width, height), 0.09f, isActive);
                 item.Hitbox = new Rect(Drawing.Position.X + Drawing.Scale.X / 10 * index + Drawing.Scale.X / 20, Drawing.Position.Y + Drawing.Scale.Y / 2, (int)Drawing.Scale.X / 10, (int)Drawing.Scale.Y);
                 return true;
             }

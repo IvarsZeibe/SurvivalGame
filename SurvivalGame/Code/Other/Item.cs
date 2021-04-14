@@ -56,7 +56,7 @@ namespace SurvivalGame
     }
     class SwordItem : IItem
     {
-        public SwordItem(float damage = 30f, float cooldown = 0.3f, string name = "sword", Color? color = null, float knockbackStrenght = 2)
+        public SwordItem(float damage = 30f, float cooldown = 0.3f, string name = "sword", Color? color = null, float knockbackStrenght = 100)
         {
             Damage = damage;
             Cooldown = cooldown;
@@ -187,6 +187,32 @@ namespace SurvivalGame
         public void OnPrimaryUse(Entity owner)
         {
             new Missile(owner, new Vector2(owner.X, owner.Y), trackEnemy, owner.Target, Damage, bulletVelocity, range).ImmuneEntities.Add(owner);
+        }
+    }
+    class Shotgun : IItem
+    {
+        public Shotgun(float damage = 20f, float cooldown = 0.3f, string name = "shotgun", int bulletCount = 3, float spread = 0, float bulletVelocity = 500f)
+        {
+            Damage = damage;
+            Cooldown = cooldown;
+            this.bulletVelocity = bulletVelocity;
+            Name = name;
+
+        }
+        float bulletVelocity;
+        public string Name { get; set; }
+        public float Damage { get; }
+        public float Cooldown { get; set; }
+        public TextureName TextureName { get; } = TextureName.PistolItem;
+        public Color Color { get; set; } = Color.Black;
+        public bool Successful { get; set; } = true;
+        public Hitbox Hitbox { get; set; }
+        public void OnPrimaryUse(Entity owner)
+        {
+            MouseState mstate = Mouse.GetState();
+            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage).immuneEntities.Add(owner);
+            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, 0.4f).immuneEntities.Add(owner);
+            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, -0.4f).immuneEntities.Add(owner);
         }
     }
 }

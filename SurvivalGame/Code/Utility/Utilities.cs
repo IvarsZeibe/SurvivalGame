@@ -15,13 +15,13 @@ namespace SurvivalGame
             texture.SetData(data);
             return texture;
         }
-        public static List<Drawing> CreateEmptyRectDrawings(Vector2 position, Color color, Vector2 scale, bool isDrawn = true)
+        public static List<Drawing> CreateEmptyRectDrawings(Vector2 position, Color color, Vector2 scale, bool isDrawn = true, float depth = 0.2f)
         {
             List<Drawing> borders = new List<Drawing>();
-            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X, position.Y), color, 0f, new Vector2(scale.X, 1), 0.2f, isDrawn));
-            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X, position.Y + scale.Y - 1), color, 0f, new Vector2(scale.X, 1), 0.2f, isDrawn));
-            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X, position.Y), color, 0f, new Vector2(1, scale.Y), 0.2f, isDrawn));
-            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X + scale.X - 1, position.Y), color, 0f, new Vector2(1, scale.Y), 0.2f, isDrawn));
+            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X, position.Y), color, 0f, new Vector2(scale.X, 1), depth, isDrawn));
+            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X, position.Y + scale.Y - 1), color, 0f, new Vector2(scale.X, 1), depth, isDrawn));
+            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X, position.Y), color, 0f, new Vector2(1, scale.Y), depth, isDrawn));
+            borders.Add(new Drawing(TextureName.Rectangle, new Vector2(position.X + scale.X - 1, position.Y), color, 0f, new Vector2(1, scale.Y), depth, isDrawn));
             return borders;
         }
         public static List<Drawing> CreateEmptyRectDrawings(Drawing drawing, Color color, int thickness = 1, bool isDrawn = true)

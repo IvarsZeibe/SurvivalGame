@@ -49,8 +49,8 @@ namespace SurvivalGame
             Jump(gameTime);
 
             UpdateMovement(gameTime);
-            Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds + knockbackX, true);
-            Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds + knockbackY, false);
+            Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
+            Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
 
             this.AttackArea.X = Hitbox.X;
             this.AttackArea.Y = Hitbox.Y;
@@ -96,14 +96,6 @@ namespace SurvivalGame
             CheckForTarget();
             if(!IsDead)
             {
-                if (Math.Abs(knockbackX) > 1)
-                    knockbackX -= (knockbackX / Math.Abs(knockbackX)) * gameTime.ElapsedGameTime.TotalSeconds * 10;
-                else
-                    knockbackX = 0;
-                if (Math.Abs(knockbackY) > 1)
-                    knockbackY -= (knockbackY / Math.Abs(knockbackY)) * gameTime.ElapsedGameTime.TotalSeconds * 10;
-                else
-                    knockbackY = 0;
 
 
                 double xedge = Hitbox.X - Target.Hitbox.X;
@@ -114,6 +106,17 @@ namespace SurvivalGame
                     XMovement = 0;
                 if (Math.Abs(yedge) < Hitbox.Height)
                     YMovement = 0;
+
+                if (Math.Abs(knockbackX) > 1)
+                    knockbackX -= knockbackX / Math.Abs(knockbackX) * 10;
+                else
+                    knockbackX = 0;
+                if (Math.Abs(knockbackY) > 1)
+                    knockbackY -= knockbackY / Math.Abs(knockbackY) * 10;
+                else
+                    knockbackY = 0;
+                XMovement += knockbackX;
+                YMovement += knockbackY;
             }
 
         }

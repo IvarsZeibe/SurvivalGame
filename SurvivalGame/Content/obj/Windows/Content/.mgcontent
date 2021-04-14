@@ -7,8 +7,10 @@
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Chat.spritefont</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Circle.png</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/GrassyBackground.jpg</File>
+    <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/PineTree.png</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Pistoltem.png</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/RPG.png</File>
+    <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Sparkles.png</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/SwordItem.png</File>
     <File>C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Untitled.png</File>
   </SourceFiles>
@@ -16,7 +18,9 @@
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File>PistolItem.png</File>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

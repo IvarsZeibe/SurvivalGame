@@ -51,6 +51,11 @@ namespace SurvivalGame
             Color color = new Color(0, 135, 0);
             TextureName texture = TextureName.GrassyBackground;
             List<Entity> Entities = new List<Entity>();
+            for (int i = 0; i < 20; i++)
+            {
+                Entities.Add(new Tree(Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
+                    Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight)));
+            }
             for (int i = 0; i < 6; i++)
             {
                 Entity targ = new NoBrainEntity();
