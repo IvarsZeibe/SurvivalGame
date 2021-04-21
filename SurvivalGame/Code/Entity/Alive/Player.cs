@@ -32,6 +32,8 @@ namespace SurvivalGame
 
             Hotbar = Globals.HUD.hotbar;
             Hotbar.Selected = 0;
+
+            Hotbar.Add(new Pistol());
         }
         public IItem EquipedItem { get => Hotbar.Get(Hotbar.Selected); }
         public Hotbar Hotbar;
@@ -45,7 +47,7 @@ namespace SurvivalGame
             {
                 if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
                 {
-                    DamageSelf(projectile.Damage, projectile.owner);
+                    DamageSelf(projectile.Damage, projectile);
                     projectile.immuneEntities.Add(this);
                     projectile.Kill();
                 }
@@ -54,7 +56,7 @@ namespace SurvivalGame
             {
                 if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
                 {
-                    DamageSelf(sword.Damage, sword.owner);
+                    DamageSelf(sword.Damage, sword);
                     sword.immuneEntities.Add(this);
                 }
             }
@@ -97,6 +99,17 @@ namespace SurvivalGame
         public override void UnLoad()
         {
             HealthBar.UnLoad();
+        }
+        public void Revive()
+        {
+            IsDead = false;
+            Globals.Drawings.Add(Drawing);
+            EntityTracker.Entities.Add(this);
+            Health = MaxHealth;
+            HealthBar.IsDead = false;
+            Globals.Drawings.Add(HealthBar.Drawing);
+            HealthBar.UpdateEnabled = true;
+            Globals.Updatables.Add(HealthBar);
         }
     }
 }

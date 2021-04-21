@@ -23,8 +23,8 @@ namespace SurvivalGame
         DefaultLevels levels;
         Input input;
 
-        float respawnCooldown = 10f;
-        float timeTillRespawn = -100f;
+        const float RESPAWN_COOLDOWN = 2000f;
+        float timeTillRespawn = RESPAWN_COOLDOWN;
 
 
 
@@ -62,6 +62,11 @@ namespace SurvivalGame
             Globals.MainMenu = new MainMenu();
             input = new Input(this, player, chat);
             Globals.Map = new Map();
+            room.Entities.Add(new Enemy(
+                    TextureName.Rectangle, 
+                    Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
+                    Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight), height: 60, speed: 0,
+                    target: player, color: Color.DarkSlateGray, addToRoom: false));
 
             Globals.HUD.hotbar.Add(new SwordItem());
             //Globals.shop.AddItemForSale(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f), 3); 
@@ -158,7 +163,7 @@ namespace SurvivalGame
             {
                 if (drawing.IsDrawn)
                 {
-                    Globals.spriteBatch.Draw(Globals.Textures[drawing.Texture.ToString()], drawing.Position, null, drawing.Color, drawing.Rotation, Vector2.Zero, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
+                    Globals.spriteBatch.Draw(Globals.Textures[drawing.Texture.ToString()], drawing.Position, null, drawing.Color, drawing.Rotation, drawing.Origin, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
                 }
             }
             foreach (var drawingText in Globals.DrawingTexts)
@@ -186,18 +191,14 @@ namespace SurvivalGame
         {
             if (player.IsDead)
             {
-                if (timeTillRespawn <= -100)
+                if (timeTillRespawn < 0)
                 {
-                    timeTillRespawn = respawnCooldown;
-                }
-                else if (timeTillRespawn < 0)
-                {
-                    player = new Player();
-                    timeTillRespawn = -100;
+                    player.Revive();
+                    timeTillRespawn = RESPAWN_COOLDOWN;
                 }
                 else
                 {
-                    timeTillRespawn -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    timeTillRespawn -= (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                 }
             }
         }

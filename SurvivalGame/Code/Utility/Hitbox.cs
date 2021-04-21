@@ -134,6 +134,10 @@ namespace SurvivalGame
         {
             return new Vector2((float)Left, (float)Top);
         }
+        public Vector2 GetPosVector()
+        {
+            return new Vector2((float)X, (float)Y);
+        }
         public Vector2 GetScaleVector()
         {
             return new Vector2((float)Width, (float)Height);

@@ -178,7 +178,7 @@ namespace SurvivalGame
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
             bool isDamaged = false;
-            if(source is Player)
+            if(source.owner is Player)
             {
                 Health -= damage;
                 isDamaged = true;

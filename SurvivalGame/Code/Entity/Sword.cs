@@ -72,7 +72,7 @@ namespace SurvivalGame
             {
                 if(Hitbox.CollisionDetect(slime.Hitbox) != Vector2.Zero && !immuneEntities.Contains(slime))
                 {
-                    slime.DamageSelf(Damage, base.owner);
+                    slime.DamageSelf(Damage, this);
                     immuneEntities.Add(slime);
                     switch (Direction)
                     {
@@ -97,7 +97,7 @@ namespace SurvivalGame
                 {
                     if (Hitbox.CollidesWith(entity.Hitbox) && !immuneEntities.Contains(entity))
                     {
-                        entity.DamageSelf(Damage, owner, DamageType.Projectile);
+                        entity.DamageSelf(Damage, this, DamageType.Projectile);
                         immuneEntities.Add(entity);
                         switch (Direction)
                         {

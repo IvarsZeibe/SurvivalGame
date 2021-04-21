@@ -100,7 +100,7 @@ namespace SurvivalGame
             {
                 if (!ImmuneEntities.Contains(entity) && entity.Hitbox.CollidesWith(Hitbox))
                 {
-                    entity.DamageSelf(damage, owner);
+                    entity.DamageSelf(damage, this);
                     ImmuneEntities.Add(entity);
                     if (explosionProgress == -1)
                         BeginExplosion();

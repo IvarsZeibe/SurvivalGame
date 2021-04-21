@@ -94,35 +94,30 @@ namespace SurvivalGame
         private void UpdateMovement(GameTime gameTime)
         {
             CheckForTarget();
-            if(!IsDead)
-            {
+            double xedge = Hitbox.X - Target.Hitbox.X;
+            double yedge = Hitbox.Y - Target.Hitbox.Y;
+            XMovement = (-xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed) * JumpSpeedMultiplier);
+            YMovement = (-yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed) * JumpSpeedMultiplier);
+            if (Math.Abs(xedge) < Hitbox.Width)
+                XMovement = 0;
+            if (Math.Abs(yedge) < Hitbox.Height)
+                YMovement = 0;
 
-
-                double xedge = Hitbox.X - Target.Hitbox.X;
-                double yedge = Hitbox.Y - Target.Hitbox.Y;
-                XMovement = (-xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed) * JumpSpeedMultiplier);
-                YMovement = (-yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed) * JumpSpeedMultiplier);
-                if (Math.Abs(xedge) < Hitbox.Width)
-                    XMovement = 0;
-                if (Math.Abs(yedge) < Hitbox.Height)
-                    YMovement = 0;
-
-                if (Math.Abs(knockbackX) > 1)
-                    knockbackX -= knockbackX / Math.Abs(knockbackX) * 10;
-                else
-                    knockbackX = 0;
-                if (Math.Abs(knockbackY) > 1)
-                    knockbackY -= knockbackY / Math.Abs(knockbackY) * 10;
-                else
-                    knockbackY = 0;
-                XMovement += knockbackX;
-                YMovement += knockbackY;
-            }
+            if (Math.Abs(knockbackX) > 1)
+                knockbackX -= knockbackX / Math.Abs(knockbackX) * 10;
+            else
+                knockbackX = 0;
+            if (Math.Abs(knockbackY) > 1)
+                knockbackY -= knockbackY / Math.Abs(knockbackY) * 10;
+            else
+                knockbackY = 0;
+            XMovement += knockbackX;
+            YMovement += knockbackY;
 
         }
         protected void CheckForTarget()
         {
-            if (Target is null || Target.IsDead)
+            if(Target is NoBrainEntity)
             {
                 foreach (var target in EntityTracker.GetEntities<Player>())
                 {
@@ -133,6 +128,9 @@ namespace SurvivalGame
                         return;
                     }
                 }
+            }
+            if (Target.IsDead)
+            {
                 Random rand = new Random();
                 if (rand.Next(0) == 1)
                     Target = new NoBrainEntity(X, Y);
@@ -175,11 +173,11 @@ namespace SurvivalGame
         }
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
-            if(source is Player)
+            if(source.owner is Player)
                 Health -= damage;
             if (Health <= 0)
             {
-                if (source is Player)
+                if (source.owner is Player)
                     Globals.HUD.points += 1;
                 Globals.HUD.EnemiesLeft -= 1;
                 Kill();

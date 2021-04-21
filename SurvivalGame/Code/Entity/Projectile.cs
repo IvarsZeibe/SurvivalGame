@@ -50,11 +50,11 @@ namespace SurvivalGame
                         new Sparkles(new Vector2(X, Y));
                     }
                 }
-                else if (!(enemy is Projectile))
+                else if (!(enemy is Projectile) && !(enemy is MouseCursor))
                 {
                     if (Hitbox.CollidesWith(enemy.Hitbox) && !immuneEntities.Contains(enemy))
                     {
-                        enemy.DamageSelf(Damage, owner);
+                        enemy.DamageSelf(Damage, this);
                         immuneEntities.Add(this);
                         Kill();
                         new Sparkles(new Vector2(X, Y));

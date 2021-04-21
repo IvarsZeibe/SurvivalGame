@@ -59,6 +59,7 @@ namespace SurvivalGame
             {
                 Globals.Drawings.Remove(Drawing);
                 IsDead = true;
+                UpdateEnabled = false;
                 //Drawing.IsDead = true;
                 //DrawingText.IsDead = true;
             }

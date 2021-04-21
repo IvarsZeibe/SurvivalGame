@@ -34,5 +34,24 @@ namespace SurvivalGame
             borders.Add(new Drawing(TextureName.Rectangle, drawing.Position + new Vector2(0, scale.Y - 1), color, 0f, new Vector2(scale.X, 1), drawing.LayerDepth - 0.01f, isDrawn));
             return borders;
         }
+
+        public static Vector2 LinearVectorDamping(Vector2 vector, Vector2 damper)
+        {
+            Vector2 oldVector = vector;
+
+            if (vector.X > 0)
+                damper.X *= -1;
+            if (vector.Y > 0)
+                damper.Y *= -1;
+
+            vector += damper;
+
+            if ((vector.X <= 0) != (oldVector.X <= 0))
+                vector.X = 0;
+            if ((vector.Y <= 0) != (oldVector.Y <= 0))
+                vector.Y = 0;
+
+            return vector;
+        }
     }
 }

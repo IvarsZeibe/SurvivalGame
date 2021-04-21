@@ -21,6 +21,8 @@ namespace SurvivalGame
         Inventory Inventory = new Inventory(3);
         private HealthBar HealthBar;
 
+        Vector2 Knockback = Vector2.Zero;
+
         public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null, bool addToRoom = true) : base(addToRoom)
         {
             if (height == 0)
@@ -45,28 +47,13 @@ namespace SurvivalGame
             PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Movement();
-            Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
-            Move(YMovement * gameTime.ElapsedGameTime.TotalSeconds, false);
+            Move((XMovement + Knockback.X) * gameTime.ElapsedGameTime.TotalSeconds, true);
+            Move((YMovement + Knockback.Y) * gameTime.ElapsedGameTime.TotalSeconds, false);
 
             TryToAttack();
 
-            foreach (var projectile in EntityTracker.GetEntities<Projectile>())
-            {
-                if (CollidesWith(projectile) && !projectile.immuneEntities.Contains(this))
-                {
-                    DamageSelf(projectile.Damage, projectile.owner);
-                    projectile.immuneEntities.Add(this);
-                    projectile.Kill();
-                }
-            }
-            foreach (var sword in EntityTracker.GetEntities<Sword>())
-            {
-                if (sword.CollidesWith(this) && !sword.immuneEntities.Contains(this))
-                {
-                    DamageSelf(sword.Damage, sword.owner);
-                    sword.immuneEntities.Add(this);
-                }
-            }
+
+            Knockback = Utilities.LinearVectorDamping(Knockback, new Vector2(100, 100) * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
             Drawing.Scale = new Vector2(Hitbox.Width, Hitbox.Height);
@@ -74,17 +61,14 @@ namespace SurvivalGame
         private void Movement()
         {
             CheckForTarget();
-            if(!Target.IsDead)
-            {
-                double xedge = Hitbox.X - Target.Hitbox.X;
-                double yedge = Hitbox.Y - Target.Hitbox.Y;
-                XMovement = -xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
-                YMovement = -yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
-                if (Math.Abs(xedge) < Hitbox.Width)
-                    XMovement = 0;
-                if (Math.Abs(yedge) < Hitbox.Height)
-                    YMovement = 0;
-            }
+            double xedge = Hitbox.X - Target.Hitbox.X;
+            double yedge = Hitbox.Y - Target.Hitbox.Y;
+            XMovement = -xedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
+            YMovement = -yedge / ((Math.Abs(xedge) + Math.Abs(yedge)) * Speed);
+            if (Math.Abs(xedge) < Hitbox.Width)
+                XMovement = 0;
+            if (Math.Abs(yedge) < Hitbox.Height)
+                YMovement = 0;
 
         }
         private void TryToAttack()
@@ -115,17 +99,21 @@ namespace SurvivalGame
         }
         protected void CheckForTarget()
         {
-            if(Target.IsDead)
+            if(Target is NoBrainEntity)
             {
-                foreach(var target in EntityTracker.GetEntities<Player>())
+                foreach (var target in EntityTracker.GetEntities<Player>())
                 {
-                    if(Hitbox.Distance(target.Hitbox) < detectionRange)
+                    if (Hitbox.Distance(target.Hitbox) < detectionRange)
                     {
                         Target = target;
                         aggresive = true;
                         return;
                     }
                 }
+            }
+            if(Target.IsDead)
+            {
+                
                 Random rand = new Random();
                 if (rand.Next(0) == 1)
                     Target = new NoBrainEntity(X, Y);
@@ -159,8 +147,16 @@ namespace SurvivalGame
         }
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
-            if(source is Player)
+
+            if (source.owner is Player)
+            {
                 Health -= damage;
+                Knockback = Vector2.Transform(new Vector2(200, 0), Matrix.CreateRotationZ(source.Drawing.Rotation));
+            }
+            else
+            {
+                return false;
+            }
             if (Hitbox is Circle)
                 Hitbox.Width = (int)((defaultWidth - minSize) * ((float)Health / MaxHealth)) + minSize;
             else
@@ -170,7 +166,7 @@ namespace SurvivalGame
             }
             if (Health <= 0)
             {
-                if(source is Player) { }
+                if(source.owner is Player) { }
                     Globals.HUD.points += 1;
                 Globals.HUD.EnemiesLeft -= 1;
                 Kill();
