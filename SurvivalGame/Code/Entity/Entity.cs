@@ -13,7 +13,8 @@ namespace SurvivalGame
     {
         Unknown,
         Sword,
-        Projectile
+        Projectile,
+        Axe
     }
     abstract class Entity
     {

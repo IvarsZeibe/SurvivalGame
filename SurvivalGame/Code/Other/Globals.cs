@@ -18,7 +18,9 @@ namespace SurvivalGame
         GrassyBackground,
         Map,
         Sparkles,
-        PineTree
+        PineTree,
+        Axe,
+        AxeItem
     }
     enum SpriteFontName
     {

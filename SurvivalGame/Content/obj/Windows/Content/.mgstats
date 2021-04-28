@@ -1,4 +1,6 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Axe.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/Axe.xnb","TextureProcessor","Texture2DContent",4244,343069,0.1714225
+"C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/AxeItem.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/AxeItem.xnb","TextureProcessor","Texture2DContent",14325,1048661,0.0368183
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/Chat.spritefont","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/Chat.xnb","FontDescriptionProcessor","SpriteFontContent",2008,37922,0.2937967
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/GrassyBackground.jpg","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/GrassyBackground.xnb","TextureProcessor","Texture2DContent",198744,9216085,0.4187849
 "C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/PineTree.png","C:/Users/Ivars/source/repos/SurvivalGame/SurvivalGame/Content/bin/Windows/Content/PineTree.xnb","TextureProcessor","Texture2DContent",49634,1048661,0.2604034

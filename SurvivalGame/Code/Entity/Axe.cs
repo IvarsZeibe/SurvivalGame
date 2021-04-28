@@ -5,19 +5,56 @@ using System.Text;
 
 namespace SurvivalGame
 {
-    //class Axe : Entity
-    //{
-    //    float Rotation = 0f;
-    //    public Axe(Entity owner, Vector2 targetPos)
-    //    {
-    //        Hitbox = new Circle(owner.X, owner.Y, 10);
+    class Axe : Entity
+    {
+        float rotation = 0f;
+        readonly float startRotation;
+        const float LIFE_SPAN = 0.2f;
+        float timeAlive = 0;
+        int damage = 10;
+        public Axe(Entity owner, Vector2 targetPos)
+        {
+            this.owner = owner;
+            Hitbox = new Circle(owner.X, owner.Y, 30);
+            float yEdge = owner.Y - targetPos.Y;
+            float xEdge = owner.X - targetPos.X;
+            startRotation = (float)Math.Atan2(yEdge, xEdge) - (float)Math.PI/3;
+            rotation = startRotation;
+            Vector2 direction = Vector2.Normalize(new Vector2(xEdge, yEdge));
+            Vector2 positionOffset = -direction * Hitbox.Width;
+            Hitbox.X += positionOffset.X;
+            Hitbox.Y += positionOffset.Y;
+            Drawing = new Drawing(TextureName.Axe, GetNewDrawingPosition(), Color.White, startRotation, new Vector2(15, Hitbox.Width*1.5f))
+            {
+                originPercentage = new Vector2(0.5f, 1f)
+            };
+        }
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+            rotation = (timeAlive / LIFE_SPAN) * -1.34f + startRotation;
+            foreach (var entity in EntityTracker.Entities)
+            {
+                if(entity is Tree)
+                {
+                    if (Hitbox.CollidesWith(entity.Hitbox))
+                    {
+                        entity.DamageSelf(damage, this, DamageType.Axe);
+                    }
+                }
+            }
 
-    //        //float yEdge = (target.Y - Y)/* * precision*/;
-    //        //float xEdge = (target.X - X)/* * precision*/;
-    //        //Drawing.Rotation = (float)Math.Atan2(yEdge, xEdge);
+            Drawing.Rotation = rotation;
+            Drawing.Position = GetNewDrawingPosition();
 
-    //        //Rotation = Vector2.Transform(direction, Matrix.CreateRotationZ(angleRad));
-    //        //Drawing = new Drawing(TextureName.Rectangle, Hitbox.GetPosVector() - new Vector2(Hitbox.Width / 2, 0), Color.White,)
-    //    }
-    //}
+            Hitbox.Active = false;
+            timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if(timeAlive > LIFE_SPAN)
+                Kill();
+        }
+        Vector2 GetNewDrawingPosition()
+        {
+            return owner.Hitbox.GetPosVector();
+        }
+    }
 }

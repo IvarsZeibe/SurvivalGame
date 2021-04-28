@@ -215,4 +215,28 @@ namespace SurvivalGame
             new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, -0.4f).immuneEntities.Add(owner);
         }
     }
+    class AxeItem : IItem
+    {
+        public AxeItem(float cooldown = 0.3f, string name = "axe", Color? color = null)
+        {
+            Cooldown = cooldown;
+            Name = name;
+            color ??= Color.White;
+            Color = (Color)color;
+        }
+        public string Name { get; set; }
+        public float Damage { get; }
+        public float Cooldown { get; set; }
+        public TextureName TextureName { get; } = TextureName.AxeItem;
+        public Color Color { get; set; } = Color.Black;
+        public bool Successful { get; set; } = true;
+        public Hitbox Hitbox { get; set; }
+        public void OnPrimaryUse(Entity owner)
+        {
+            MouseState mstate = Mouse.GetState();
+            double yEdge = (owner.Y - owner.Target.Y);
+            double xEdge = (owner.X - owner.Target.X);
+            new Axe(owner, owner.Target.Hitbox.GetPosVector());
+        }
+    }
 }

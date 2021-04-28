@@ -33,7 +33,6 @@ namespace SurvivalGame
             Hotbar = Globals.HUD.hotbar;
             Hotbar.Selected = 0;
 
-            Hotbar.Add(new Pistol());
         }
         public IItem EquipedItem { get => Hotbar.Get(Hotbar.Selected); }
         public Hotbar Hotbar;

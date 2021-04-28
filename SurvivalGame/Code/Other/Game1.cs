@@ -62,13 +62,15 @@ namespace SurvivalGame
             Globals.MainMenu = new MainMenu();
             input = new Input(this, player, chat);
             Globals.Map = new Map();
-            room.Entities.Add(new Enemy(
-                    TextureName.Rectangle, 
-                    Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
-                    Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight), height: 60, speed: 0,
-                    target: player, color: Color.DarkSlateGray, addToRoom: false));
+            //room.Entities.Add(new Enemy(
+            //        TextureName.Rectangle, 
+            //        Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
+            //        Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight), height: 60, speed: 0,
+            //        target: player, color: Color.DarkSlateGray, addToRoom: false));
 
             Globals.HUD.hotbar.Add(new SwordItem());
+            Globals.HUD.hotbar.Add(new Pistol());
+            Globals.HUD.hotbar.Add(new AxeItem());
             //Globals.shop.AddItemForSale(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f), 3); 
             Globals.shop.AddItemForSale(new Pistol(), 3);
             Globals.shop.AddItemForSale(new Pistol(10, 0.1f, "mini"), 5);
@@ -100,6 +102,8 @@ namespace SurvivalGame
             addTexture("GrassyBackground");
             addTexture("Sparkles");
             addTexture("PineTree");
+            addTexture("AxeItem");
+            addTexture("Axe");
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
         }
 
@@ -240,7 +244,7 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        switch (Globals.rand.Next(0,10))
+                        switch (Globals.rand.Next(0,3))
                         {
                             case 0:
                             case 1:

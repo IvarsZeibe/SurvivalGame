@@ -35,7 +35,11 @@ namespace SurvivalGame
         //    this.IsDrawn = isDrawn;
         //    Globals.Drawings.Add(this);
         //}
-        public Vector2 Origin = Vector2.Zero;
+        public Vector2 originPercentage = Vector2.Zero;
+        public Vector2 Origin
+        {
+            get => new Vector2(Globals.Textures[Texture.ToString()].Width, Globals.Textures[Texture.ToString()].Height) * originPercentage;
+        }
         public TextureName Texture { get; set; } = TextureName.Rectangle;
         public Vector2 Position { get; set; } = Vector2.Zero;
         public Color Color { get; set; } = Color.White;

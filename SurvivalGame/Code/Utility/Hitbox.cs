@@ -17,6 +17,7 @@ namespace SurvivalGame
         public virtual double Bottom { get; set; }
         public virtual int Width { get; set; }
         public virtual int Height { get; set; }
+        public bool Active = true;
 
         public bool CollidesWith(Hitbox h2)
         {
@@ -24,20 +25,24 @@ namespace SurvivalGame
         }
         public Vector2 CollisionDetect(Hitbox h2)
         {
-            if (this is Rect)
+            if (Active && h2.Active)
             {
-                if (h2 is Rect)
-                    return CollisionRectRect(this as Rect, h2 as Rect);
+                if (this is Rect)
+                {
+                    if (h2 is Rect)
+                        return CollisionRectRect(this as Rect, h2 as Rect);
+                    else
+                        return CollisionRecCircle(this as Rect, h2 as Circle);
+                }
                 else
-                    return CollisionRecCircle(this as Rect, h2 as Circle);
+                {
+                    if (h2 is Circle)
+                        return CollisionCircleCircle(this as Circle, h2 as Circle);
+                    else
+                        return CollisionRecCircle(h2 as Rect, this as Circle);
+                }
             }
-            else
-            {
-                if (h2 is Circle)
-                    return CollisionCircleCircle(this as Circle, h2 as Circle);
-                else
-                    return CollisionRecCircle(h2 as Rect, this as Circle);
-            }
+            return Vector2.Zero;
         }
 
         Vector2 CollisionRectRect(Rect h1, Rect h2)
