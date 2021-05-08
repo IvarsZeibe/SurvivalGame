@@ -41,9 +41,11 @@ namespace SurvivalGame
             Drawing = new Drawing(texture, new Vector2(x, y), color ?? Color.White, 0, new Vector2(width, height), 0.4f, true);
             Inventory.Add(new Pistol());
             Inventory.Add(new SwordItem());
+            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
             PrimaryCooldown += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Movement();
@@ -147,11 +149,25 @@ namespace SurvivalGame
         }
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
-
-            if (source.owner is Player)
+            if (source != null)
+            {
+                if (source.owner is Player)
+                {
+                    if (source is Projectile)
+                    {
+                        foreach (var effect in (source as Projectile).effects)
+                        {
+                            effect.Owner = this;
+                        }
+                        ActiveEffects.AddRange((source as Projectile).effects);
+                    }
+                    Health -= damage;
+                    Knockback = Vector2.Transform(new Vector2(200, 0), Matrix.CreateRotationZ(source.Drawing.Rotation));
+                }
+            }
+            else if (damageType == DamageType.Fire)
             {
                 Health -= damage;
-                Knockback = Vector2.Transform(new Vector2(200, 0), Matrix.CreateRotationZ(source.Drawing.Rotation));
             }
             else
             {
@@ -166,7 +182,7 @@ namespace SurvivalGame
             }
             if (Health <= 0)
             {
-                if(source.owner is Player) { }
+                if(source != null && source.owner is Player)
                     Globals.HUD.points += 1;
                 Globals.HUD.EnemiesLeft -= 1;
                 Kill();
@@ -176,12 +192,12 @@ namespace SurvivalGame
         public override void Load()
         {
             HealthBar.Load();
-            Drawing.IsDrawn = true;
+            base.Load();
         }
         public override void UnLoad()
         {
             HealthBar.UnLoad();
-            Drawing.IsDrawn = false;
+            base.UnLoad();
         }
     }
 }

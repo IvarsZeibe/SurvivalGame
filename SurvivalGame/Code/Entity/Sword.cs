@@ -55,6 +55,7 @@ namespace SurvivalGame
             // radius = (owner.Hitbox.Width + owner.Hitbox.Height) / 4;
             //Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.White, 0f,
             //    new Vector2(radius, radius), 0.4f, true);
+            Drawings.Add("base", Drawing);
         }
 
         public override void Update(GameTime gameTime)

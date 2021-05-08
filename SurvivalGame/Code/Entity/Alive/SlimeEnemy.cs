@@ -43,9 +43,11 @@ namespace SurvivalGame
             HealthBar = new HealthBar(this);
             Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.LightGreen, 0, new Vector2(Hitbox.Width, Hitbox.Height), 0.4f, true);
             Shadow = new Drawing(TextureName.Rectangle, new Vector2((float)Hitbox.Left, (float)Hitbox.Bottom + 1), Color.Black, 0, new Vector2(Hitbox.Width, 1f), 0.9f, true);
+            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
             Jump(gameTime);
 
             UpdateMovement(gameTime);
@@ -173,11 +175,31 @@ namespace SurvivalGame
         }
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
-            if(source.owner is Player)
-                Health -= damage;
-            if (Health <= 0)
+            if (source != null)
             {
                 if (source.owner is Player)
+                {
+                    if(source is Projectile)
+                    {
+                        foreach (var effect in (source as Projectile).effects)
+                        {
+                            effect.Owner = this;
+                        }
+                        ActiveEffects.AddRange((source as Projectile).effects);
+                    }
+                    Health -= damage;
+                }
+            }
+            else
+            {
+                if(damageType == DamageType.Fire)
+                {
+                    Health -= damage;
+                }
+            }
+            if (Health <= 0)
+            {
+                if (source != null && source.owner is Player)
                     Globals.HUD.points += 1;
                 Globals.HUD.EnemiesLeft -= 1;
                 Kill();
@@ -194,13 +216,13 @@ namespace SurvivalGame
         {
             HealthBar.Load();
             Shadow.IsDrawn = true;
-            Drawing.IsDrawn = true;
+            base.Load();
         }
         public override void UnLoad()
         {
             HealthBar.UnLoad();
             Shadow.IsDrawn = false;
-            Drawing.IsDrawn = false;
+            base.UnLoad();
         }
     }
 }

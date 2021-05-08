@@ -35,6 +35,7 @@ namespace SurvivalGame
             this.range = _range;
 
             Drawing = new Drawing(TextureName.Rectangle, Hitbox.GetTopLeftPosVector(), Color.DarkKhaki, 0, new Vector2(width, height), 0.5f, true);
+            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {

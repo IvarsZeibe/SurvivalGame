@@ -28,6 +28,7 @@ namespace SurvivalGame
             {
                 originPercentage = new Vector2(0.5f, 1f)
             };
+            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {

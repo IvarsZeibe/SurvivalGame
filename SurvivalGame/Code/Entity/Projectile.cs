@@ -15,13 +15,14 @@ namespace SurvivalGame
         protected int Range { get; set; }
         protected Vector2 StartingCoord { get; set; }
         protected Vector2 direction = Vector2.Zero;
-        public Projectile(Entity _owner, TextureName texture, float speed, Vector2 source, Vector2 target, int damage, float angleRad = 0)
+        public List<IEffect> effects = new List<IEffect>();
+        public Projectile(Entity _owner, TextureName texture, float speed, Vector2 source, Vector2 target, int damage, float angleRad = 0, int range = 600)
         {
             owner = _owner;
             //this.Texture = texture;
             this.Hitbox = new Circle(source.X, source.Y, 2);
             this.Collision = false;
-            this.Range = 600;
+            this.Range = range;
             this.Speed = speed;
             this.StartingCoord = new Vector2(X, Y);
             this.Damage = damage;
@@ -31,6 +32,7 @@ namespace SurvivalGame
             //direction = Vector2.Transform(direction, Matrix.CreateRotationX(angle));
             direction = Vector2.Transform(direction, Matrix.CreateRotationZ(angleRad));
             Drawing.Rotation += angleRad;
+            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {

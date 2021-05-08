@@ -32,6 +32,7 @@ namespace SurvivalGame
             Inventory.Add(new SwordItem(50, 0.5f, knockbackStrenght: 5));
             Inventory.Add(new Pistol());
             Inventory.Add(new Shotgun());
+            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {
@@ -196,13 +197,13 @@ namespace SurvivalGame
             return isDamaged;
         }
         public override void Load() 
-        { 
-            Drawing.IsDrawn = true;
+        {
+            base.Load();
             HealthBar.Load();
         }
         public override void UnLoad() 
-        { 
-            Drawing.IsDrawn = false;
+        {
+            base.UnLoad();
             HealthBar.UnLoad();
         }
         public override void Kill()

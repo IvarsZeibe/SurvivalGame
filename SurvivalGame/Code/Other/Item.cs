@@ -239,4 +239,37 @@ namespace SurvivalGame
             new Axe(owner, owner.Target.Hitbox.GetPosVector());
         }
     }
+    class FlamethrowerItem : IItem
+    {
+        public FlamethrowerItem(float damage = 5f, float cooldown = 0.02f, string name = "flamethrower", float bulletVelocity = 250f, int bulletSpeedVariation = 70, int spread = 7)
+        {
+            Damage = damage;
+            Cooldown = cooldown;
+            this.bulletVelocity = bulletVelocity;
+            this.bulletSpeedVariation = bulletSpeedVariation;
+            this.spread = spread;
+            Name = name;
+
+        }
+        float bulletVelocity;
+        int bulletSpeedVariation;
+        int spread;
+        int range = 200;
+        public string Name { get; set; }
+        public float Damage { get; }
+        public float Cooldown { get; set; }
+        public TextureName TextureName { get; } = TextureName.PistolItem;
+        public Color Color { get; set; } = Color.Black;
+        public bool Successful { get; set; } = true;
+        public Hitbox Hitbox { get; set; }
+        public void OnPrimaryUse(Entity owner)
+        {
+            MouseState mstate = Mouse.GetState();
+            float angle = Globals.rand.Next(-spread, spread) / 100f * (float)Math.PI;
+            var projectile = new Projectile(owner, TextureName.Rectangle, bulletVelocity + Globals.rand.Next(-bulletSpeedVariation, bulletSpeedVariation), new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, angle, range);
+            projectile.immuneEntities.Add(owner);
+            projectile.Drawing.Color = Color.Orange;
+            projectile.effects.Add(new OnFire(1, 10));
+        }
+    }
 }

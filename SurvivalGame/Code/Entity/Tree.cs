@@ -18,30 +18,69 @@ namespace SurvivalGame
             Vector2 origin = new Vector2(0.5f, 1f);
             Hitbox = new Rect(x, y, 30, 30);
             Vector2 drawingSize = new Vector2(150, 150);
-            Drawing = new Drawing(TextureName.PineTree, Hitbox.GetTopLeftPosVector() - new Vector2(62, 115) + drawingSize * origin, color, drawingRotation, drawingSize, 0.3f - (float)y / 100000);
+            Drawing = new Drawing(TextureName.PineTree, Hitbox.GetTopLeftPosVector(), color, drawingRotation, drawingSize, 0.3f - (float)y / 100000);
             {
                 Drawing.originPercentage = origin;
+                Drawing.Offset = -new Vector2(62, 115) + drawingSize * origin;
             }
+            Drawings.Add("base", Drawing);
+            Drawing drawing = new Drawing(TextureName.PineTreeOnFire, Vector2.Zero, Color.White, 0f, new Vector2(150, 150), Drawing.LayerDepth - 0.01f)
+            {
+                originPercentage = new Vector2(1f, 1.5f)
+            };
+            Globals.Drawings.Remove(drawing);
+            Drawings.Add("OnFire", drawing);
         }
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
             UpdateAnimations(gameTime);
             Drawing.Rotation = drawingRotation;
             Drawing.Color = color;
         }
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
-            if(damageType == DamageType.Axe)
+            if (source is Projectile)
+            {
+                foreach (var effect in (source as Projectile).effects)
+                {
+                    effect.Owner = this;
+                }
+                ActiveEffects.AddRange((source as Projectile).effects);
+            }
+            if (damageType == DamageType.Axe)
             {
                 Health -= damage;
-                if(Health > 0)
+
+            }
+            else if (damageType == DamageType.Fire)
+            {
+                if (damageType == DamageType.Fire)
+                {
+                    Health -= damage * 3;
+                }
+            }
+            else
+                return false;
+
+            if (Health > 0)
+            {
+                if (shakeLeft <= 0)
                 {
                     shakeLeft = SHAKE_LENGTH;
                 }
-                else
+            }
+            else
+            {
+                Hitbox.Active = false;
+                if (fallLeft <= 0)
                 {
-                    Hitbox.Active = false;
-                    if (Hitbox.X > source.Hitbox.X)
+
+                    if (source is null)
+                    {
+                        Kill();
+                    }
+                    else if (Hitbox.X > source.Hitbox.X)
                     {
                         fallLeft = FALL_LENGHT;
                         fallDirection = Direction.Right;
@@ -52,9 +91,9 @@ namespace SurvivalGame
                         fallDirection = Direction.Left;
                     }
                 }
-                return true;
+
             }
-            return false;
+            return true;
         }
         float stayFallenLeft = 0f;
         float STAY_FALLEN_LENGTH = 2f;

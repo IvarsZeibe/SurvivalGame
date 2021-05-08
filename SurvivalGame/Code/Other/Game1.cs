@@ -70,6 +70,7 @@ namespace SurvivalGame
 
             Globals.HUD.hotbar.Add(new SwordItem());
             Globals.HUD.hotbar.Add(new Pistol());
+            Globals.HUD.hotbar.Add(new FlamethrowerItem());
             Globals.HUD.hotbar.Add(new AxeItem());
             //Globals.shop.AddItemForSale(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f), 3); 
             Globals.shop.AddItemForSale(new Pistol(), 3);
@@ -102,8 +103,10 @@ namespace SurvivalGame
             addTexture("GrassyBackground");
             addTexture("Sparkles");
             addTexture("PineTree");
+            addTexture("PineTreeOnFire");
             addTexture("AxeItem");
             addTexture("Axe");
+            addTexture("fire");
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
         }
 
@@ -244,7 +247,7 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        switch (Globals.rand.Next(0,3))
+                        switch (Globals.rand.Next(0,8))
                         {
                             case 0:
                             case 1:

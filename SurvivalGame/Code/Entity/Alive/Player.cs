@@ -93,10 +93,12 @@ namespace SurvivalGame
         }
         public override void Load()
         {
+            base.Load();
             HealthBar.Load();
         }
         public override void UnLoad()
         {
+            base.UnLoad();
             HealthBar.UnLoad();
         }
         public void Revive()

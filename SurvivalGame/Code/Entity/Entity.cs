@@ -14,7 +14,8 @@ namespace SurvivalGame
         Unknown,
         Sword,
         Projectile,
-        Axe
+        Axe,
+        Fire
     }
     abstract class Entity
     {
@@ -29,6 +30,7 @@ namespace SurvivalGame
                 Globals.Rooms[Globals.activeRoomCoords].Entities.Add(this);
         }
         public Drawing Drawing;
+        public Dictionary<string, Drawing> Drawings = new Dictionary<string, Drawing>();
         public Entity owner = null;
         public Hitbox Hitbox { get; set; }
         public bool Collision { get; set; }
@@ -40,8 +42,20 @@ namespace SurvivalGame
         public Vector2 RecievedKnockback { get; set; } = Vector2.Zero;
         public bool IsDead { get; set; } = false;
         public bool IsLoaded { get; set; }
-        public virtual void Load() { Drawing.IsDrawn = true; }
-        public virtual void UnLoad() { Drawing.IsDrawn = false; }
+        public virtual void Load()
+        {
+            foreach (var Drawing in Drawings)
+            {
+                Drawing.Value.IsDrawn = true;
+            }
+        }
+        public virtual void UnLoad() 
+        {
+            foreach (var Drawing in Drawings)
+            {
+                Drawing.Value.IsDrawn = false;
+            }
+        }
         public Entity Target { get; set; }
 
         private float speed;
@@ -61,7 +75,10 @@ namespace SurvivalGame
             get => (float)Hitbox.Y;
             set => Hitbox.Y = value;
         }
-        public virtual void Update(GameTime gameTime) { }
+        public virtual void Update(GameTime gameTime) 
+        {
+            ApplyEffects(gameTime);
+        }
         public virtual bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
             Health -= damage;
@@ -69,8 +86,36 @@ namespace SurvivalGame
         }
         public virtual void Kill()
         {
-            Globals.Drawings.Remove(Drawing);
+            List<IEffect> elapsedEffects = new List<IEffect>(ActiveEffects);
+            foreach (var effect in elapsedEffects)
+            {
+                effect.Remove();
+            }
+            foreach (var Drawing in Drawings)
+            {
+                Globals.Drawings.Remove(Drawing.Value);
+            }
             IsDead = true;
+        }
+        public List<IEffect> ActiveEffects = new List<IEffect>();
+        public virtual void ApplyEffects(GameTime gameTime)
+        {
+            List<IEffect> elapsedEffects = new List<IEffect>();
+            foreach (var effect in ActiveEffects)
+            {
+                effect.Apply(gameTime);
+                if (effect.Duration <= 0)
+                {
+                    elapsedEffects.Add(effect);
+                    break;
+                }
+                if (IsDead)
+                    break;
+            }
+            foreach (var effect in elapsedEffects)
+            {
+                effect.Remove();
+            }
         }
         public bool CollidesWith(Entity entity)
         {

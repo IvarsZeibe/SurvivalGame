@@ -20,7 +20,9 @@ namespace SurvivalGame
         Sparkles,
         PineTree,
         Axe,
-        AxeItem
+        AxeItem,
+        PineTreeOnFire,
+        fire
     }
     enum SpriteFontName
     {

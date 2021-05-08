@@ -14,7 +14,7 @@ namespace SurvivalGame
         public Drawing(TextureName texture, Vector2 position, Color color, float rotation, Vector2 scale, float layerDepth = 0.5f, bool isDrawn = true)
         {
             this.Texture = texture;
-            this.Position = position;
+            this.Coord = position;
             this.Color = color;
             this.Rotation = rotation;
             if(scale != Vector2.Zero)
@@ -41,7 +41,13 @@ namespace SurvivalGame
             get => new Vector2(Globals.Textures[Texture.ToString()].Width, Globals.Textures[Texture.ToString()].Height) * originPercentage;
         }
         public TextureName Texture { get; set; } = TextureName.Rectangle;
-        public Vector2 Position { get; set; } = Vector2.Zero;
+        public Vector2 Coord { get; set; } = Vector2.Zero;
+        public Vector2 Position 
+        {
+            get => Coord + Offset;
+            set => Coord = value - Offset; 
+        }
+        public Vector2 Offset { get; set; } = Vector2.Zero;
         public Color Color { get; set; } = Color.White;
         public float Rotation { get; set; } = 0f;
         public Vector2 scale = new Vector2(1,1);
