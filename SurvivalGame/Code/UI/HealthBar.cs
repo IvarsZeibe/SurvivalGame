@@ -44,12 +44,12 @@ namespace SurvivalGame
         public bool IsDead { get; set; } = false;
         public void Load() 
         {
-            Drawing.IsDrawn = true;
+            Drawing.Enable();
             UpdateEnabled = true;
         }
         public void UnLoad()
         {
-            Drawing.IsDrawn = false;
+            Drawing.Disable();
             UpdateEnabled = false;
         }
 

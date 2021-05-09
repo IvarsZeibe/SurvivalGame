@@ -28,8 +28,11 @@ namespace SurvivalGame
             {
                 originPercentage = new Vector2(1f, 1.5f)
             };
-            Globals.Drawings.Remove(drawing);
             Drawings.Add("OnFire", drawing);
+            Animations.Add("chopShake", new ShakeAnimation(Drawing));
+            Animations.Add("despawn", new DisappearingAnimation(Drawing));
+            Animations.Add("stayStill", new StillnessAnimation(Drawing));
+            Animations.Add("fall", new FallAnimation(Drawing));
         }
         public override void Update(GameTime gameTime)
         {
@@ -65,15 +68,15 @@ namespace SurvivalGame
 
             if (Health > 0)
             {
-                if (shakeLeft <= 0)
+                if (Animations["chopShake"].Inactive)
                 {
-                    shakeLeft = SHAKE_LENGTH;
+                    Animations["chopShake"].Start();
                 }
             }
             else
             {
                 Hitbox.Active = false;
-                if (fallLeft <= 0)
+                if (Animations["fall"].Inactive)
                 {
 
                     if (source is null)
@@ -82,88 +85,34 @@ namespace SurvivalGame
                     }
                     else if (Hitbox.X > source.Hitbox.X)
                     {
-                        fallLeft = FALL_LENGHT;
-                        fallDirection = Direction.Right;
+                        Animations["fall"].Start();
                     }
                     else
                     {
-                        fallLeft = FALL_LENGHT;
-                        fallDirection = Direction.Left;
+                        (Animations["fall"] as FallAnimation).direction = Direction.Left;
+                        Animations["fall"].Start();
                     }
                 }
 
             }
             return true;
         }
-        float stayFallenLeft = 0f;
-        float STAY_FALLEN_LENGTH = 2f;
         void UpdateAnimations(GameTime gameTime)
         {
-            if(shakeLeft > 0)
+            foreach(var animation in Animations)
             {
-                shakeLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                AnimateShake();
+                animation.Value.Update(gameTime);
             }
-            if(fallLeft > 0)
+            drawingRotation = Drawing.Rotation;
+            color = Drawing.Color;
+            if (Animations["fall"].Progress == 1 && Animations["stayStill"].Inactive)
             {
-                fallLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                AnimateFall();
-                if (fallLeft <= 0)
-                    stayFallenLeft = STAY_FALLEN_LENGTH;
+                Animations["stayStill"].Start();
             }
-            if(disappearingLeft > 0)
+            if(Animations["stayStill"].Progress == 1)
             {
-                disappearingLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                AnimateDisappearing();
+                Animations["despawn"].Start();
             }
-            if(stayFallenLeft > 0)
-            {
-                stayFallenLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (stayFallenLeft <= 0)
-                    disappearingLeft = DISAPPEARING_LENGTH;
-            }
-        }
-        const float SHAKE_LENGTH = 0.6f;
-        float shakeLeft = 0f;
-        void AnimateShake()
-        {
-            float shakeCount = 2;
-            int segments = 4;
-            float animationLength = SHAKE_LENGTH / shakeCount;
-            float animationPart = (shakeLeft % animationLength);
-            int segment = (int)Math.Floor(animationPart / (animationLength / segments));
-            float progress = 1 - animationPart / animationLength;
-            if (progress < 0.25f)
-                drawingRotation = progress * 0.3f;
-            else if (progress < 0.5f)
-                drawingRotation = (0.5f - progress) * 0.3f;
-            else if (progress < 0.75f)
-                drawingRotation = -(progress - 0.5f) * 0.3f;
-            else if (progress < 1f)
-                drawingRotation = -(1 - progress) * 0.3f;
-        }
-        const float FALL_LENGHT = 1.5f;
-        float fallLeft = 0f;
-        Direction fallDirection;
-        void AnimateFall()
-        {
-            float progress = 1 - (fallLeft / FALL_LENGHT);
-            if (fallDirection == Direction.Right)
-                drawingRotation = 1.57f * progress * progress;
-            else
-                drawingRotation = -1.57f * progress * progress;
-        }
-        const float DISAPPEARING_LENGTH = 1f;
-        float disappearingLeft = 0f;
-        void AnimateDisappearing()
-        {
-            float progress = 1 - disappearingLeft / DISAPPEARING_LENGTH;
-            color.A = Convert.ToByte(255 - 255 * progress);
-            color.R = Convert.ToByte(255 - 255 * progress);
-            color.G = Convert.ToByte(255 - 255 * progress);
-            color.B = Convert.ToByte(255 - 255 * progress);
-            if (progress >= 1)
-                Kill();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace SurvivalGame
         public string Name { get; } = "OnFire";
         public int Strength { get; set; }
         public float Duration { get; set; }
-        Drawing drawing { get; set; } = new Drawing(TextureName.fire, Vector2.Zero, Color.White, 0f, new Vector2(10, 10), 0.39f, false) {originPercentage = new Vector2(0.5f, 0.5f) };
+        Drawing drawing { get; set; }
         float attackRate = 0.5f;
         float sinceAttack = 0f;
         public OnFire(int strength, int duration, Entity Owner = null)
@@ -28,7 +28,6 @@ namespace SurvivalGame
             Strength = strength;
             Duration = duration;
             this.Owner = Owner;
-            Globals.Drawings.Remove(drawing);
             //if (owner.Drawings.ContainsKey(Name))
             //{
             //    Globals.Drawings.Remove(owner.Drawings[Name]);
@@ -44,16 +43,15 @@ namespace SurvivalGame
                 return;
             if (!Owner.Drawings.ContainsKey(Name))
             {
-                drawing.Scale = new Vector2(Owner.Drawings["base"].GetWidth(), Owner.Drawings["base"].GetHeight()) * new Vector2(0.6f, 1.2f);
+                Vector2 scale = new Vector2(Owner.Drawings["base"].GetWidth(), Owner.Drawings["base"].GetHeight()) * new Vector2(0.6f, 1.2f);
+                drawing = new Drawing(TextureName.fire, Vector2.Zero, Color.White, 0f, scale, Owner.Drawings["base"].LayerDepth - 0.01f, false) { originPercentage = new Vector2(0.5f, 0.5f) };
                 Owner.Drawings.Add(Name, drawing);
+                drawing.Enable();
             }
             else
             {
                 drawing = Owner.Drawings[Name];
-            }
-            if (!Globals.Drawings.Contains(drawing))
-            {
-                Globals.Drawings.Add(drawing);
+                drawing.Enable();
             }
 
             Duration -= (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -68,7 +66,6 @@ namespace SurvivalGame
             drawing.Coord = Owner.Drawings["base"].Position + new Vector2(Owner.Drawings["base"].GetWidth(), Owner.Drawings["base"].GetHeight()) * 0.5f;
             drawing.Rotation = Owner.Drawings["base"].Rotation;
             //drawing.Coord = Owner.Hitbox.GetTopLeftPosVector();
-            drawing.IsDrawn = true;
         }
         public void Remove()
         {

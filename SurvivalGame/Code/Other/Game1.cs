@@ -247,7 +247,7 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        switch (Globals.rand.Next(0,8))
+                        switch (Globals.rand.Next(0,3))
                         {
                             case 0:
                             case 1:

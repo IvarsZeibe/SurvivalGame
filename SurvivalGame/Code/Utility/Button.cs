@@ -29,14 +29,14 @@ namespace SurvivalGame
         public void Activate()
         {
             IsActive = true;
-            Background.IsDrawn = true;
+            Background.Enable();
             if (!(Text is null))
                 Text.IsDrawn = true;
         }
         public void Deactivate()
         {
             IsActive = false;
-            Background.IsDrawn = false;
+            Background.Disable();
             if (!(Text is null))
                 Text.IsDrawn = false;
         }

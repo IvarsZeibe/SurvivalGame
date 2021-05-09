@@ -50,7 +50,7 @@ namespace SurvivalGame
         {
             isActive = true;
             if (!(background is null))
-                background.IsDrawn = true;
+                background.Enable();
             foreach(var level in Levels)
             {
                 level.Enable();
@@ -64,7 +64,7 @@ namespace SurvivalGame
                 e.UnLoad();
             }
             if (!(background is null))
-                background.IsDrawn = false;
+                background.Disable();
             foreach (var level in Levels)
             {
                 level.Disable();

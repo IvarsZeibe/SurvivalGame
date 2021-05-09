@@ -99,19 +99,19 @@ namespace SurvivalGame
         {
             totalOffsetFromCenter = Vector2.Zero;
             Update();
-            drawing.IsDrawn = true;
+            drawing.Enable();
             foreach(var drawing in border)
             {
-                drawing.IsDrawn = true;
+                drawing.Enable();
             }
             IsActive = true;
         }
         public void Close()
         {
-            drawing.IsDrawn = false;
+            drawing.Disable();
             foreach (var drawing in border)
             {
-                drawing.IsDrawn = false;
+                drawing.Disable();
             }
             IsActive = false;
             BeingDragged = false;

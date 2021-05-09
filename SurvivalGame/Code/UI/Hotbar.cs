@@ -104,29 +104,29 @@ namespace SurvivalGame
         public void Activate()
         {
             isActive = true;
-            Drawing.IsDrawn = true;
+            Drawing.Enable();
             foreach(var drawing in ItemDrawings)
             {
                 if (!(drawing is null))
-                    drawing.IsDrawn = true;
+                    drawing.Enable();
             }
             foreach(var border in SelectedItemBorder)
             {
-                border.IsDrawn = true;
+                border.Enable();
             }
         }
         public void Deactivate()
         {
             isActive = false;
-            Drawing.IsDrawn = false;
+            Drawing.Disable();
             foreach (var drawing in ItemDrawings)
             {
                 if(!(drawing is null))
-                    drawing.IsDrawn = false;
+                    drawing.Disable();
             }
             foreach (var border in SelectedItemBorder)
             {
-                border.IsDrawn = false;
+                border.Disable();
             }
         }
     }

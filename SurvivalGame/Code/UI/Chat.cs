@@ -52,7 +52,7 @@ namespace SurvivalGame
                         {
                             line.DrawingText.IsDrawn = false;
                         }
-                        Drawing.IsDrawn = false;
+                        Drawing.Disable();
                         UpdateEnabled = false;
                     }
                 }
@@ -63,7 +63,7 @@ namespace SurvivalGame
         public void NewLine()
         {
             UpdateEnabled = true;
-            Drawing.IsDrawn = true;
+            Drawing.Enable();
             if (ActiveText != null)
             {
                 if (ActiveText.DrawingText.Text.Length > 0)

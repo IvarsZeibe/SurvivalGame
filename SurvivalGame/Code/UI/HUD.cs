@@ -54,7 +54,7 @@ namespace SurvivalGame
             hotbar.Activate();
             foreach(var drawing in drawings)
             {
-                drawing.Value.IsDrawn = true;
+                drawing.Value.Enable();
             }
             foreach (var text in textDrawings)
             {
@@ -67,7 +67,7 @@ namespace SurvivalGame
             hotbar.Deactivate();
             foreach (var drawing in drawings)
             {
-                drawing.Value.IsDrawn = false;
+                drawing.Value.Disable();
             }
             foreach (var text in textDrawings)
             {

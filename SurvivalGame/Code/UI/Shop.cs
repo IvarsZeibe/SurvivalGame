@@ -66,29 +66,29 @@ namespace SurvivalGame
         public void Open()
         {
             isActive = true;
-            background.IsDrawn = true;
-            closeButton.IsDrawn = true;
+            background.Enable();
+            closeButton.Enable();
             title.IsDrawn = true;
             foreach(var slot in slots)
             {
-                slot.itemSlotDrawing.IsDrawn = true;
-                slot.itemDrawing.IsDrawn = true;
+                slot.itemSlotDrawing.Enable();
+                slot.itemDrawing.Enable();
                 slot.priceTextDrawing.IsDrawn = true;
-                slot.priceCoinDrawing.IsDrawn = true;
+                slot.priceCoinDrawing.Enable();
             }
         }
         public void Close()
         {
             isActive = false;
-            background.IsDrawn = false;
-            closeButton.IsDrawn = false;
+            background.Disable();
+            closeButton.Disable();
             title.IsDrawn = false;
             foreach (var slot in slots)
             {
-                slot.itemSlotDrawing.IsDrawn = false;
-                slot.itemDrawing.IsDrawn = false;
+                slot.itemSlotDrawing.Disable();
+                slot.itemDrawing.Disable();
                 slot.priceTextDrawing.IsDrawn = false;
-                slot.priceCoinDrawing.IsDrawn = false;
+                slot.priceCoinDrawing.Disable();
             }
         }
         public void CheckLeftClickEvent() 

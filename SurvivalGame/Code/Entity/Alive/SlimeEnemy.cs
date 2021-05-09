@@ -215,13 +215,13 @@ namespace SurvivalGame
         public override void Load()
         {
             HealthBar.Load();
-            Shadow.IsDrawn = true;
+            Shadow.Enable();
             base.Load();
         }
         public override void UnLoad()
         {
             HealthBar.UnLoad();
-            Shadow.IsDrawn = false;
+            Shadow.Disable();
             base.UnLoad();
         }
     }

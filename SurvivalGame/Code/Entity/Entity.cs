@@ -22,12 +22,20 @@ namespace SurvivalGame
         public Entity()
         {
             //EntityTracker.Entities.Add(this);
+            IsLoaded = true;
             Globals.Rooms[Globals.activeRoomCoords].Entities.Add(this);
         }
         public Entity(bool addToRoom)
         {
-            if(addToRoom)
+            if (addToRoom)
+            {
+                IsLoaded = true;
                 Globals.Rooms[Globals.activeRoomCoords].Entities.Add(this);
+            }
+            else
+            {
+                IsLoaded = false;
+            }
         }
         public Drawing Drawing;
         public Dictionary<string, Drawing> Drawings = new Dictionary<string, Drawing>();
@@ -44,16 +52,18 @@ namespace SurvivalGame
         public bool IsLoaded { get; set; }
         public virtual void Load()
         {
+            IsLoaded = true;
             foreach (var Drawing in Drawings)
             {
-                Drawing.Value.IsDrawn = true;
+                Drawing.Value.Enable();
             }
         }
-        public virtual void UnLoad() 
+        public virtual void UnLoad()
         {
+            IsLoaded = false;
             foreach (var Drawing in Drawings)
             {
-                Drawing.Value.IsDrawn = false;
+                Drawing.Value.Disable();
             }
         }
         public Entity Target { get; set; }
@@ -93,7 +103,7 @@ namespace SurvivalGame
             }
             foreach (var Drawing in Drawings)
             {
-                Globals.Drawings.Remove(Drawing.Value);
+                Drawing.Value.Disable();
             }
             IsDead = true;
         }
@@ -117,6 +127,7 @@ namespace SurvivalGame
                 effect.Remove();
             }
         }
+        public Dictionary<string, Animation> Animations = new Dictionary<string, Animation>();
         public bool CollidesWith(Entity entity)
         {
             return Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero;

@@ -31,14 +31,14 @@ namespace SurvivalGame
         {
             IsActive = true;
             startButton.Activate();
-            background.IsDrawn = true;
+            background.Enable();
             Globals.HUD.Deactivate();
         }
         public void Deactivate()
         {
             IsActive = false;
             startButton.Deactivate();
-            background.IsDrawn = false;
+            background.Disable();
             Globals.HUD.Activate();
         }
     }
