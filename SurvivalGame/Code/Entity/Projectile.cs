@@ -15,7 +15,7 @@ namespace SurvivalGame
         protected int Range { get; set; }
         protected Vector2 StartingCoord { get; set; }
         protected Vector2 direction = Vector2.Zero;
-        public List<IEffect> effects = new List<IEffect>();
+        public List<Effect> effects = new List<Effect>();
         public Projectile(Entity _owner, TextureName texture, float speed, Vector2 source, Vector2 target, int damage, float angleRad = 0, int range = 600)
         {
             owner = _owner;

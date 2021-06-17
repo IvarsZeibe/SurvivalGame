@@ -107,6 +107,7 @@ namespace SurvivalGame
             addTexture("AxeItem");
             addTexture("Axe");
             addTexture("fire");
+            addTexture("grass");
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
         }
 
@@ -135,18 +136,23 @@ namespace SurvivalGame
             input.Update(gameTime);
             //UpdateKeys();
             //OnKeyDown(gameTime);
-
             if (!Globals.MainMenu.IsActive)
             {
-                CheckForRoomChange();
-                Globals.Command.DoCommand(this);
-                Globals.HUD.Update(gameTime);
-                //levels.Update(gameTime);
-                Globals.Rooms[Globals.activeRoomCoords].Update(gameTime);
-                EntityTracker.UpdateEntities(gameTime);
-                UpdateUpdatables(gameTime);
-                TryToRespawnPlayer(gameTime);
+                if (Globals.gameActive)
+                {
+                    CheckForRoomChange();
+                    Globals.Command.DoCommand(this);
+                    Globals.HUD.Update(gameTime);
+                    //levels.Update(gameTime);
+                    Globals.Rooms[Globals.activeRoomCoords].Update(gameTime);
+                    EntityTracker.UpdateEntities(gameTime);
+                    UpdateUpdatables(gameTime);
+                    TryToRespawnPlayer(gameTime);
+                }
+                else if (Globals.editorActive)
+                {
 
+                }
             }
             Globals.MouseCursor.Update(gameTime);
 
@@ -170,7 +176,13 @@ namespace SurvivalGame
             {
                 if (drawing.IsDrawn)
                 {
-                    Globals.spriteBatch.Draw(Globals.Textures[drawing.Texture.ToString()], drawing.Position, null, drawing.Color, drawing.Rotation, drawing.Origin, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
+                    if (drawing.TextureStr == "none")
+                        Globals.spriteBatch.Draw(Globals.Textures[drawing.Texture.ToString()], drawing.Position, null, drawing.Color, drawing.Rotation, drawing.Origin, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
+                    else
+                    {
+                        var i = Globals.Textures[drawing.TextureStr];
+                        Globals.spriteBatch.Draw(Globals.Textures[drawing.TextureStr], drawing.Position, null, drawing.Color, drawing.Rotation, drawing.Origin, drawing.Scale, SpriteEffects.None, drawing.LayerDepth);
+                    }
                 }
             }
             foreach (var drawingText in Globals.DrawingTexts)

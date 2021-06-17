@@ -88,6 +88,7 @@ namespace SurvivalGame
         public virtual void Update(GameTime gameTime) 
         {
             ApplyEffects(gameTime);
+            UpdateAnimations(gameTime);
         }
         public virtual bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
@@ -96,7 +97,7 @@ namespace SurvivalGame
         }
         public virtual void Kill()
         {
-            List<IEffect> elapsedEffects = new List<IEffect>(ActiveEffects);
+            List<Effect> elapsedEffects = new List<Effect>(ActiveEffects);
             foreach (var effect in elapsedEffects)
             {
                 effect.Remove();
@@ -107,10 +108,10 @@ namespace SurvivalGame
             }
             IsDead = true;
         }
-        public List<IEffect> ActiveEffects = new List<IEffect>();
+        public List<Effect> ActiveEffects = new List<Effect>();
         public virtual void ApplyEffects(GameTime gameTime)
         {
-            List<IEffect> elapsedEffects = new List<IEffect>();
+            List<Effect> elapsedEffects = new List<Effect>();
             foreach (var effect in ActiveEffects)
             {
                 effect.Apply(gameTime);
@@ -128,6 +129,13 @@ namespace SurvivalGame
             }
         }
         public Dictionary<string, Animation> Animations = new Dictionary<string, Animation>();
+        protected virtual void UpdateAnimations(GameTime gameTime)
+        {
+            foreach (var animation in Animations)
+            {
+                animation.Value.Update(gameTime);
+            }
+        }
         public bool CollidesWith(Entity entity)
         {
             return Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero;

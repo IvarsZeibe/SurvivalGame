@@ -64,6 +64,12 @@ namespace SurvivalGame
                     Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight), targ, false));
                 Entities.Add(targ);
             }
+            for (int i = 0; i < 400; i++)
+            {
+                Vector2 pos = new Vector2(Globals.rand.Next(Globals.graphics.PreferredBackBufferWidth), Globals.rand.Next(Globals.graphics.PreferredBackBufferHeight));
+                var grass = new Grass(pos);
+                Entities.Add(grass);
+            }
             var level = new Level("Wave1", 10);
             Entity target = new NoBrainEntity();
             Entities.Add(target);

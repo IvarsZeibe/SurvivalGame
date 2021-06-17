@@ -5,48 +5,43 @@ using System.Text;
 
 namespace SurvivalGame
 {
-    interface IEffect
+    abstract class Effect
     {
-        public void Apply(GameTime gameTime);
-        public string Name { get; }
+        public virtual void Apply(GameTime gameTime) { }
+        public string Name { get; set; }
         public int Strength { get; set; }
         public float Duration { get; set; }
         public Entity Owner { get; set; }
-        public void Remove();
+        public virtual void Remove() { }
+        public Vector2 flameSize = new Vector2(0.5f, 1f);
     }
-    class OnFire : IEffect
+    class OnFire : Effect
     {
-        public Entity Owner { get; set; }
-        public string Name { get; } = "OnFire";
-        public int Strength { get; set; }
-        public float Duration { get; set; }
         Drawing drawing { get; set; }
         float attackRate = 0.5f;
         float sinceAttack = 0f;
         public OnFire(int strength, int duration, Entity Owner = null)
         {
+            Name = "OnFire";
             Strength = strength;
             Duration = duration;
             this.Owner = Owner;
-            //if (owner.Drawings.ContainsKey(Name))
-            //{
-            //    Globals.Drawings.Remove(owner.Drawings[Name]);
-            //    owner.Drawings[Name] = drawing;
-            //}
-            //else
-            //    owner.Drawings.Add(Name, drawing);
         }
 
-        public void Apply(GameTime gameTime)
+        public override void Apply(GameTime gameTime)
         {
             if (Owner is null)
                 return;
             if (!Owner.Drawings.ContainsKey(Name))
             {
-                Vector2 scale = new Vector2(Owner.Drawings["base"].GetWidth(), Owner.Drawings["base"].GetHeight()) * new Vector2(0.6f, 1.2f);
-                drawing = new Drawing(TextureName.fire, Vector2.Zero, Color.White, 0f, scale, Owner.Drawings["base"].LayerDepth - 0.01f, false) { originPercentage = new Vector2(0.5f, 0.5f) };
+                Vector2 scale = new Vector2(Owner.Drawings["base"].GetWidth(), Owner.Drawings["base"].GetHeight()) * flameSize;
+                drawing = new Drawing(TextureName.fire, Vector2.Zero, Color.White, 0f, scale, Owner.Drawings["base"].LayerDepth - 0.01f, false) 
+                {
+                    originPercentage = new Vector2(0.5f, 0.5f)
+                };
                 Owner.Drawings.Add(Name, drawing);
                 drawing.Enable();
+                Owner.Animations.Add("fire", new FireAnimation(drawing));
             }
             else
             {
@@ -62,16 +57,22 @@ namespace SurvivalGame
             }
             else
                 sinceAttack += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            drawing.Coord = Owner.Drawings["base"].Position + new Vector2(Owner.Drawings["base"].GetWidth(), Owner.Drawings["base"].GetHeight()) * 0.5f;
-            drawing.Rotation = Owner.Drawings["base"].Rotation;
-            //drawing.Coord = Owner.Hitbox.GetTopLeftPosVector();
+            var i = Vector2.Transform(new Vector2(0, 1), Matrix.CreateRotationZ(3.14f/2));
+            Vector2 rotationOffset = (Vector2.Transform(new Vector2(0, -0.5f), Matrix.CreateRotationZ(Owner.Drawings["base"].Rotation))) * Owner.Drawings["base"].Size;
+            drawing.Coord = Owner.Drawings["base"].Position + Owner.Drawings["base"].Size * 0.5f - (Owner.Drawings["base"].originPercentage - new Vector2(0, 0.5f)) * Owner.Drawings["base"].Size + rotationOffset;
+            Animation animation;
+            Owner.Animations.TryGetValue("fire", out animation);
+            if (animation != null)
+                drawing.Rotation = Owner.Drawings["base"].Rotation + (Owner.Animations["fire"] as FireAnimation).rotation;
+            else
+                drawing.Rotation = Owner.Drawings["base"].Rotation;
         }
-        public void Remove()
+        public override void Remove()
         {
             Owner.ActiveEffects.Remove(this);
             Globals.Drawings.Remove(drawing);
             Owner.Drawings.Remove(Name);
+            Owner.Animations.Remove("fire");
         }
     }
 }

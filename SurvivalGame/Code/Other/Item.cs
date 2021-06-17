@@ -266,9 +266,11 @@ namespace SurvivalGame
         {
             MouseState mstate = Mouse.GetState();
             float angle = Globals.rand.Next(-spread, spread) / 100f * (float)Math.PI;
-            var projectile = new Projectile(owner, TextureName.Rectangle, bulletVelocity + Globals.rand.Next(-bulletSpeedVariation, bulletSpeedVariation), new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, angle, range);
+            var projectile = new Projectile(owner, TextureName.fire, bulletVelocity + Globals.rand.Next(-bulletSpeedVariation, bulletSpeedVariation), new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, angle, range);
             projectile.immuneEntities.Add(owner);
-            projectile.Drawing.Color = Color.Orange;
+            projectile.Drawing.Scale = new Vector2(5, 10);
+            //projectile.Drawing.Color = Color.Orange;
+            projectile.Drawing.Rotation -= 3.14f / 2;
             projectile.effects.Add(new OnFire(1, 10));
         }
     }

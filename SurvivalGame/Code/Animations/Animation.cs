@@ -18,6 +18,7 @@ namespace SurvivalGame
         public float TotalLength { get => LENGTH * iterationCount; }
         public int iterationCount = 1;
         public int iteration = 0;
+        public bool isLoop = false;
         public Drawing Owner { get; set; }
         public float Progress
         {
@@ -64,10 +65,9 @@ namespace SurvivalGame
         }
         public void Stop()
         {
-            //Progress = 1;
             Inactive = true;
             IsActive = false;
-            Reset();
+            TotalProgress = 0;
         }
         public virtual void Reset()
         {

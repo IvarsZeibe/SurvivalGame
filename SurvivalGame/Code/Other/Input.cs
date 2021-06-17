@@ -86,7 +86,7 @@ namespace SurvivalGame
             {
                 foreach (var key in Globals.PressedKeyboardKeys)
                 {
-                    if (!Globals.MainMenu.IsActive)
+                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
                     {
                         switch (key)
                         {
@@ -117,7 +117,7 @@ namespace SurvivalGame
                 }
                 foreach (var key in Globals.NewKeyboardKeys)
                 {
-                    if (!Globals.MainMenu.IsActive)
+                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
                     {
                         switch (key)
                         {
@@ -186,7 +186,7 @@ namespace SurvivalGame
                 }
                 foreach (var button in Globals.PressedMouseKeys)
                 {
-                    if (!Globals.MainMenu.IsActive)
+                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
                     {
                         switch (button)
                         {
@@ -203,7 +203,7 @@ namespace SurvivalGame
                 }
                 foreach (var button in Globals.NewMouseKeys)
                 {
-                    if (!Globals.MainMenu.IsActive)
+                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
                     {
                         switch (button)
                         {

@@ -28,7 +28,8 @@ namespace SurvivalGame
             Target = Globals.MouseCursor;
             HealthBar = new HealthBar(this);
             Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Red, 0f,
-                new Vector2(radius, radius), 0.4f, true);
+                new Vector2(radius, radius), 0.4f);
+            Drawings.Add("base", Drawing);
 
             Hotbar = Globals.HUD.hotbar;
             Hotbar.Selected = 0;
@@ -60,6 +61,7 @@ namespace SurvivalGame
                 }
             }
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
+            Drawing.LayerDepth = 0.4f - (float)Y / 100000;
             if (IsDead)
                 Globals.Drawings.Remove(Drawing);
         }

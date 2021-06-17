@@ -46,7 +46,6 @@ namespace SurvivalGame
 
         public static GraphicsDeviceManager graphics { get; set; }
         public static SpriteBatch spriteBatch { get; set; }
-        //public static GraphicsDevice GraphicsDevice { get; set; }
 
         public static List<Drawing> Drawings = new List<Drawing>();
         public static List<DrawingText> DrawingTexts = new List<DrawingText>();
@@ -60,6 +59,9 @@ namespace SurvivalGame
         public static List<MouseKey> PressedMouseKeys = new List<MouseKey>();
         public static List<MouseKey> NewMouseKeys = new List<MouseKey>();
 
+        public static bool gameActive = false;
+        public static bool editorActive = false;
+
         public static Command Command;
         public static HUD HUD;
         public static MouseCursor MouseCursor;
@@ -68,7 +70,8 @@ namespace SurvivalGame
         public static Map Map;
 
         public static Dictionary<(int x, int y), Room> Rooms = new Dictionary<(int x, int y), Room>();
-        public static (int x, int y) activeRoomCoords { get; set; } = (0,0);
+        public static (int x, int y) activeRoomCoords { get; set; } = (0, 0);
+        public static Room getActiveRoom { get => Rooms[activeRoomCoords]; }
 
     }
 }

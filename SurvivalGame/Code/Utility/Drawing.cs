@@ -25,12 +25,31 @@ namespace SurvivalGame
                 Disable();
             }
         }
+        public Drawing(string texture, Vector2 position, Color color, float rotation, Vector2 scale, float layerDepth = 0.5f, bool isDrawn = true)
+        {
+            this.TextureStr = texture;
+            this.Coord = position;
+            this.Color = color;
+            this.Rotation = rotation;
+            if (scale != Vector2.Zero)
+                this.Scale = scale;
+            this.LayerDepth = layerDepth;
+            if (isDrawn)
+            {
+                Enable();
+            }
+            else
+            {
+                Disable();
+            }
+        }
         public Vector2 originPercentage = Vector2.Zero;
         public Vector2 Origin
         {
             get => new Vector2(Globals.Textures[Texture.ToString()].Width, Globals.Textures[Texture.ToString()].Height) * originPercentage;
         }
         public TextureName Texture { get; set; } = TextureName.Rectangle;
+        public string TextureStr { get; set; } = "none";
         public Vector2 Coord { get; set; } = Vector2.Zero;
         public Vector2 Position
         {
@@ -46,16 +65,15 @@ namespace SurvivalGame
             get => scale;
             set
             {
-                //if (Texture == TextureName.Rectangle)
-                //    scale = value;
-                //else
-                scale = new Vector2((float)value.X / Globals.Textures[Texture.ToString()].Width, (float)value.Y / Globals.Textures[Texture.ToString()].Height);
+                if(TextureStr == "none")
+                    scale = new Vector2((float)value.X / Globals.Textures[Texture.ToString()].Width, (float)value.Y / Globals.Textures[Texture.ToString()].Height);
+                else
+                    scale = new Vector2((float)value.X / Globals.Textures[TextureStr].Width, (float)value.Y / Globals.Textures[TextureStr].Height);
             }
         }
         public float LayerDepth { get; set; } = 0.5f;
         bool isDrawn = false;
         public bool IsDrawn { get => isDrawn; }
-        //public bool IsDead { get; set; } = false;
         public float GetWidth()
         {
             return Globals.Textures[Texture.ToString()].Width * scale.X;
@@ -64,6 +82,7 @@ namespace SurvivalGame
         {
             return Globals.Textures[Texture.ToString()].Height * scale.Y;
         }
+        public Vector2 Size { get => new Vector2(GetWidth(), GetHeight()); }
         public void Enable()
         {
             if (!IsDrawn)

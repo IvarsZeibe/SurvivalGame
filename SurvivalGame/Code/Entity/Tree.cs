@@ -19,16 +19,15 @@ namespace SurvivalGame
             Hitbox = new Rect(x, y, 30, 30);
             Vector2 drawingSize = new Vector2(150, 150);
             Drawing = new Drawing(TextureName.PineTree, Hitbox.GetTopLeftPosVector(), color, drawingRotation, drawingSize, 0.3f - (float)y / 100000);
-            {
-                Drawing.originPercentage = origin;
-                Drawing.Offset = -new Vector2(62, 115) + drawingSize * origin;
-            }
+            Drawing.originPercentage = origin;
+            Drawing.Offset = -new Vector2(62, 115) + drawingSize * origin;
             Drawings.Add("base", Drawing);
             Drawing drawing = new Drawing(TextureName.PineTreeOnFire, Vector2.Zero, Color.White, 0f, new Vector2(150, 150), Drawing.LayerDepth - 0.01f)
             {
-                originPercentage = new Vector2(1f, 1.5f)
+                originPercentage = origin
             };
-            Drawings.Add("OnFire", drawing);
+            drawing.Offset = drawing.Size * -0.5f;
+            //Drawings.Add("OnFire", drawing);
             Animations.Add("chopShake", new ShakeAnimation(Drawing));
             Animations.Add("despawn", new DisappearingAnimation(Drawing));
             Animations.Add("stayStill", new StillnessAnimation(Drawing));
@@ -38,8 +37,6 @@ namespace SurvivalGame
         {
             base.Update(gameTime);
             UpdateAnimations(gameTime);
-            Drawing.Rotation = drawingRotation;
-            Drawing.Color = color;
         }
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {
@@ -48,6 +45,11 @@ namespace SurvivalGame
                 foreach (var effect in (source as Projectile).effects)
                 {
                     effect.Owner = this;
+                    if(effect is OnFire)
+                    {
+                        //effect.followRotation = true;
+                        (effect as OnFire).flameSize = new Vector2(0.3f, 0.6f);
+                    }
                 }
                 ActiveEffects.AddRange((source as Projectile).effects);
             }
@@ -68,7 +70,7 @@ namespace SurvivalGame
 
             if (Health > 0)
             {
-                if (Animations["chopShake"].Inactive)
+                if (Animations["chopShake"].Inactive && damageType != DamageType.Fire)
                 {
                     Animations["chopShake"].Start();
                 }
@@ -77,7 +79,7 @@ namespace SurvivalGame
             {
                 Hitbox.Active = false;
                 if (Animations["fall"].Inactive)
-                {
+                 {
 
                     if (source is null)
                     {
@@ -97,20 +99,17 @@ namespace SurvivalGame
             }
             return true;
         }
-        void UpdateAnimations(GameTime gameTime)
+        protected override void UpdateAnimations(GameTime gameTime)
         {
-            foreach(var animation in Animations)
+            base.UpdateAnimations(gameTime);
+            if (Animations["fall"].Progress == 1)
             {
-                animation.Value.Update(gameTime);
-            }
-            drawingRotation = Drawing.Rotation;
-            color = Drawing.Color;
-            if (Animations["fall"].Progress == 1 && Animations["stayStill"].Inactive)
-            {
+                Animations["fall"].Stop();
                 Animations["stayStill"].Start();
             }
             if(Animations["stayStill"].Progress == 1)
             {
+                Animations["stayStill"].Stop();
                 Animations["despawn"].Start();
             }
         }

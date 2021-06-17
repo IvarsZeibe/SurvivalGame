@@ -16,6 +16,7 @@ namespace SurvivalGame
         public Level ActiveLevel { get => Levels[activeLevelIndex]; }
         private int activeLevelIndex = 0;
         public bool CanLeave = true;
+        public double windXCoord = 0;
         public Room((int x, int y) coords, string name, Color color, TextureName backgroundTexture = TextureName.None)
         {
             Name = name;
@@ -43,6 +44,11 @@ namespace SurvivalGame
                 else activeLevelIndex = 0;
             }
             Levels[activeLevelIndex].Update(gameTime);
+            windXCoord += gameTime.ElapsedGameTime.TotalSeconds * Globals.rand.Next(100,800);
+            if(windXCoord > Globals.rand.Next(5000, 40000))
+            {
+                windXCoord = 0;
+            }
 
         }
         bool isActive = false;
