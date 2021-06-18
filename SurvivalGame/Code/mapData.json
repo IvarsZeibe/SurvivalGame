@@ -1,0 +1,39 @@
+{
+  "Coords": {},
+  "BackgroundColor": {
+    "B": 0,
+    "G": 220,
+    "R": 0,
+    "A": 255,
+    "PackedValue": 4278246400
+  },
+  "background": {
+    "Origin": {},
+    "Texture": 6,
+    "TextureStr": "none",
+    "Coord": {},
+    "Position": {},
+    "Offset": {},
+    "Color": {
+      "B": 0,
+      "G": 220,
+      "R": 0,
+      "A": 255,
+      "PackedValue": 4278246400
+    },
+    "Rotation": 0,
+    "Scale": {},
+    "LayerDepth": 1,
+    "IsDrawn": true,
+    "Size": {}
+  },
+  "Name": "Spawn",
+  "ActiveLevel": {
+    "IsActive": true,
+    "spawners": [],
+    "Name": "None",
+    "EnemiesLeft": 0
+  },
+  "CanLeave": true,
+  "windXCoord": 0
+}

@@ -2,7 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SurvivalGame
 {
@@ -52,6 +56,59 @@ namespace SurvivalGame
                 vector.Y = 0;
 
             return vector;
+        }
+        public static void SaveGame()
+        {
+            using StreamWriter file = new StreamWriter("C:\\Users\\Ivars\\source\\repos\\SurvivalGame\\SurvivalGame\\Code\\mapData.json");
+            var serializeOptions = new JsonSerializerOptions { WriteIndented = true };
+            serializeOptions.Converters.Add(new saveCovertor());
+            foreach (var room in Globals.Rooms)
+            {
+                var roomForSave = new Room(room.Value.Coords, room.Value.Name, room.Value.BackgroundColor, addToRooms: false);
+                roomForSave.background = room.Value.background;
+                roomForSave.Entities.Clear();
+                string jsonString = JsonSerializer.Serialize(roomForSave, serializeOptions);
+                file.WriteLine(jsonString);
+                Trace.WriteLine(jsonString);
+            }
+
+            Trace.WriteLine(JsonSerializer.Serialize((2, 3), serializeOptions));
+        }
+        public static void LoadGame()
+        {
+            //using StreamWriter file = new StreamWriter("C:\\Users\\Ivars\\source\\repos\\SurvivalGame\\SurvivalGame\\Code\\mapData.json");
+            string jsonString = File.ReadAllText("C:\\Users\\Ivars\\source\\repos\\SurvivalGame\\SurvivalGame\\Code\\mapData.json");
+            //List<Entities> Globals.Rooms.Clear();
+            var serializeOptions = new JsonSerializerOptions { WriteIndented = true };
+            serializeOptions.Converters.Add(new saveCovertor());
+            //foreach (var line in jsonString)
+            //{
+            Room room = JsonSerializer.Deserialize<Room>(jsonString, serializeOptions);
+                if(Globals.Rooms[room.Coords] != null)
+                    Globals.Rooms[room.Coords].UnLoad();
+                Globals.Rooms[room.Coords] = room;
+            room.Load();
+
+            //}
+        }
+    }
+    public class saveCovertor : JsonConverter<>
+    {
+        public override object Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options)
+        {
+            Trace.WriteLine(reader.TokenType);
+            throw new JsonException();
+        }
+
+        public override void Write(
+            Utf8JsonWriter writer,
+            object objectToWrite,
+            JsonSerializerOptions options) 
+        {
+
         }
     }
 }

@@ -39,6 +39,7 @@ namespace SurvivalGame
             get => Y + Diameter / 2f;
             set => Y = value - Diameter / 2f;
         }
+        Circle() { }
         public Circle(double x, double y, int diameter)
         {
             X = x;

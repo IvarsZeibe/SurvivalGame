@@ -60,7 +60,6 @@ namespace SurvivalGame
         public static List<MouseKey> NewMouseKeys = new List<MouseKey>();
 
         public static bool gameActive = false;
-        public static bool editorActive = false;
 
         public static Command Command;
         public static HUD HUD;
@@ -68,6 +67,7 @@ namespace SurvivalGame
         public static Shop shop;
         public static MainMenu MainMenu;
         public static Map Map;
+        public static Editor Editor;
 
         public static Dictionary<(int x, int y), Room> Rooms = new Dictionary<(int x, int y), Room>();
         public static (int x, int y) activeRoomCoords { get; set; } = (0, 0);

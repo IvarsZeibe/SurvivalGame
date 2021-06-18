@@ -19,23 +19,22 @@ namespace SurvivalGame
     }
     abstract class Entity
     {
-        public Entity()
-        {
-            //EntityTracker.Entities.Add(this);
-            IsLoaded = true;
-            Globals.Rooms[Globals.activeRoomCoords].Entities.Add(this);
-        }
-        public Entity(bool addToRoom)
+        public Entity(bool addToRoom = true)
         {
             if (addToRoom)
             {
-                IsLoaded = true;
-                Globals.Rooms[Globals.activeRoomCoords].Entities.Add(this);
+                AddToRoom();
             }
             else
             {
                 IsLoaded = false;
             }
+        }
+        public void AddToRoom()
+        {
+            IsLoaded = true;
+            Globals.Rooms[Globals.activeRoomCoords].Entities.Add(this);
+
         }
         public Drawing Drawing;
         public Dictionary<string, Drawing> Drawings = new Dictionary<string, Drawing>();

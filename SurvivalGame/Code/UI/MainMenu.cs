@@ -10,6 +10,8 @@ namespace SurvivalGame
         private Drawing background;
         private Button startButton;
         private Button editorButton;
+        private Button closeButton;
+        private Button loadButton;
         public bool IsActive;
         public MainMenu()
         {
@@ -21,6 +23,12 @@ namespace SurvivalGame
             editorButton = new Button(
                 new Rect(Globals.graphics.PreferredBackBufferWidth / 2, Globals.graphics.PreferredBackBufferHeight / 2 + 55, 100, 50),
                 Color.Black, new StringBuilder("Editor"), Color.White);
+            closeButton = new Button(
+                new Rect(Globals.graphics.PreferredBackBufferWidth / 2, Globals.graphics.PreferredBackBufferHeight / 2 + 110, 100, 50),
+                Color.Black, new StringBuilder("Save and quit"), Color.White);
+            loadButton = new Button(
+                new Rect(Globals.graphics.PreferredBackBufferWidth / 2, Globals.graphics.PreferredBackBufferHeight / 2 + 165, 100, 50),
+                Color.Black, new StringBuilder("Save and quit"), Color.White);
             Activate();
         }
         public void CheckClickEvent()
@@ -29,16 +37,24 @@ namespace SurvivalGame
             {
                 Globals.HUD.Activate();
                 Globals.gameActive = true;
-                Globals.editorActive = false;
+                Globals.Editor.IsActive = false;
                 Globals.getActiveRoom.Load();
                 Deactivate();
             }
             if (Globals.MouseCursor.Hitbox.CollidesWith(editorButton.Hitbox))
             {
                 Globals.gameActive = false;
-                Globals.editorActive = true;
+                Globals.Editor.IsActive = true;
                 Globals.getActiveRoom.UnLoad();
                 Deactivate();
+            }
+            if (Globals.MouseCursor.Hitbox.CollidesWith(closeButton.Hitbox))
+            {
+                Utilities.SaveGame();
+            }
+            if (Globals.MouseCursor.Hitbox.CollidesWith(loadButton.Hitbox))
+            {
+                Utilities.LoadGame();
             }
         }
         public void Activate()
@@ -55,7 +71,6 @@ namespace SurvivalGame
             startButton.Deactivate();
             editorButton.Deactivate();
             background.Disable();
-            Globals.HUD.Activate();
         }
     }
 }

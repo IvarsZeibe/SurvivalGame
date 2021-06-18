@@ -1,0 +1,10 @@
+reqiured
+
+rooms
+	coords
+		x, y
+	entities
+	background color
+	name
+	background
+	
