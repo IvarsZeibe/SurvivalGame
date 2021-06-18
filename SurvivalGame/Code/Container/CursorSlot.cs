@@ -11,7 +11,6 @@ namespace SurvivalGame
         private readonly int width = 50;
         private readonly int height = 50;
         private const int slotCountHorizontal = 1;
-        CursorSlot() { }
         public CursorSlot(MouseCursor owner, bool isDrawn = false)
         {
             Owner = owner;

@@ -8,7 +8,6 @@ namespace SurvivalGame
     class HealthBar : IUpdate
     {
         private readonly Vector2 maxScale;
-        HealthBar() { }
         public HealthBar(Entity owner)
         {
             this.Owner = owner;

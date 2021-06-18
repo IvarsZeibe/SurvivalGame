@@ -22,7 +22,7 @@ namespace SurvivalGame
         /// Update
         /// </summary>
         private static List<Entity> DeadEntities { get; set; } = new List<Entity>();
-        public static void UpdateEntities(GameTime gameTime, bool updateEntities = true)
+        public static void UpdateEntities(GameTime gameTime)
         {
             for (int i = 0; i < Entities.Count; i++) 
             {
@@ -30,7 +30,7 @@ namespace SurvivalGame
                     Entities[i].Load();
                 if (Entities[i].IsDead)
                     DeadEntities.Add(Entities[i]);
-                else if (updateEntities)
+                else
                     Entities[i].Update(gameTime);
             }
             foreach (var deadEntity in DeadEntities)

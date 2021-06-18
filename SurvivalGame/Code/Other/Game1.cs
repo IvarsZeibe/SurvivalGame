@@ -60,7 +60,6 @@ namespace SurvivalGame
             Globals.shop = new Shop();
             Globals.Command = new Command(this);
             Globals.MainMenu = new MainMenu();
-            Globals.Editor = new Editor();
             input = new Input(this, player, chat);
             Globals.Map = new Map();
             //room.Entities.Add(new Enemy(
@@ -150,9 +149,9 @@ namespace SurvivalGame
                     UpdateUpdatables(gameTime);
                     TryToRespawnPlayer(gameTime);
                 }
-                else if (Globals.Editor.IsActive)
+                else if (Globals.editorActive)
                 {
-                    Globals.Editor.Update(gameTime);
+
                 }
             }
             Globals.MouseCursor.Update(gameTime);
@@ -168,7 +167,7 @@ namespace SurvivalGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.LightGray);
+            GraphicsDevice.Clear(Globals.Rooms[Globals.activeRoomCoords].BackgroundColor);
             // TODO: Add your drawing code here
 
             Globals.spriteBatch.Begin(SpriteSortMode.BackToFront);
@@ -190,11 +189,6 @@ namespace SurvivalGame
             {
                 if (drawingText.IsDrawn)
                     Globals.spriteBatch.DrawString(Globals.SpriteFonts[drawingText.SpriteFont], drawingText.Text, drawingText.Position, drawingText.Color, drawingText.Rotation, Vector2.Zero, drawingText.Scale, SpriteEffects.None, drawingText.LayerDepth);
-            }
-
-            if (Globals.Editor.IsActive)
-            {
-                Globals.Editor.Draw(Globals.spriteBatch);
             }
 
             Globals.spriteBatch.End();

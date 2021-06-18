@@ -12,7 +12,7 @@ namespace SurvivalGame
     class MouseCursor : Entity
     {
         public CursorSlot CursorSlot;
-        public MouseCursor() : base(false)
+        public MouseCursor()
         {
             Hitbox = new Rect(0, 0, 3, 3);
             Drawing = new Drawing(TextureName.Rectangle, new Vector2(0, 0), Color.White, 0f, new Vector2(3, 3), 0.01f, true);

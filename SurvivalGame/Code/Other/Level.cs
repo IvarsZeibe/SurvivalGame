@@ -8,11 +8,10 @@ namespace SurvivalGame
     class Level
     {
         public bool IsActive { get; set; } = true;
-        public List<Spawner> spawners { get; set; } = new List<Spawner>();
-        public string Name { get; set; }
-        public int EnemiesLeft { get; set; }
+        public List<Spawner> spawners = new List<Spawner>();
+        public readonly string Name;
+        public int EnemiesLeft;
         //Func<bool> EndCondition;
-        Level() { }
         public Level(string name, int enemiesLeft)
         {
             Name = name;

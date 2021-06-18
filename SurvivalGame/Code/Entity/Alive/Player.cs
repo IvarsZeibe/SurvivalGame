@@ -16,6 +16,7 @@ namespace SurvivalGame
 
         private readonly int radius = 40;
         private HealthBar HealthBar;
+
         public Player()
         {
             this.Mass = 10;

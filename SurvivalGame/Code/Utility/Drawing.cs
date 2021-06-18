@@ -7,7 +7,6 @@ namespace SurvivalGame
 {
     class Drawing
     {
-        Drawing() { }
         public Drawing(TextureName texture, Vector2 position, Color color, float rotation, Vector2 scale, float layerDepth = 0.5f, bool isDrawn = true)
         {
             this.Texture = texture;

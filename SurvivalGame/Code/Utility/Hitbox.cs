@@ -147,9 +147,5 @@ namespace SurvivalGame
         {
             return new Vector2((float)Width, (float)Height);
         }
-        public Rectangle ToRectangle()
-        {
-            return new Rectangle((int)Math.Round(X - Width / 2), (int)Math.Round(Y - Height / 2), Width, Height);
-        }
     }
 }
