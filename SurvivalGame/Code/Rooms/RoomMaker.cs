@@ -108,6 +108,12 @@ namespace SurvivalGame
                     target: targ, color: Color.DarkGray, addToRoom: false));
                 Entities.Add(targ);
             }
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 pos = new Vector2(Globals.rand.Next(Globals.graphics.PreferredBackBufferWidth), Globals.rand.Next(Globals.graphics.PreferredBackBufferHeight));
+                var stone = new Stone(pos);
+                Entities.Add(stone);
+            }
             var level = new Level("Wave1", 6);
             Entity target = new NoBrainEntity();
             Spawner spawner = new EnemySpawner(target);

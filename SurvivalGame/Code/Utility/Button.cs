@@ -24,7 +24,8 @@ namespace SurvivalGame
             Background = new Drawing(
                 TextureName.Rectangle, Hitbox.GetTopLeftPosVector(),
                 backgroundColor, 0f, Hitbox.GetScaleVector(), 0.1f);
-            Text = new DrawingText(SpriteFontName.Aerial16, text, new Vector2((float)Hitbox.X, (float)Hitbox.Y), textColor, 0f, new Vector2(1,1), 0.09f, true);
+            var pos = Hitbox.GetPosVector() - Globals.SpriteFonts[SpriteFontName.Aerial16].MeasureString(text) * 0.5f;
+            Text = new DrawingText(SpriteFontName.Aerial16, text, pos, textColor, 0f, new Vector2(1,1), 0.09f, true);
         }
         public void Activate()
         {

@@ -9,7 +9,6 @@ namespace SurvivalGame
     {
         private Drawing background;
         private Button startButton;
-        private Button editorButton;
         public bool IsActive;
         public MainMenu()
         {
@@ -18,9 +17,6 @@ namespace SurvivalGame
             startButton = new Button(
                 new Rect(Globals.graphics.PreferredBackBufferWidth / 2, Globals.graphics.PreferredBackBufferHeight / 2, 100, 50),
                 Color.Black, new StringBuilder("Start"), Color.White);
-            editorButton = new Button(
-                new Rect(Globals.graphics.PreferredBackBufferWidth / 2, Globals.graphics.PreferredBackBufferHeight / 2 + 55, 100, 50),
-                Color.Black, new StringBuilder("Editor"), Color.White);
             Activate();
         }
         public void CheckClickEvent()
@@ -28,16 +24,7 @@ namespace SurvivalGame
             if (Globals.MouseCursor.Hitbox.CollidesWith(startButton.Hitbox))
             {
                 Globals.HUD.Activate();
-                Globals.gameActive = true;
-                Globals.editorActive = false;
                 Globals.getActiveRoom.Load();
-                Deactivate();
-            }
-            if (Globals.MouseCursor.Hitbox.CollidesWith(editorButton.Hitbox))
-            {
-                Globals.gameActive = false;
-                Globals.editorActive = true;
-                Globals.getActiveRoom.UnLoad();
                 Deactivate();
             }
         }
@@ -45,7 +32,6 @@ namespace SurvivalGame
         {
             IsActive = true;
             startButton.Activate();
-            editorButton.Activate();
             background.Enable();
             Globals.HUD.Deactivate();
         }
@@ -53,7 +39,6 @@ namespace SurvivalGame
         {
             IsActive = false;
             startButton.Deactivate();
-            editorButton.Deactivate();
             background.Disable();
             Globals.HUD.Activate();
         }

@@ -86,7 +86,7 @@ namespace SurvivalGame
             {
                 foreach (var key in Globals.PressedKeyboardKeys)
                 {
-                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
+                    if (!Globals.MainMenu.IsActive)
                     {
                         switch (key)
                         {
@@ -117,7 +117,7 @@ namespace SurvivalGame
                 }
                 foreach (var key in Globals.NewKeyboardKeys)
                 {
-                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
+                    if (!Globals.MainMenu.IsActive)
                     {
                         switch (key)
                         {
@@ -186,7 +186,7 @@ namespace SurvivalGame
                 }
                 foreach (var button in Globals.PressedMouseKeys)
                 {
-                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
+                    if (!Globals.MainMenu.IsActive)
                     {
                         switch (button)
                         {
@@ -203,7 +203,7 @@ namespace SurvivalGame
                 }
                 foreach (var button in Globals.NewMouseKeys)
                 {
-                    if (!Globals.MainMenu.IsActive && Globals.gameActive)
+                    if (!Globals.MainMenu.IsActive)
                     {
                         switch (button)
                         {
@@ -222,6 +222,10 @@ namespace SurvivalGame
                                 break;
                             case MouseKey.RightButton:
                                 Globals.shop.CheckRightClickEvent();
+                                break;
+                            case MouseKey.MiddleButton:
+                                var light = new LightBulb(Globals.MouseCursor.Hitbox.GetPosVector(), new Vector2(200, 200), Color.Orange);
+                                Globals.getActiveRoom.Entities.Add(light);
                                 break;
                         }
                     }

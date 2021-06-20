@@ -19,13 +19,7 @@ namespace SurvivalGame
     }
     abstract class Entity
     {
-        public Entity()
-        {
-            //EntityTracker.Entities.Add(this);
-            IsLoaded = true;
-            Globals.Rooms[Globals.activeRoomCoords].Entities.Add(this);
-        }
-        public Entity(bool addToRoom)
+        public Entity(bool addToRoom = true)
         {
             if (addToRoom)
             {
@@ -39,6 +33,7 @@ namespace SurvivalGame
         }
         public Drawing Drawing;
         public Dictionary<string, Drawing> Drawings = new Dictionary<string, Drawing>();
+        public List<Light> Lights = new List<Light>();
         public Entity owner = null;
         public Hitbox Hitbox { get; set; }
         public bool Collision { get; set; }

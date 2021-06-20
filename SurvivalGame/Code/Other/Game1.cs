@@ -108,6 +108,9 @@ namespace SurvivalGame
             addTexture("Axe");
             addTexture("fire");
             addTexture("grass");
+            addTexture("stone");
+            addTexture("light");
+            addTexture("light2");
             Globals.SpriteFonts.Add(SpriteFontName.Aerial16, this.Content.Load<SpriteFont>("Chat"));
         }
 
@@ -138,22 +141,15 @@ namespace SurvivalGame
             //OnKeyDown(gameTime);
             if (!Globals.MainMenu.IsActive)
             {
-                if (Globals.gameActive)
-                {
-                    CheckForRoomChange();
-                    Globals.Command.DoCommand(this);
-                    Globals.HUD.Update(gameTime);
-                    //levels.Update(gameTime);
-                    Globals.Rooms[Globals.activeRoomCoords].Update(gameTime);
-                    EntityTracker.UpdateEntities(gameTime);
-                    UpdateUpdatables(gameTime);
-                    TryToRespawnPlayer(gameTime);
-                }
-                else if (Globals.editorActive)
-                {
-
-                }
-            }
+                CheckForRoomChange();
+                Globals.Command.DoCommand(this);
+                Globals.HUD.Update(gameTime);
+                //levels.Update(gameTime);
+                Globals.Rooms[Globals.activeRoomCoords].Update(gameTime);
+                EntityTracker.UpdateEntities(gameTime);
+                UpdateUpdatables(gameTime);
+                TryToRespawnPlayer(gameTime);
+        }
             Globals.MouseCursor.Update(gameTime);
 
 
@@ -170,8 +166,10 @@ namespace SurvivalGame
             GraphicsDevice.Clear(Globals.Rooms[Globals.activeRoomCoords].BackgroundColor);
             // TODO: Add your drawing code here
 
+            Globals.getActiveRoom.light.Update(Globals.spriteBatch, gameTime);
             Globals.spriteBatch.Begin(SpriteSortMode.BackToFront);
 
+            Globals.getActiveRoom.light.Draw(Globals.spriteBatch);
             foreach (var drawing in Globals.Drawings)
             {
                 if (drawing.IsDrawn)
@@ -259,7 +257,7 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        switch (Globals.rand.Next(0,3))
+                        switch (Globals.rand.Next(0,6))
                         {
                             case 0:
                             case 1:

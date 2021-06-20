@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,6 +11,7 @@ namespace SurvivalGame
         public readonly (int x, int y)Coords;
         public Color BackgroundColor { get; set; }
         public Drawing background;
+        //public LightMap lightMap = new LightMap();
         public string Name { get; set; }
         public List<Entity> Entities { get; set; } = new List<Entity>();
         public List<Level> Levels { get; set; } = new List<Level>() {new Level("None", 0) };
@@ -17,6 +19,7 @@ namespace SurvivalGame
         private int activeLevelIndex = 0;
         public bool CanLeave = true;
         public double windXCoord = 0;
+        public LightMap light = new LightMap();
         public Room((int x, int y) coords, string name, Color color, TextureName backgroundTexture = TextureName.None)
         {
             Name = name;
@@ -49,7 +52,7 @@ namespace SurvivalGame
             {
                 windXCoord = 0;
             }
-
+            //lightMap.Update(gameTime);
         }
         bool isActive = false;
         public void Load()
@@ -57,7 +60,11 @@ namespace SurvivalGame
             isActive = true;
             if (!(background is null))
                 background.Enable();
-            foreach(var level in Levels)
+            foreach (var e in Entities)
+            {
+                e.Load();
+            }
+            foreach (var level in Levels)
             {
                 level.Enable();
             }
@@ -65,10 +72,16 @@ namespace SurvivalGame
         public void UnLoad()
         {
             isActive = false;
+            List<Entity> deadEntities = new List<Entity>();
             foreach (var e in Entities)
             {
                 e.UnLoad();
+                if (e.IsDead)
+                    deadEntities.Add(e);
             }
+            foreach (var ent in deadEntities)
+                Entities.Remove(ent);
+
             if (!(background is null))
                 background.Disable();
             foreach (var level in Levels)

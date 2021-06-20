@@ -59,9 +59,6 @@ namespace SurvivalGame
         public static List<MouseKey> PressedMouseKeys = new List<MouseKey>();
         public static List<MouseKey> NewMouseKeys = new List<MouseKey>();
 
-        public static bool gameActive = false;
-        public static bool editorActive = false;
-
         public static Command Command;
         public static HUD HUD;
         public static MouseCursor MouseCursor;

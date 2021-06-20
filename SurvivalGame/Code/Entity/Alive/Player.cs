@@ -27,8 +27,8 @@ namespace SurvivalGame
             this.Health = 1000;
             Target = Globals.MouseCursor;
             HealthBar = new HealthBar(this);
-            Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.Red, 0f,
-                new Vector2(radius, radius), 0.4f);
+            //Drawing = new Drawing(TextureName.Circle, Hitbox.GetTopLeftPosVector(), Color.Red, 0f, Hitbox.GetScaleVector(), 0.4f);
+            Drawing = new Drawing(TextureName.Circle, Hitbox.GetTopLeftPosVector(), Color.Red, 0f, Hitbox.GetScaleVector(), 0.4f);
             Drawings.Add("base", Drawing);
 
             Hotbar = Globals.HUD.hotbar;
