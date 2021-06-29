@@ -72,6 +72,7 @@ namespace SurvivalGame
             Globals.HUD.hotbar.Add(new Pistol());
             Globals.HUD.hotbar.Add(new FlamethrowerItem());
             Globals.HUD.hotbar.Add(new AxeItem());
+            Globals.HUD.hotbar.Add(new BlockItem());
             //Globals.shop.AddItemForSale(new Pistol(50, 1.5f, "sniper", bulletVelocity: 1500f), 3); 
             Globals.shop.AddItemForSale(new Pistol(), 3);
             Globals.shop.AddItemForSale(new Pistol(10, 0.1f, "mini"), 5);

@@ -123,13 +123,11 @@ namespace SurvivalGame
             {
                 if (Effects.Exists(eff => eff.Strength >= effect.Strength && eff.Duration >= effect.Duration))
                 {
-                    Trace.WriteLine(1);
                     return false;
                 }
                 var efect = Effects.Find(eff => eff.Strength <= effect.Strength && eff.Duration <= effect.Duration);
                 if (efect != null)
                 {
-                    Trace.WriteLine(2);
                     effect.Animation = efect.Animation;
                     effect.Animation.Owner = effect.Drawing;
                     efect.Duration = 0;
@@ -224,7 +222,10 @@ namespace SurvivalGame
                             else
                             {
                                 if (intersection > movementDecrease)
+                                {
                                     movementDecrease = intersection;
+                                    SlidePast(entity);
+                                }
                             }
                         }
                             
@@ -269,8 +270,97 @@ namespace SurvivalGame
             {
                 return movementDecreaseTotal;
             }
+            void SlidePast(Entity entity, float slideStrength = 1) 
+            {
+                string situation;
+                if (Hitbox is Circle)
+                {
+                    if (entity.Hitbox is Circle)
+                        situation = "cc";
+                    else
+                        situation = "cr";
+                }
+                else
+                {
+                    if (entity.Hitbox is Circle)
+                        situation = "rc";
+                    else
+                        situation = "rr";
+                }
+                if (xDirection)
+                {
+                    switch (situation)
+                    {
+                        case "cc":
+                            if (Y > entity.Y)
+                            {
+                                Move(slideStrength, false);
+                            }
+                            else if (Y < entity.Y)
+                            {
+                                Move(-slideStrength, false);
+                            }
+                            break;
+                        case "cr":
+                            if (Y > entity.Hitbox.Bottom)
+                            {
+                                Move(slideStrength, false);
+                            }
+                            else if (Y < entity.Hitbox.Top)
+                            {
+                                Move(-slideStrength, false);
+                            }
+                            break;
+                        case "rc":
+                            if (Hitbox.Bottom > entity.Y)
+                            {
+                                Move(slideStrength, false);
+                            }
+                            else if (Hitbox.Top < entity.Y)
+                            {
+                                Move(-slideStrength, false);
+                            }
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (situation)
+                    {
+                        case "cc":
+                            if (X > entity.X)
+                            {
+                                Move(slideStrength, true);
+                            }
+                            else if (X < entity.X)
+                            {
+                                Move(-slideStrength, true);
+                            }
+                            break;
+                        case "cr":
+                            if (X > entity.Hitbox.Right)
+                            {
+                                Move(slideStrength, true);
+                            }
+                            else if (X < entity.Hitbox.Left)
+                            {
+                                Move(-slideStrength, true);
+                            }
+                            break;
+                        case "rc":
+                            if (Hitbox.Right > entity.X)
+                            {
+                                Move(slideStrength, true);
+                            }
+                            else if (Hitbox.Left < entity.X)
+                            {
+                                Move(-slideStrength, true);
+                            }
+                            break;
+                    }
 
+                }
+            }
         }
-
     }
 }
