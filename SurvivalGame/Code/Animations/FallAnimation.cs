@@ -7,8 +7,9 @@ namespace SurvivalGame
 {
     class FallAnimation : Animation
     {
-        float rotationChanges = 0f;
-        public Direction direction = Direction.Right;
+        public float rotationChanges { get; set; } = 0f;
+        public Direction direction { get; set; } = Direction.Right;
+        FallAnimation() { }
         public FallAnimation(Drawing owner, float shake_length = 1.5f) : base(owner, shake_length) { }
         public override void Update(GameTime gameTime)
         {

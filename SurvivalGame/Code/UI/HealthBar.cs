@@ -5,19 +5,18 @@ using System.Text;
 
 namespace SurvivalGame
 {
-    class HealthBar : IUpdate
+    class HealthBar
     {
-        private readonly Vector2 maxScale;
+        public Vector2 maxScale { get; set; }
+        HealthBar() { }
         public HealthBar(Entity owner)
         {
-            this.Owner = owner;
-            this.UpdateEnabled = true;
-            Globals.Updatables.Add(this);
+            //this.Owner = owner;
             maxScale = new Vector2(50, 3f);
             this.Drawing = new Drawing 
             (
                 TextureName.Rectangle,
-                new Vector2((float)Owner.Hitbox.X - (maxScale.X / 2), (float)Owner.Hitbox.Top - 20f),
+                new Vector2((float)owner.Hitbox.X - (maxScale.X / 2), (float)owner.Hitbox.Top - 20f),
                 Color.Red,
                 0f,
                 maxScale,
@@ -37,40 +36,36 @@ namespace SurvivalGame
             //        true
             //    );
         }
-        public bool UpdateEnabled { get; set; }
-        private Entity Owner { get; set; }
+        //public Entity Owner { get; set; }
         public Drawing Drawing { get; set; }
         public DrawingText DrawingText { get; set; }
-        public bool IsDead { get; set; } = false;
         public void Load() 
         {
             Drawing.Enable();
-            UpdateEnabled = true;
         }
         public void UnLoad()
         {
             Drawing.Disable();
-            UpdateEnabled = false;
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(Entity Owner)
         {
-            if (Owner.IsDead)
-            {
-                Globals.Drawings.Remove(Drawing);
-                IsDead = true;
-                UpdateEnabled = false;
-                //Drawing.IsDead = true;
-                //DrawingText.IsDead = true;
-            }
-            else
-            {
+            //if (Owner.IsDead)
+            //{
+            //    Globals.Drawings.Remove(Drawing);
+            //    IsDead = true;
+            //    UpdateEnabled = false;
+            //    //Drawing.IsDead = true;
+            //    //DrawingText.IsDead = true;
+            //}
+            //else
+            //{
                 this.Drawing.Scale = new Vector2((float)Owner.Health / Owner.MaxHealth * 50, 3f);
                 this.Drawing.Position = new Vector2((float)Owner.Hitbox.X - maxScale.X / 2, (float)Owner.Hitbox.Top - 20f);
                 //this.DrawingText.Position = this.Drawing.Position;
                 //this.DrawingText.Text.Clear();
                 //this.DrawingText.Text.Append(Owner.Health);
-            }
+            //}
         }
     }
 }

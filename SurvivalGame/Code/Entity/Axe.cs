@@ -7,11 +7,12 @@ namespace SurvivalGame
 {
     class Axe : Entity
     {
-        float rotation = 0f;
-        readonly float startRotation;
-        const float LIFE_SPAN = 0.2f;
-        float timeAlive = 0;
-        int damage = 10;
+        public float rotation { get; set; } = 0f;
+        public float startRotation { get; set; }
+        public float LIFE_SPAN { get; set; } = 0.2f;
+        public float timeAlive { get; set; } = 0;
+        public int damage { get; set; } = 10;
+        Axe() { }
         public Axe(Entity owner, Vector2 targetPos)
         {
             this.owner = owner;
@@ -28,7 +29,6 @@ namespace SurvivalGame
             {
                 originPercentage = new Vector2(0.5f, 1f)
             };
-            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {

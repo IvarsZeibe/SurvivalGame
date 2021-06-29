@@ -7,7 +7,8 @@ namespace SurvivalGame
 {
     class DisappearingAnimation : Animation
     {
-        Vector4 colorChange = Vector4.Zero;
+        public Vector4 colorChange { get; set; } = Vector4.Zero;
+        DisappearingAnimation() { }
         public DisappearingAnimation(Drawing owner, float iterationLength = 2f) : base(owner, iterationLength) { }
         public override void Update(GameTime gameTime)
         {

@@ -7,7 +7,8 @@ namespace SurvivalGame
 {
     class EnemySpawner : Spawner
     {
-        Entity target;
+        public Entity target { get; set; }
+        EnemySpawner() { }
         public EnemySpawner(Entity target) : base()
         {
             this.target = target;

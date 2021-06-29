@@ -7,6 +7,7 @@ namespace SurvivalGame
 {
     class StillnessAnimation : Animation
     {
+        StillnessAnimation() { }
         public StillnessAnimation(Drawing owner, float iterationLength = 2f) : base(owner, iterationLength) { }
         public override void Update(GameTime gameTime)
         {

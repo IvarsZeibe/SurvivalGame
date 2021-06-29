@@ -17,7 +17,7 @@ namespace SurvivalGame
         public virtual double Bottom { get; set; }
         public virtual int Width { get; set; }
         public virtual int Height { get; set; }
-        public bool Active = true;
+        public bool Active { get; set; } = true;
 
         public bool CollidesWith(Hitbox h2)
         {

@@ -8,10 +8,11 @@ namespace SurvivalGame
     class Level
     {
         public bool IsActive { get; set; } = true;
-        public List<Spawner> spawners = new List<Spawner>();
-        public readonly string Name;
-        public int EnemiesLeft;
+        public List<Spawner> spawners { get; set; } = new List<Spawner>();
+        public string Name { get; set; }
+        public int EnemiesLeft { get; set; }
         //Func<bool> EndCondition;
+        Level() { }
         public Level(string name, int enemiesLeft)
         {
             Name = name;
@@ -22,19 +23,18 @@ namespace SurvivalGame
         {
             if (EnemiesLeft <= 0)
                 Disable();
-
+            foreach(var spawner in spawners)
+            {
+                spawner.Update(gameTime);
+            }
         }
         public void Disable()
         {
             IsActive = false;
-            foreach (var spawner in spawners)
-                spawner.IsDead = true;
         }
         public void Enable()
         {
             IsActive = true;
-            foreach (var spawner in spawners)
-                spawner.IsDead = false;
         }
 
     }

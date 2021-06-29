@@ -7,12 +7,14 @@ namespace SurvivalGame
 {
     class Hotbar
     {
-        private int padding = 3;
-        private readonly int width = 500;
-        private readonly int height = 50;
-        public const int slotCountHorizontal = 10;
+        int padding = 3;
+        int width = 500;
+        int height = 50;
+        int slotCountHorizontal = 10;
+        Hotbar() { }
         public Hotbar(/*Entity owner,*/ bool isDrawn = true)
         {
+            Inventory = new Inventory(slotCountHorizontal);
             //Owner = owner;
             Drawing = new Drawing
                 (
@@ -38,9 +40,10 @@ namespace SurvivalGame
         public Hitbox Hitbox { get; set; }
         //private Entity Owner { get; }
         public Drawing Drawing { get; set; }
-        public List<Drawing> ItemDrawings { get; } = new List<Drawing>();
+        public List<Drawing> ItemDrawings { get; set; } = new List<Drawing>();
         public List<Drawing> SelectedItemBorder { get; set; } = new List<Drawing>();
-        private int selected;
+        public int selected { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
         public int Selected
         {
             get
@@ -57,7 +60,7 @@ namespace SurvivalGame
                 SelectedItemBorder = Utilities.CreateEmptyRectDrawings(Drawing.Position + new Vector2(width * selected, 0), Color.Black, new Vector2(width, height), isActive, depth: 0.1f);
             }
         }
-        public Inventory Inventory { get; set; } = new Inventory(slotCountHorizontal);
+        public Inventory Inventory { get; set; }
 
         public bool Add(IItem item, int index = -1)
         {

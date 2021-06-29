@@ -11,9 +11,10 @@ namespace SurvivalGame
         private readonly int width = 50;
         private readonly int height = 50;
         private const int slotCountHorizontal = 1;
-        public CursorSlot(MouseCursor owner, bool isDrawn = false)
+        CursorSlot() { }
+        public CursorSlot(MouseCursor Owner, bool isDrawn = false)
         {
-            Owner = owner;
+            //Owner = owner;
             Drawing = new Drawing
                 (
                     TextureName.Rectangle,
@@ -30,9 +31,9 @@ namespace SurvivalGame
             }
             //SelectedItemFrame = new Drawing(TextureName.Rectangle, Vector2.Zero, Color.Red, 0, new Vector2(Drawing.Scale.X / 10, Drawing.Scale.Y), 0.2f);
         }
-        private MouseCursor Owner { get; }
+        //private MouseCursor Owner { get; }
         public Drawing Drawing { get; set; }
-        public List<Drawing> ItemDrawings { get; } = new List<Drawing>();
+        public List<Drawing> ItemDrawings { get; set; } = new List<Drawing>();
         public Inventory Inventory { get; set; } = new Inventory(slotCountHorizontal);
         public IItem Add(IItem item, int index = 0)
         {
@@ -54,7 +55,7 @@ namespace SurvivalGame
         {
             return Inventory.Get(index);
         }
-        public void Update()
+        public void Update(MouseCursor Owner)
         {
             Vector2 newPosition = new Vector2((float)Owner.Hitbox.X, (float)Owner.Hitbox.Y);
             foreach(var i in ItemDrawings)
@@ -63,6 +64,22 @@ namespace SurvivalGame
                     i.Position = i.Position - Drawing.Position + newPosition;
             }
             Drawing.Position = newPosition;
+        }
+        public void Unload()
+        {
+            foreach(var drawing in ItemDrawings)
+            {
+                if(drawing != null)
+                    drawing.Disable();
+            }
+        }
+        public void Load()
+        {
+            foreach (var drawing in ItemDrawings)
+            {
+                if (drawing != null)
+                    drawing.Enable();
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ namespace SurvivalGame
     }
     class EmptyItem : IItem
     {
+        public EmptyItem() { }
         public string Name { get; set; } = "Air";
         public float Damage { get; } = 0f;
         public float Cooldown { get; set; } = 0f;
@@ -31,6 +32,7 @@ namespace SurvivalGame
     }
     class Pistol : IItem
     {
+        Pistol() { }
         public Pistol(float damage = 20f, float cooldown = 0.3f, string name = "pistol", Color? color = null, float bulletVelocity = 500f)
         {
             Damage = damage;
@@ -40,9 +42,9 @@ namespace SurvivalGame
             color ??= Color.White;
             Color = (Color)color;
         }
-        float bulletVelocity;
+        public float bulletVelocity { get; set; }
         public string Name { get; set; }
-        public float Damage { get; }
+        public float Damage { get; set; }
         public float Cooldown { get; set; }
         public TextureName TextureName { get; } = TextureName.PistolItem;
         public Color Color { get; set; } = Color.Black;
@@ -56,6 +58,7 @@ namespace SurvivalGame
     }
     class SwordItem : IItem
     {
+        SwordItem() { }
         public SwordItem(float damage = 30f, float cooldown = 0.3f, string name = "sword", Color? color = null, float knockbackStrenght = 100)
         {
             Damage = damage;
@@ -67,7 +70,7 @@ namespace SurvivalGame
         }
         public float knockbackStrenght { get; set; }
         public string Name { get; set; }
-        public float Damage { get; }
+        public float Damage { get; set; }
         public float Cooldown { get; set; }
         public TextureName TextureName { get; } = TextureName.SwordItem;
         public Color Color { get; set; } = Color.Black;
@@ -83,6 +86,7 @@ namespace SurvivalGame
     }
     class BlockItem : IItem
     {
+        BlockItem() { }
         public BlockItem(float cooldown = 0.3f, string name = "block", Color? color = null)
         {
             Cooldown = cooldown;
@@ -163,6 +167,7 @@ namespace SurvivalGame
     }
     class RPG : IItem
     {
+        RPG() { }
         public RPG(int _damage = 60, bool _trackEnemy = true, float speed = 500f, int _range = 800, float cooldown = 1f, string name = "rpg", Color? color = null)
         {
             range = _range;
@@ -174,11 +179,11 @@ namespace SurvivalGame
             color ??= Color.White;
             Color = (Color)color;
         }
-        bool trackEnemy;
-        float bulletVelocity;
-        int range;
+        public bool trackEnemy { get; set; }
+        public float bulletVelocity { get; set; }
+        public int range { get; set; }
         public string Name { get; set; }
-        public int Damage { get; }
+        public int Damage { get; set; }
         public float Cooldown { get; set; }
         public TextureName TextureName { get; } = TextureName.RPG;
         public Color Color { get; set; } = Color.Black;
@@ -191,6 +196,7 @@ namespace SurvivalGame
     }
     class Shotgun : IItem
     {
+        Shotgun() { }
         public Shotgun(float damage = 20f, float cooldown = 0.3f, string name = "shotgun", int bulletCount = 3, float spread = 0, float bulletVelocity = 500f)
         {
             Damage = damage;
@@ -199,9 +205,9 @@ namespace SurvivalGame
             Name = name;
 
         }
-        float bulletVelocity;
+        public float bulletVelocity { get; set; }
         public string Name { get; set; }
-        public float Damage { get; }
+        public float Damage { get; set; }
         public float Cooldown { get; set; }
         public TextureName TextureName { get; } = TextureName.PistolItem;
         public Color Color { get; set; } = Color.Black;
@@ -217,6 +223,7 @@ namespace SurvivalGame
     }
     class AxeItem : IItem
     {
+        AxeItem() { }
         public AxeItem(float cooldown = 0.3f, string name = "axe", Color? color = null)
         {
             Cooldown = cooldown;
@@ -225,7 +232,7 @@ namespace SurvivalGame
             Color = (Color)color;
         }
         public string Name { get; set; }
-        public float Damage { get; }
+        public float Damage { get; set; }
         public float Cooldown { get; set; }
         public TextureName TextureName { get; } = TextureName.AxeItem;
         public Color Color { get; set; } = Color.Black;
@@ -241,6 +248,7 @@ namespace SurvivalGame
     }
     class FlamethrowerItem : IItem
     {
+        FlamethrowerItem() { }
         public FlamethrowerItem(float damage = 5f, float cooldown = 0.02f, string name = "flamethrower", float bulletVelocity = 250f, int bulletSpeedVariation = 70, int spread = 7)
         {
             Damage = damage;
@@ -251,12 +259,12 @@ namespace SurvivalGame
             Name = name;
 
         }
-        float bulletVelocity;
-        int bulletSpeedVariation;
-        int spread;
-        int range = 200;
+        public float bulletVelocity { get; set; }
+        public int bulletSpeedVariation { get; set; }
+        public int spread { get; set; }
+        public int range { get; set; } = 200;
         public string Name { get; set; }
-        public float Damage { get; }
+        public float Damage { get; set; }
         public float Cooldown { get; set; }
         public TextureName TextureName { get; } = TextureName.PistolItem;
         public Color Color { get; set; } = Color.Black;
@@ -267,11 +275,12 @@ namespace SurvivalGame
             MouseState mstate = Mouse.GetState();
             float angle = Globals.rand.Next(-spread, spread) / 100f * (float)Math.PI;
             var projectile = new Projectile(owner, TextureName.fire, bulletVelocity + Globals.rand.Next(-bulletSpeedVariation, bulletSpeedVariation), new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, angle, range);
+            projectile.Lights.Add(new Light(Vector2.Zero, new Vector2(40, 40), Color.Orange, relativePosition: true));
             projectile.immuneEntities.Add(owner);
             projectile.Drawing.Scale = new Vector2(5, 10);
             //projectile.Drawing.Color = Color.Orange;
             projectile.Drawing.Rotation -= 3.14f / 2;
-            projectile.effects.Add(new OnFire(1, 10));
+            projectile.Effects.Add(new OnFire(1, 10, false));
         }
     }
 }

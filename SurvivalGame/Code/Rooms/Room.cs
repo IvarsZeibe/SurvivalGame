@@ -8,10 +8,9 @@ namespace SurvivalGame
 {
     class Room
     {
-        public readonly (int x, int y)Coords;
+        public (int x, int y) Coords { get; set; }
         public Color BackgroundColor { get; set; }
-        public Drawing background;
-        //public LightMap lightMap = new LightMap();
+        public Drawing background { get; set; }
         public string Name { get; set; }
         public List<Entity> Entities { get; set; } = new List<Entity>();
         public List<Level> Levels { get; set; } = new List<Level>() {new Level("None", 0) };
@@ -19,7 +18,8 @@ namespace SurvivalGame
         private int activeLevelIndex = 0;
         public bool CanLeave = true;
         public double windXCoord = 0;
-        public LightMap light = new LightMap();
+        //public LightMap light = new LightMap();
+        Room() { }
         public Room((int x, int y) coords, string name, Color color, TextureName backgroundTexture = TextureName.None)
         {
             Name = name;
@@ -40,6 +40,7 @@ namespace SurvivalGame
         }
         public void Update(GameTime gameTime)
         {
+            Globals.worldTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (!Levels[activeLevelIndex].IsActive)
             {
                 if (activeLevelIndex < Levels.Count - 1)
@@ -54,7 +55,7 @@ namespace SurvivalGame
             }
             //lightMap.Update(gameTime);
         }
-        bool isActive = false;
+        public bool isActive { get; set; } = false;
         public void Load()
         {
             isActive = true;

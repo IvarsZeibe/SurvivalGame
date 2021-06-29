@@ -11,13 +11,13 @@ namespace SurvivalGame
 {
     class Player : Entity
     {
-        private float PrimaryCooldown = 0f;
-        private float SecondaryCooldown = 0f;
+        public float PrimaryCooldown { get; set; } = 0f;
+        public float SecondaryCooldown { get; set; } = 0f;
 
-        private readonly int radius = 40;
-        private HealthBar HealthBar;
-
-        public Player()
+        public int radius { get; set; } = 40;
+        public HealthBar HealthBar { get; set; }
+        Player() { }
+        public Player(bool addToRoom = true) : base(addToRoom)
         {
             this.Mass = 10;
             this.Collision = true;
@@ -29,14 +29,13 @@ namespace SurvivalGame
             HealthBar = new HealthBar(this);
             //Drawing = new Drawing(TextureName.Circle, Hitbox.GetTopLeftPosVector(), Color.Red, 0f, Hitbox.GetScaleVector(), 0.4f);
             Drawing = new Drawing(TextureName.Circle, Hitbox.GetTopLeftPosVector(), Color.Red, 0f, Hitbox.GetScaleVector(), 0.4f);
-            Drawings.Add("base", Drawing);
 
-            Hotbar = Globals.HUD.hotbar;
             Hotbar.Selected = 0;
 
         }
+        [System.Text.Json.Serialization.JsonIgnore]
         public IItem EquipedItem { get => Hotbar.Get(Hotbar.Selected); }
-        public Hotbar Hotbar;
+        public Hotbar Hotbar { get => Globals.HUD.hotbar; }
 
         public override void Update(GameTime gameTime)
         {
@@ -60,10 +59,12 @@ namespace SurvivalGame
                     sword.immuneEntities.Add(this);
                 }
             }
+            HealthBar.Update(this);
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
             Drawing.LayerDepth = 0.4f - (float)Y / 100000;
             if (IsDead)
                 Globals.Drawings.Remove(Drawing);
+
         }
         public void UsePrimary()
         {
@@ -109,10 +110,7 @@ namespace SurvivalGame
             Globals.Drawings.Add(Drawing);
             EntityTracker.Entities.Add(this);
             Health = MaxHealth;
-            HealthBar.IsDead = false;
             Globals.Drawings.Add(HealthBar.Drawing);
-            HealthBar.UpdateEnabled = true;
-            Globals.Updatables.Add(HealthBar);
         }
     }
 }

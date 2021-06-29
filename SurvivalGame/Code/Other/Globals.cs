@@ -65,10 +65,12 @@ namespace SurvivalGame
         public static Shop shop;
         public static MainMenu MainMenu;
         public static Map Map;
+        public static LightMap lightMap;
 
         public static Dictionary<(int x, int y), Room> Rooms = new Dictionary<(int x, int y), Room>();
         public static (int x, int y) activeRoomCoords { get; set; } = (0, 0);
         public static Room getActiveRoom { get => Rooms[activeRoomCoords]; }
+        public static float worldTime = 0f;
 
     }
 }

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +19,7 @@ namespace SurvivalGame
     }
     abstract class Entity
     {
+        Entity() { }
         public Entity(bool addToRoom = true)
         {
             if (addToRoom)
@@ -31,17 +32,21 @@ namespace SurvivalGame
                 IsLoaded = false;
             }
         }
-        public Drawing Drawing;
-        public Dictionary<string, Drawing> Drawings = new Dictionary<string, Drawing>();
-        public List<Light> Lights = new List<Light>();
-        public Entity owner = null;
+        [System.Text.Json.Serialization.JsonIgnore]
+        public Drawing Drawing {
+            get => Drawings["base"];
+            set => Drawings["base"] = value;
+        }
+        public Dictionary<string, Drawing> Drawings { get; set; } = new Dictionary<string, Drawing>();
+        public List<Light> Lights { get; set; } = new List<Light>();
+        public Entity owner { get; set; } = null;
         public Hitbox Hitbox { get; set; }
         public bool Collision { get; set; }
         public int Health { get; set; }
         public int MaxHealth { get; set; }
         public int Mass { get; set; }
-        protected double XMovement { get; set; }
-        protected double YMovement { get; set; }
+        public double XMovement { get; set; }
+        public double YMovement { get; set; }
         public Vector2 RecievedKnockback { get; set; } = Vector2.Zero;
         public bool IsDead { get; set; } = false;
         public bool IsLoaded { get; set; }
@@ -60,14 +65,21 @@ namespace SurvivalGame
             {
                 Drawing.Value.Disable();
             }
+            Effects.ForEach(eff => eff.UnLoad());
         }
         public Entity Target { get; set; }
 
         private float speed;
+        [System.Text.Json.Serialization.JsonIgnore]
         public float Speed
         {
             get => speed;
             set { speed = 1 / value; }
+        }
+        public float DirectSpeed
+        {
+            get => speed;
+            set { speed = value; }
         }
         public float X
         {
@@ -92,38 +104,41 @@ namespace SurvivalGame
         }
         public virtual void Kill()
         {
-            List<Effect> elapsedEffects = new List<Effect>(ActiveEffects);
-            foreach (var effect in elapsedEffects)
-            {
-                effect.Remove();
-            }
-            foreach (var Drawing in Drawings)
-            {
-                Drawing.Value.Disable();
-            }
+            UnLoad();
+            IsLoaded = true;
             IsDead = true;
         }
-        public List<Effect> ActiveEffects = new List<Effect>();
+        public List<Effect> Effects { get; set; } = new List<Effect>();
         public virtual void ApplyEffects(GameTime gameTime)
         {
-            List<Effect> elapsedEffects = new List<Effect>();
-            foreach (var effect in ActiveEffects)
+            foreach (var effect in Effects.FindAll(eff => eff.IsActive))
             {
-                effect.Apply(gameTime);
-                if (effect.Duration <= 0)
-                {
-                    elapsedEffects.Add(effect);
-                    break;
-                }
-                if (IsDead)
-                    break;
+                effect.Apply(gameTime, this);
             }
-            foreach (var effect in elapsedEffects)
-            {
-                effect.Remove();
-            }
+            Effects = Effects.FindAll(effect => !effect.IsDead);
         }
-        public Dictionary<string, Animation> Animations = new Dictionary<string, Animation>();
+        public bool AddEffect(Effect effect)
+        {
+            if (Effects.Exists(eff => eff.GetType() == effect.GetType()))
+            {
+                if (Effects.Exists(eff => eff.Strength >= effect.Strength && eff.Duration >= effect.Duration))
+                {
+                    Trace.WriteLine(1);
+                    return false;
+                }
+                var efect = Effects.Find(eff => eff.Strength <= effect.Strength && eff.Duration <= effect.Duration);
+                if (efect != null)
+                {
+                    Trace.WriteLine(2);
+                    effect.Animation = efect.Animation;
+                    effect.Animation.Owner = effect.Drawing;
+                    efect.Duration = 0;
+                }
+            }
+            Effects.Add(effect);
+            return true;
+        }
+        public Dictionary<string, Animation> Animations { get; set; } = new Dictionary<string, Animation>();
         protected virtual void UpdateAnimations(GameTime gameTime)
         {
             foreach (var animation in Animations)

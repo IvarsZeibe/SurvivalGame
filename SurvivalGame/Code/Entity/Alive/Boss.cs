@@ -10,15 +10,16 @@ namespace SurvivalGame
         float attackLenght = 5f;
         float retreatLenght = 5f;
 
-        string currentPhase = "peaceful";
-        float timeSincePhaseChange = 0f;
-        float timeSinceLastAttack = 0f;
-        float angryFor = 0f;
-        Inventory Inventory = new Inventory(3);
-        int activeWeapon = 0;
-        HealthBar HealthBar;
-        Vector2 direction = Vector2.Zero;
-        public Boss() : base(false)
+        public string currentPhase { get; set; } = "peaceful";
+        public float timeSincePhaseChange { get; set; } = 0f;
+        public float timeSinceLastAttack { get; set; } = 0f;
+        public float angryFor { get; set; } = 0f;
+        public Inventory Inventory { get; set; } = new Inventory(3);
+        public int activeWeapon { get; set; } = 0;
+        public HealthBar HealthBar { get; set; }
+        public Vector2 direction { get; set; } = Vector2.Zero;
+        Boss() { }
+        public Boss(bool a = true) : base(false)
         {
             MaxHealth = 2000;
             Health = MaxHealth;
@@ -26,13 +27,12 @@ namespace SurvivalGame
             Collision = true;
             Speed = 1f / 150;
             Target = null;
-            Drawing = new Drawing(TextureName.Circle, Hitbox.GetTopLeftPosVector(), Color.DarkGray, 0f, Hitbox.GetScaleVector());
+            Drawings.Add("base", new Drawing(TextureName.Circle, Hitbox.GetTopLeftPosVector(), Color.DarkGray, 0f, Hitbox.GetScaleVector()));
             HealthBar = new HealthBar(this);
 
             Inventory.Add(new SwordItem(50, 0.5f, knockbackStrenght: 5));
             Inventory.Add(new Pistol());
             Inventory.Add(new Shotgun());
-            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {
@@ -41,6 +41,7 @@ namespace SurvivalGame
             angryFor -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             PhaseChanger();
             CheckForTarget();
+            HealthBar.Update(this);
 
             MoveSelf(gameTime);
             //Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);

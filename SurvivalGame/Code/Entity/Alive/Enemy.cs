@@ -11,18 +11,18 @@ namespace SurvivalGame
 {
     class Enemy : Entity
     {
-        protected float PrimaryCooldown = 0f;
-        private int defaultWidth;
-        private int defaultHeight;
+        public float PrimaryCooldown { get; set; } = 0f;
+        public int defaultWidth { get; set; }
+        public int defaultHeight { get; set; }
         private int minSize = 10;
         private int detectionRange = 400;
         private int followRange = 800;
-        private bool aggresive = true;
-        Inventory Inventory = new Inventory(3);
-        private HealthBar HealthBar;
+        public bool aggresive { get; set; } = true;
+        public Inventory Inventory { get; set; } = new Inventory(3);
+        public HealthBar HealthBar { get; set; }
 
-        Vector2 Knockback = Vector2.Zero;
-
+        public Vector2 Knockback { get; set; } = Vector2.Zero;
+        Enemy() { }
         public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null, bool addToRoom = true) : base(addToRoom)
         {
             if (height == 0)
@@ -41,7 +41,6 @@ namespace SurvivalGame
             Drawing = new Drawing(texture, new Vector2(x, y), color ?? Color.White, 0, new Vector2(width, height), 0.4f, true);
             Inventory.Add(new Pistol());
             Inventory.Add(new SwordItem());
-            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {
@@ -56,6 +55,8 @@ namespace SurvivalGame
 
 
             Knockback = Utilities.LinearVectorDamping(Knockback, new Vector2(100, 100) * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            HealthBar.Update(this);
 
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top);
             Drawing.Scale = new Vector2(Hitbox.Width, Hitbox.Height);
@@ -155,11 +156,13 @@ namespace SurvivalGame
                 {
                     if (source is Projectile)
                     {
-                        foreach (var effect in (source as Projectile).effects)
+                        var effects = source.Effects.FindAll(eff => eff.IsPassable);
+                        effects.ForEach(eff => eff.IsActive = true);
+                        effects.ForEach(eff => eff.IsPassable = false);
+                        foreach (var effect in effects)
                         {
-                            effect.Owner = this;
+                            AddEffect(effect);
                         }
-                        ActiveEffects.AddRange((source as Projectile).effects);
                     }
                     Health -= damage;
                     Knockback = Vector2.Transform(new Vector2(200, 0), Matrix.CreateRotationZ(source.Drawing.Rotation));

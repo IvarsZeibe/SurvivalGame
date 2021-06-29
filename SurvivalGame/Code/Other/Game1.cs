@@ -18,7 +18,7 @@ namespace SurvivalGame
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
 
-        Player player;
+        Player player { get => EntityTracker.GetEntity<Player>(); }
         Chat chat;
         DefaultLevels levels;
         Input input;
@@ -55,7 +55,7 @@ namespace SurvivalGame
             var room = new Room((0, 0), "Spawn", new Color(0, 220, 0), TextureName.GrassyBackground);
             Globals.MouseCursor = new MouseCursor();
             Globals.HUD = new HUD();
-            player = new Player();
+            new Player();
             chat = new Chat(Globals.graphics);
             Globals.shop = new Shop();
             Globals.Command = new Command(this);
@@ -67,7 +67,7 @@ namespace SurvivalGame
             //        Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
             //        Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight), height: 60, speed: 0,
             //        target: player, color: Color.DarkSlateGray, addToRoom: false));
-
+            Globals.lightMap = new LightMap();
             Globals.HUD.hotbar.Add(new SwordItem());
             Globals.HUD.hotbar.Add(new Pistol());
             Globals.HUD.hotbar.Add(new FlamethrowerItem());
@@ -141,7 +141,10 @@ namespace SurvivalGame
             //OnKeyDown(gameTime);
             if (!Globals.MainMenu.IsActive)
             {
-                CheckForRoomChange();
+                //if(EntityTracker.GetEntities<Player>().Count > 0)
+                //    player = EntityTracker.GetEntities<Player>()[0];
+                if(player != null)
+                    CheckForRoomChange();
                 Globals.Command.DoCommand(this);
                 Globals.HUD.Update(gameTime);
                 //levels.Update(gameTime);
@@ -166,10 +169,10 @@ namespace SurvivalGame
             GraphicsDevice.Clear(Globals.Rooms[Globals.activeRoomCoords].BackgroundColor);
             // TODO: Add your drawing code here
 
-            Globals.getActiveRoom.light.Update(Globals.spriteBatch, gameTime);
+            Globals.lightMap.Update(Globals.spriteBatch, gameTime);
             Globals.spriteBatch.Begin(SpriteSortMode.BackToFront);
 
-            Globals.getActiveRoom.light.Draw(Globals.spriteBatch);
+            Globals.lightMap.Draw(Globals.spriteBatch);
             foreach (var drawing in Globals.Drawings)
             {
                 if (drawing.IsDrawn)
@@ -206,11 +209,11 @@ namespace SurvivalGame
 
         void TryToRespawnPlayer(GameTime gameTime)
         {
-            if (player.IsDead)
+            if (player is null)
             {
                 if (timeTillRespawn < 0)
                 {
-                    player.Revive();
+                    new Player();
                     timeTillRespawn = RESPAWN_COOLDOWN;
                 }
                 else
@@ -224,6 +227,7 @@ namespace SurvivalGame
         {
             if (Globals.Rooms[Globals.activeRoomCoords].CanLeave)
             {
+                var player = this.player;
                 Vector2 oldPlayerPos;
                 var oldRoom = Globals.Rooms[Globals.activeRoomCoords];
                 (int x, int y) newRoomCoords;
@@ -257,7 +261,7 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        switch (Globals.rand.Next(0,6))
+                        switch (Globals.rand.Next(0,8))
                         {
                             case 0:
                             case 1:
@@ -337,4 +341,5 @@ namespace SurvivalGame
             }
         }
     }
+
 }

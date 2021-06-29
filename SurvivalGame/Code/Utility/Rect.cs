@@ -33,6 +33,7 @@ namespace SurvivalGame
             get => Y + Height / 2f;
             set => Y = value - Height / 2f;
         }
+        Rect() { }
         public Rect(double x, double y, int width, int height, bool topLeft = false)
         {
             Width = width;

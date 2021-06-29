@@ -7,9 +7,11 @@ namespace SurvivalGame
 {
     class FireAnimation : Animation
     {
-        Vector2 sizeChange = Vector2.Zero;
-        Animation shake;
+        public Vector2 sizeChange { get; set; } = Vector2.Zero;
+        public Animation shake { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
         public float rotation { get => (shake as ShakeAnimation).rotation; }
+        FireAnimation() { }
         public FireAnimation(Drawing owner, float length = 2f) : base(owner, length) 
         {
             isLoop = true;

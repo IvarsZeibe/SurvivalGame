@@ -7,7 +7,8 @@ namespace SurvivalGame
 {
     class NoBrainEntity: Entity
     {
-        float timeTillDeath;
+        public float timeTillDeath { get; set; }
+        NoBrainEntity() { }
         public NoBrainEntity(float? x = null, float? y = null, float timeTillDeath = 3)
         {
             Random rand = new Random();
@@ -17,7 +18,6 @@ namespace SurvivalGame
             this.Hitbox = new Circle((double)x, (double)y, 0);
             this.Mass = 0;
             this.Collision = false;
-            this.Speed = 0;
             this.Health = 100;
             this.MaxHealth = Health;
         }

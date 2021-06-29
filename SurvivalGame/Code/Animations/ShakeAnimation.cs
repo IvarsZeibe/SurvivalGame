@@ -2,14 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace SurvivalGame
 {
     class ShakeAnimation : Animation
     {
-        float rotationChanges = 0f;
+        public float rotationChanges { get; set; } = 0f;
+        [JsonIgnore]
         public float rotation { get => rotationChanges; }
-        float strength;
+        public float strength { get; set; }
+        ShakeAnimation() { }
         public ShakeAnimation(Drawing owner, float shake_length = 0.6f, float strength = 0.3f) : base(owner, shake_length) 
         {
             iterationCount = 2;

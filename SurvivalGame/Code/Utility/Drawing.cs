@@ -7,6 +7,7 @@ namespace SurvivalGame
 {
     class Drawing
     {
+        Drawing() { }
         public Drawing(TextureName texture, Vector2 position, Color color, float rotation, Vector2 scale, float layerDepth = 0.5f, bool isDrawn = true)
         {
             this.Texture = texture;
@@ -43,7 +44,8 @@ namespace SurvivalGame
                 Disable();
             }
         }
-        public Vector2 originPercentage = Vector2.Zero;
+        public Vector2 originPercentage { get; set; } = Vector2.Zero;
+        [System.Text.Json.Serialization.JsonIgnore]
         public Vector2 Origin
         {
             get => new Vector2(Globals.Textures[Texture.ToString()].Width, Globals.Textures[Texture.ToString()].Height) * originPercentage;
@@ -51,6 +53,7 @@ namespace SurvivalGame
         public TextureName Texture { get; set; } = TextureName.Rectangle;
         public string TextureStr { get; set; } = "none";
         public Vector2 Coord { get; set; } = Vector2.Zero;
+        [System.Text.Json.Serialization.JsonIgnore]
         public Vector2 Position
         {
             get => Coord + Offset;
@@ -59,7 +62,8 @@ namespace SurvivalGame
         public Vector2 Offset { get; set; } = Vector2.Zero;
         public Color Color { get; set; } = Color.White;
         public float Rotation { get; set; } = 0f;
-        public Vector2 scale = new Vector2(1, 1);
+        public Vector2 scale { get; set; } = new Vector2(1, 1);
+        [System.Text.Json.Serialization.JsonIgnore]
         public Vector2 Scale
         {
             get => scale;
@@ -72,7 +76,8 @@ namespace SurvivalGame
             }
         }
         public float LayerDepth { get; set; } = 0.5f;
-        bool isDrawn = false;
+        bool isDrawn { get; set; } = false;
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool IsDrawn { get => isDrawn; }
         public float GetWidth()
         {

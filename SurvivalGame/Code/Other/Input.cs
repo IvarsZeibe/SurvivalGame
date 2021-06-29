@@ -10,7 +10,7 @@ namespace SurvivalGame
     class Input
     {
         Game1 Game1;
-        Player player;
+        Player player { get => EntityTracker.GetEntity<Player>(); }
         Chat chat;
 
         int OldScrollWheel;
@@ -21,7 +21,7 @@ namespace SurvivalGame
         public Input(Game1 game1, Player player, Chat chat)
         {
             Game1 = game1;
-            this.player = player;
+            //this.player = player;
             this.chat = chat;
 
         }
@@ -91,23 +91,23 @@ namespace SurvivalGame
                         switch (key)
                         {
                             case Keys.D:
-                                if (!player.IsDead)
+                                if (player != null)
                                     player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
                                 break;
                             case Keys.A:
-                                if (!player.IsDead)
+                                if (player != null)
                                     player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, true);
                                 break;
                             case Keys.S:
-                                if (!player.IsDead)
+                                if (player != null)
                                     player.Move(player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
                                 break;
                             case Keys.W:
-                                if (!player.IsDead)
+                                if (player != null)
                                     player.Move(-player.Speed * gameTime.ElapsedGameTime.TotalSeconds, false);
                                 break;
                             case Keys.Space:
-                                if (!player.IsDead)
+                                if (player != null)
                                 {
                                     player.UsePrimary();
                                 }
@@ -122,34 +122,44 @@ namespace SurvivalGame
                         switch (key)
                         {
                             case Keys.D1:
-                                player.Hotbar.Selected = 0;
+                                if(player != null)
+                                    player.Hotbar.Selected = 0;
                                 break;
                             case Keys.D2:
-                                player.Hotbar.Selected = 1;
+                                if (player != null)
+                                    player.Hotbar.Selected = 1;
                                 break;
                             case Keys.D3:
-                                player.Hotbar.Selected = 2;
+                                if (player != null)
+                                    player.Hotbar.Selected = 2;
                                 break;
                             case Keys.D4:
-                                player.Hotbar.Selected = 3;
+                                if (player != null)
+                                    player.Hotbar.Selected = 3;
                                 break;
                             case Keys.D5:
-                                player.Hotbar.Selected = 4;
+                                if (player != null)
+                                    player.Hotbar.Selected = 4;
                                 break;
                             case Keys.D6:
-                                player.Hotbar.Selected = 5;
+                                if (player != null)
+                                    player.Hotbar.Selected = 5;
                                 break;
                             case Keys.D7:
-                                player.Hotbar.Selected = 6;
+                                if (player != null)
+                                    player.Hotbar.Selected = 6;
                                 break;
                             case Keys.D8:
-                                player.Hotbar.Selected = 7;
+                                if (player != null)
+                                    player.Hotbar.Selected = 7;
                                 break;
                             case Keys.D9:
-                                player.Hotbar.Selected = 8;
+                                if (player != null)
+                                    player.Hotbar.Selected = 8;
                                 break;
                             case Keys.D0:
-                                player.Hotbar.Selected = 9;
+                                if (player != null)
+                                    player.Hotbar.Selected = 9;
                                 break;
                             case Keys.T:
                                 chat.NewLine();
@@ -176,11 +186,14 @@ namespace SurvivalGame
                             else
                                 Globals.MainMenu.Activate();
                             break;
-                    }
-                    switch (key)
-                    {
                         case Keys.F11:
                             Globals.graphics.ToggleFullScreen();
+                            break;
+                        case Keys.F1:
+                            SaveManager.Save();
+                            break;
+                        case Keys.F2:
+                            SaveManager.Load();
                             break;
                     }
                 }
@@ -191,7 +204,7 @@ namespace SurvivalGame
                         switch (button)
                         {
                             case MouseKey.RightButton:
-                                if (!player.IsDead)
+                                if (player != null)
                                     player.UseSecondary();
                                 break;
                             case MouseKey.LeftButton:
@@ -208,12 +221,15 @@ namespace SurvivalGame
                         switch (button)
                         {
                             case MouseKey.LeftButton:
-                                for (int i = 0; i < player.Hotbar.Inventory.SlotMax; i++)
+                                if (player != null)
                                 {
-                                    if (Globals.MouseCursor.Hitbox.CollidesWith(player.Hotbar.Get(i).Hitbox))
+                                    for (int i = 0; i < player.Hotbar.Inventory.SlotMax; i++)
                                     {
-                                        player.Hotbar.Add(Globals.MouseCursor.CursorSlot.Add(player.Hotbar.Get(i)), i);
-                                        break;
+                                        if (Globals.MouseCursor.Hitbox.CollidesWith(player.Hotbar.Get(i).Hitbox))
+                                        {
+                                            player.Hotbar.Add(Globals.MouseCursor.CursorSlot.Add(player.Hotbar.Get(i)), i);
+                                            break;
+                                        }
                                     }
                                 }
                                 Globals.shop.CheckLeftClickEvent();
@@ -224,7 +240,7 @@ namespace SurvivalGame
                                 Globals.shop.CheckRightClickEvent();
                                 break;
                             case MouseKey.MiddleButton:
-                                var light = new LightBulb(Globals.MouseCursor.Hitbox.GetPosVector(), new Vector2(200, 200), Color.Orange);
+                                var light = new LightBulb(Globals.MouseCursor.Hitbox.GetPosVector(), new Vector2(500, 500), new Color(150, 100, 0));
                                 Globals.getActiveRoom.Entities.Add(light);
                                 break;
                         }

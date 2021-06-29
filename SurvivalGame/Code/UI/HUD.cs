@@ -28,7 +28,6 @@ namespace SurvivalGame
                     Globals.Rooms[Globals.activeRoomCoords].ActiveLevel.EnemiesLeft = value;
             }
         }
-
         public HUD()
         {
             CreatePointsUI();

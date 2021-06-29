@@ -18,6 +18,14 @@ namespace SurvivalGame
         {
             return Entities.FindAll(delegate (Entity entity) { return entity is T; }).ConvertAll(element => element as T);
         }
+        public static T GetEntity<T>(int number = 0) where T : Entity
+        {
+            var entities =  GetEntities<T>();
+            if (entities.Count > 0)
+                return entities[number];
+            else return null;
+        }
+
         /// <summary>
         /// Update
         /// </summary>

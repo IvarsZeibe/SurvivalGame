@@ -10,15 +10,16 @@ namespace SurvivalGame
 {
     class Sword : Entity
     {
-        public List<Entity> immuneEntities = new List<Entity>();
-        float StartingRotation { get; set; }
-        Direction Direction { get; set; }
-        float timeAlive;
-        float timeTillDeath = 0.2f;
+        public List<Entity> immuneEntities { get; set; } = new List<Entity>();
+        public float StartingRotation { get; set; }
+        public Direction Direction { get; set; }
+        public float timeAlive { get; set; }
+        public float timeTillDeath { get; set; } = 0.2f;
         public int Damage { get; set; }
-        private float sizeRatio = 0.8f;
-        private float KnockbackStrenght;
+        public float sizeRatio { get; set; } = 0.8f;
+        public float KnockbackStrenght { get; set; }
         // rotation right = 0, up = -1.57, left = 3.14 or -3.14, bottom = 1.57
+        Sword() { }
         public Sword(TextureName texture, Entity owner, float rotation, int damage, float knockbackStrenght)
         {
             Damage = damage;
@@ -55,7 +56,6 @@ namespace SurvivalGame
             // radius = (owner.Hitbox.Width + owner.Hitbox.Height) / 4;
             //Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.White, 0f,
             //    new Vector2(radius, radius), 0.4f, true);
-            Drawings.Add("base", Drawing);
         }
 
         public override void Update(GameTime gameTime)
@@ -94,7 +94,7 @@ namespace SurvivalGame
             }
             foreach(var entity in EntityTracker.Entities)
             {
-                if(!(entity is SlimeEnemy))
+                if(!(entity is SlimeEnemy) && !(entity is Sword))
                 {
                     if (Hitbox.CollidesWith(entity.Hitbox) && !immuneEntities.Contains(entity))
                     {

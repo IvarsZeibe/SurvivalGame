@@ -7,9 +7,15 @@ namespace SurvivalGame
 {
     class Sparkles : IUpdate
     {
-        Drawing Drawing;
-        float Lifespan = 0.25f;
-        float timeAlive = 0;
+        public Drawing Drawing { get; set; }
+        public float Lifespan { get; set; } = 0.25f;
+        public float timeAlive { get; set; } = 0;
+        Sparkles()
+        {
+            Globals.Updatables.Add(this);
+            if (Drawing.IsDrawn)
+                Globals.Drawings.Add(Drawing);
+        }
         public Sparkles(Vector2 _position)
         {
             Vector2 size = new Vector2(20, 20);

@@ -7,19 +7,22 @@ namespace SurvivalGame
 {
     abstract class Animation
     {
+        protected Animation() { }
         public Animation(Drawing owner, float length)
         {
             Owner = owner;
             LENGTH = length;
         }
 
-        protected readonly float LENGTH;
-        protected float sinceStart = 0f;
+        public float LENGTH { get; set; }
+        public float sinceStart { get; set; } = 0f;
+        [System.Text.Json.Serialization.JsonIgnore]
         public float TotalLength { get => LENGTH * iterationCount; }
-        public int iterationCount = 1;
-        public int iteration = 0;
-        public bool isLoop = false;
+        public int iterationCount { get; set; } = 1;
+        public int iteration { get; set; } = 0;
+        public bool isLoop { get; set; } = false;
         public Drawing Owner { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
         public float Progress
         {
             get
@@ -31,6 +34,7 @@ namespace SurvivalGame
             }
             set => sinceStart = LENGTH * (value + iteration);
         }
+        [System.Text.Json.Serialization.JsonIgnore]
         public float TotalProgress
         {
             get 
@@ -46,8 +50,8 @@ namespace SurvivalGame
                 iteration = (int)(TotalLength / LENGTH) - 1;
             }
         }
-        public bool Inactive = true;
-        public bool IsActive { get; protected set; }
+        public bool Inactive { get; set; } = true;
+        public bool IsActive { get; set; }
 
         public void Pause()
         {

@@ -6,7 +6,8 @@ namespace SurvivalGame
 {
     class Inventory
     {
-        private List<IItem> Content = new List<IItem>();
+        public List<IItem> Content { get; set; } = new List<IItem>();
+        Inventory() { }
         public Inventory(int slotMax)
         {
             SlotMax = slotMax;
@@ -15,7 +16,7 @@ namespace SurvivalGame
                 Content.Add(new EmptyItem());
             }
         }
-        public int SlotMax { get; }
+        public int SlotMax { get; set; }
         public bool Add(IItem item, int index = -1)
         {
             if (index == -1)

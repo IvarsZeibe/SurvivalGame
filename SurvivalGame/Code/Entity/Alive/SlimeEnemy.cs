@@ -7,28 +7,32 @@ namespace SurvivalGame
 {
     class SlimeEnemy : Entity
     {
-        private int Damage;
-        private float AttackCooldown = 0.1f;
-        private float AttackCooldownLeft = 0f;
-        private bool aggresive = true;
+        public int Damage { get; set; }
+        public float AttackCooldown { get; set; } = 0.1f;
+        public float AttackCooldownLeft { get; set; } = 0f;
+        public bool aggresive { get; set; } = true;
 
-        private double JumpSpeedMultiplier = 1;
-        private double JumpProgress = 0;
-        private double BaseJumpCooldown = 1.5;
-        private double JumpCooldownRandomness { get => (Globals.rand.NextDouble() - 0.5) * 2; }
-        private double JumpCooldownLeft = 0;
-        private float yOffset = 0f;
+        public double JumpSpeedMultiplier { get; set; } = 1;
+        public double JumpProgress { get; set; } = 0;
+        public double BaseJumpCooldown { get; set; } = 1.5;
+        double JumpCooldownRandomness { get => (Globals.rand.NextDouble() - 0.5) * 2; }
+        public double JumpCooldownLeft { get; set; } = 0;
+        public float yOffset { get; set; } = 0f;
 
-        public double knockbackX = 0;
-        public double knockbackY = 0;
+        public double knockbackX { get; set; } = 0;
+        public double knockbackY { get; set; } = 0;
 
-        private int detectionRange = 800;
-        private int followRange = 800;
+        public int detectionRange { get; set; } = 800;
+        public int followRange { get; set; } = 800;
 
-        private Hitbox AttackArea;
-        private Drawing Shadow;
-        private HealthBar HealthBar;
+        public Hitbox AttackArea { get; set; }
+        private Drawing Shadow { 
+            get => Drawings["Shadow"];
+            set => Drawings["Shadow"] = value;
+        }
+        public HealthBar HealthBar { get; set; }
 
+        SlimeEnemy() { }
         public SlimeEnemy(float x, float y, Entity target, bool addToRoom = true) : base(addToRoom)
         {
             this.Hitbox = new Circle(x, y, 20);
@@ -43,12 +47,12 @@ namespace SurvivalGame
             HealthBar = new HealthBar(this);
             Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.LightGreen, 0, new Vector2(Hitbox.Width, Hitbox.Height), 0.4f, true);
             Shadow = new Drawing(TextureName.Rectangle, new Vector2((float)Hitbox.Left, (float)Hitbox.Bottom + 1), Color.Black, 0, new Vector2(Hitbox.Width, 1f), 0.9f, true);
-            Drawings.Add("base", Drawing);
         }
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
             Jump(gameTime);
+            HealthBar.Update(this);
 
             UpdateMovement(gameTime);
             Move(XMovement * gameTime.ElapsedGameTime.TotalSeconds, true);
@@ -181,11 +185,13 @@ namespace SurvivalGame
                 {
                     if(source is Projectile)
                     {
-                        foreach (var effect in (source as Projectile).effects)
+                        var effects = source.Effects.FindAll(eff => eff.IsPassable);
+                        effects.ForEach(eff => eff.IsActive = true);
+                        effects.ForEach(eff => eff.IsPassable = false);
+                        foreach (var effect in effects)
                         {
-                            effect.Owner = this;
+                            AddEffect(effect);
                         }
-                        ActiveEffects.AddRange((source as Projectile).effects);
                     }
                     Health -= damage;
                 }
@@ -211,6 +217,7 @@ namespace SurvivalGame
         {
             base.Kill();
             Globals.Drawings.Remove(Shadow);
+            HealthBar.UnLoad();
         }
         public override void Load()
         {
