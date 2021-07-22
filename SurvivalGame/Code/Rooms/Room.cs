@@ -19,21 +19,14 @@ namespace SurvivalGame
         public bool CanLeave = true;
         public double windXCoord = 0;
         //public LightMap light = new LightMap();
-        Room() { }
+        public Room() { }
         public Room((int x, int y) coords, string name, Color color, TextureName backgroundTexture = TextureName.None)
         {
             Name = name;
             Coords = coords;
             BackgroundColor = color;
-            if (backgroundTexture is TextureName.None)
-            {
-                background = null;
-            }
-            else
-            {
-                background = new Drawing(backgroundTexture, Vector2.Zero, color, 0f,
-                    new Vector2(Globals.graphics.PreferredBackBufferWidth, Globals.graphics.PreferredBackBufferHeight), 1f, false);
-            }
+            background = new Drawing(backgroundTexture, Vector2.Zero, color, 0f,
+                new Vector2(Globals.graphics.PreferredBackBufferWidth, Globals.graphics.PreferredBackBufferHeight), 1f, false);
 
             Load();
             Globals.Rooms.Add(coords, this);
@@ -89,6 +82,14 @@ namespace SurvivalGame
             {
                 level.Disable();
             }
+        }
+        public bool AddToRoom(Entity entity)
+        {
+            if (Entities.Contains(entity))
+                return false;
+            Entities.Add(entity);
+            entity.IsLoaded = isActive;
+            return true;
         }
     }
 }

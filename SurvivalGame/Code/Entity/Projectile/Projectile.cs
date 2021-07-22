@@ -57,7 +57,7 @@ namespace SurvivalGame
                     if (Hitbox.CollidesWith(enemy.Hitbox) && !immuneEntities.Contains(enemy))
                     {
                         enemy.DamageSelf(Damage, this);
-                        immuneEntities.Add(this);
+                        immuneEntities.Add(enemy);
                         Kill();
                         new Sparkles(new Vector2(X, Y));
                     }

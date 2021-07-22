@@ -20,7 +20,7 @@ namespace SurvivalGame
     abstract class Entity
     {
         Entity() { }
-        public Entity(bool addToRoom = true)
+        public Entity(bool addToRoom = false)
         {
             if (addToRoom)
             {
@@ -31,6 +31,10 @@ namespace SurvivalGame
             {
                 IsLoaded = false;
             }
+        }
+        public virtual void SetDafaultValues()
+        {
+
         }
         [System.Text.Json.Serialization.JsonIgnore]
         public Drawing Drawing {
@@ -147,6 +151,39 @@ namespace SurvivalGame
         public bool CollidesWith(Entity entity)
         {
             return Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero;
+        }
+        protected Dictionary<string, Action<object>> properties = null;
+        public List<string> GetPropertiesNames()
+        {
+            if (properties is null)
+                CreateDefaultProperties();
+            List<string> propertiesNames = new List<string>();
+            foreach (string key in properties.Keys)
+                propertiesNames.Add(key);
+            return propertiesNames;
+        }
+        public bool SetProperty(string name, object value)
+        {
+            if (properties is null)
+                CreateDefaultProperties();
+            bool flag = properties.TryGetValue(name, out var propertySetter);
+            try
+            {
+                propertySetter(value);
+            }
+            catch (Exception e)
+            {
+                flag = false; 
+            }
+            return flag;
+        }
+        protected virtual void CreateDefaultProperties()
+        {
+            properties = new Dictionary<string, Action<object>>();
+            properties.Add("width", new Action<object>(width => Hitbox.Width = Convert.ToInt32(width)));
+            properties.Add("height", new Action<object>(height => Hitbox.Height = Convert.ToInt32(height)));
+            properties.Add("x", new Action<object>(x => Hitbox.X = Convert.ToDouble(x)));
+            properties.Add("y", new Action<object>(y => Hitbox.Y = Convert.ToDouble(y)));
         }
         public float Move(double movement, bool xDirection, List<(Entity movedEntity, float maxMovement)> movedEntities = null, float movementDecreaseTotal = 0f, float mass = 0)
         {

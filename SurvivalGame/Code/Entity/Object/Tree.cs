@@ -33,6 +33,23 @@ namespace SurvivalGame
             Animations.Add("stayStill", new StillnessAnimation(Drawing));
             Animations.Add("fall", new FallAnimation(Drawing));
         }
+        public override void SetDafaultValues()
+        {
+            base.SetDafaultValues();
+            Collision = true;
+            Mass = 19;
+            Health = 100;
+            Vector2 origin = new Vector2(0.5f, 1f);
+            Hitbox = new Rect(0, 0, 30, 30);
+            Vector2 drawingSize = new Vector2(150, 150);
+            Drawing = new Drawing(TextureName.PineTree, Hitbox.GetTopLeftPosVector(), color, drawingRotation, drawingSize, 0.3f - (float)0 / 100000, false);
+            Drawing.originPercentage = origin;
+            Drawing.Offset = -new Vector2(62, 115) + drawingSize * origin;
+            Animations.Add("chopShake", new ShakeAnimation(Drawing));
+            Animations.Add("despawn", new DisappearingAnimation(Drawing));
+            Animations.Add("stayStill", new StillnessAnimation(Drawing));
+            Animations.Add("fall", new FallAnimation(Drawing));
+        }
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);

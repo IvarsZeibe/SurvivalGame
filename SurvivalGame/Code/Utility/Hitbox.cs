@@ -135,6 +135,16 @@ namespace SurvivalGame
             Rect result = new Rect(h1.X + h2.X, h1.Y + h2.Y, h1.Width + h2.Width, h1.Height + h2.Height);
             return result;
         }
+        public static Hitbox operator *(Hitbox h1, float value)
+        {
+            Hitbox result = new Rect(h1.X * value, h1.Y * value, (int)(h1.Width * value), (int)(h1.Height * value));
+            return result;
+        }
+        public void AddToCoords(double x, double y)
+        {
+            X += x;
+            Y += y;
+        }
         public Vector2 GetTopLeftPosVector()
         {
             return new Vector2((float)Left, (float)Top);
@@ -146,6 +156,10 @@ namespace SurvivalGame
         public Vector2 GetScaleVector()
         {
             return new Vector2((float)Width, (float)Height);
+        }
+        public Rectangle ToRectangle()
+        {
+            return new Rectangle((int)Math.Round(X - Width / 2), (int)Math.Round(Y - Height / 2), Width, Height);
         }
     }
 }

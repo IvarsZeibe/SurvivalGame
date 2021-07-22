@@ -31,7 +31,7 @@ namespace SurvivalGame
                             rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
                             rand.Next(0, Globals.graphics.PreferredBackBufferHeight),
                             rand.Next(15, 25), rand.Next(25, 35), target: target, color: Color.DarkGray);
-
+                    Globals.getActiveRoom.Entities.Add(enemy);
 
                     foreach (var entity in EntityTracker.Entities)
                     {

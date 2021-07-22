@@ -53,7 +53,9 @@ namespace SurvivalGame
         public void OnPrimaryUse(Entity owner)
         {
             MouseState mstate = Mouse.GetState();
-            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage).immuneEntities.Add(owner);
+            var projectile = new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage);
+            projectile.immuneEntities.Add(owner);
+            Globals.getActiveRoom.Entities.Add(projectile);
         }
     }
     class SwordItem : IItem
@@ -81,7 +83,9 @@ namespace SurvivalGame
             MouseState mstate = Mouse.GetState();
             double yEdge = (owner.Y - owner.Target.Y);
             double xEdge = (owner.X - owner.Target.X);
-            new Sword(TextureName.Rectangle, owner, (float)Math.Atan2(yEdge, xEdge), (int)Damage, knockbackStrenght).immuneEntities.Add(owner);
+            var sword = new Sword(TextureName.Rectangle, owner, (float)Math.Atan2(yEdge, xEdge), (int)Damage, knockbackStrenght);
+            sword.immuneEntities.Add(owner);
+            Globals.getActiveRoom.Entities.Add(sword);
         }
     }
     class BlockItem : IItem
@@ -112,6 +116,7 @@ namespace SurvivalGame
         void MakeWall()
         {
             var wall = new Wall(TextureName.Rectangle, mstate.X, mstate.Y);
+            Globals.getActiveRoom.Entities.Add(wall);
 
             bool suitableSpot = true;
             foreach (var entity in EntityTracker.Entities)
@@ -137,6 +142,7 @@ namespace SurvivalGame
         void MakeGhost()
         {
             var wallGhost = new Wall(TextureName.Rectangle, mstate.X, mstate.Y, false);
+            Globals.getActiveRoom.Entities.Add(wallGhost);
 
             bool intersects = false;
             foreach (var w in EntityTracker.GetEntities<Wall>())
@@ -191,7 +197,9 @@ namespace SurvivalGame
         public Hitbox Hitbox { get; set; }
         public void OnPrimaryUse(Entity owner)
         {
-            new Missile(owner, new Vector2(owner.X, owner.Y), trackEnemy, owner.Target, Damage, bulletVelocity, range).ImmuneEntities.Add(owner);
+            var missile = new Missile(owner, new Vector2(owner.X, owner.Y), trackEnemy, owner.Target, Damage, bulletVelocity, range);
+            missile.ImmuneEntities.Add(owner);
+            Globals.getActiveRoom.Entities.Add(missile);
         }
     }
     class Shotgun : IItem
@@ -216,10 +224,19 @@ namespace SurvivalGame
         public void OnPrimaryUse(Entity owner)
         {
             MouseState mstate = Mouse.GetState();
-            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage).immuneEntities.Add(owner);
-            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, 0.4f).immuneEntities.Add(owner);
-            new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, -0.4f).immuneEntities.Add(owner);
-        }
+
+            var proj1 = new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage);
+            proj1.immuneEntities.Add(owner);
+            Globals.getActiveRoom.Entities.Add(proj1);
+
+            var proj2 = new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, 0.4f);
+            proj2.immuneEntities.Add(owner);
+            Globals.getActiveRoom.Entities.Add(proj2);
+
+            var proj3 = new Projectile(owner, TextureName.Rectangle, bulletVelocity, new Vector2(owner.X, owner.Y), new Vector2(owner.Target.X, owner.Target.Y), (int)Damage, -0.4f);
+            proj3.immuneEntities.Add(owner);
+            Globals.getActiveRoom.Entities.Add(proj3);
+            }
     }
     class AxeItem : IItem
     {
@@ -243,7 +260,7 @@ namespace SurvivalGame
             MouseState mstate = Mouse.GetState();
             double yEdge = (owner.Y - owner.Target.Y);
             double xEdge = (owner.X - owner.Target.X);
-            new Axe(owner, owner.Target.Hitbox.GetPosVector());
+            Globals.getActiveRoom.Entities.Add(new Axe(owner, owner.Target.Hitbox.GetPosVector()));
         }
     }
     class FlamethrowerItem : IItem
@@ -281,6 +298,7 @@ namespace SurvivalGame
             //projectile.Drawing.Color = Color.Orange;
             projectile.Drawing.Rotation -= 3.14f / 2;
             projectile.Effects.Add(new OnFire(1, 10, false));
+            Globals.getActiveRoom.Entities.Add(projectile);
         }
     }
 }

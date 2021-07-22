@@ -71,6 +71,16 @@ namespace SurvivalGame
 
             Globals.Map.Update();
         }
+        public static Entity Clone(Entity entity) 
+        {
+            var data = JsonSerializer.Serialize(entity, Options);
+            File.WriteAllText(@"C:\Users\Ivars\source\repos\SurvivalGame\SurvivalGame\Code\tempData.txt", data);
+            myReferenceHandler.Reset();
+            var dat = File.ReadAllText(@"C:\Users\Ivars\source\repos\SurvivalGame\SurvivalGame\Code\tempData.txt");
+            Entity ent = JsonSerializer.Deserialize<Entity>(dat, Options);
+            myReferenceHandler.Reset();
+            return ent;
+        }
 
     }
 }

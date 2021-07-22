@@ -14,7 +14,6 @@ namespace SurvivalGame
         Chat chat;
 
         int OldScrollWheel;
-        int ScrollWheel;
 
         Vector2 oldMousePos;
         Vector2 mouseMovment;
@@ -71,7 +70,7 @@ namespace SurvivalGame
 
             Globals.NewMouseKeys = Globals.PressedMouseKeys.Except(oldList).ToList();
 
-            ScrollWheel = mstate.ScrollWheelValue - OldScrollWheel;
+            Globals.ScrollWheel = mstate.ScrollWheelValue - OldScrollWheel;
             OldScrollWheel = mstate.ScrollWheelValue;
 
             mouseMovment = oldMousePos - new Vector2(mstate.Position.X, mstate.Position.Y);
@@ -253,12 +252,12 @@ namespace SurvivalGame
                     }
                 }
             }
-            if (ScrollWheel != 0) 
+            if (Globals.ScrollWheel != 0) 
             {
                 if (Globals.MouseCursor.Hitbox.CollidesWith(Globals.Map.Hitbox))
                 {
-                    Globals.Map.Zoom(ScrollWheel);
-                } 
+                    Globals.Map.Zoom(Globals.ScrollWheel);
+                }
             }
         }
         void OnKeyUp(GameTime gameTime)

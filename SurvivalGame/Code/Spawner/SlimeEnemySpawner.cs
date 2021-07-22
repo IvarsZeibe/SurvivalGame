@@ -25,6 +25,7 @@ namespace SurvivalGame
                         rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
                         rand.Next(0, Globals.graphics.PreferredBackBufferHeight),
                         target);
+                    Globals.getActiveRoom.Entities.Add(slime);
                     foreach (var e in EntityTracker.Entities)
                     {
                         if (slime != e && slime.CollidesWith(e))

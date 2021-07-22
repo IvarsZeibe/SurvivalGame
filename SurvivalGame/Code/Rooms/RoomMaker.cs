@@ -61,7 +61,7 @@ namespace SurvivalGame
                 Entity targ = new NoBrainEntity();
                 Entities.Add(new SlimeEnemy(
                     Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth), 
-                    Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight), targ, false));
+                    Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight), targ));
                 Entities.Add(targ);
             }
             for (int i = 0; i < 400; i++)
@@ -95,7 +95,7 @@ namespace SurvivalGame
                     TextureName.Rectangle,
                     Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
                     Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight),
-                    target: targ, color: Color.DarkSlateGray, addToRoom: false));
+                    target: targ, color: Color.DarkSlateGray));
                 Entities.Add(targ);
             }
             for (int i = 0; i < 2; i++)
@@ -105,7 +105,7 @@ namespace SurvivalGame
                     TextureName.Circle,
                     Globals.rand.Next(0, Globals.graphics.PreferredBackBufferWidth),
                     Globals.rand.Next(0, Globals.graphics.PreferredBackBufferHeight),
-                    target: targ, color: Color.DarkGray, addToRoom: false));
+                    target: targ, color: Color.DarkGray));
                 Entities.Add(targ);
             }
             for (int i = 0; i < 10; i++)

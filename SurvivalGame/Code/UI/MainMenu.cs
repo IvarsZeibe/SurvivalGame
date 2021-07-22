@@ -9,6 +9,7 @@ namespace SurvivalGame
     {
         private Drawing background;
         private Button startButton;
+        private Button editorButton;
         public bool IsActive;
         public MainMenu()
         {
@@ -17,14 +18,24 @@ namespace SurvivalGame
             startButton = new Button(
                 new Rect(Globals.graphics.PreferredBackBufferWidth / 2, Globals.graphics.PreferredBackBufferHeight / 2, 100, 50),
                 Color.Black, new StringBuilder("Start"), Color.White);
+            editorButton = new Button(
+                new Rect(Globals.graphics.PreferredBackBufferWidth / 2, Globals.graphics.PreferredBackBufferHeight / 2 + 55, 100, 50),
+                Color.Black, new StringBuilder("Editor"), Color.White);
             Activate();
         }
         public void CheckClickEvent()
         {
-            if (Globals.MouseCursor.Hitbox.CollidesWith(startButton.Hitbox))
+            if (Globals.MouseCursor.Hitbox.CollidesWith(startButton.Hitbox) && startButton.IsActive)
             {
                 Globals.HUD.Activate();
+                Globals.Editor.IsActive = false;
                 Globals.getActiveRoom.Load();
+                Deactivate();
+            }
+            if (Globals.MouseCursor.Hitbox.CollidesWith(editorButton.Hitbox) && editorButton.IsActive)
+            {
+                Globals.Editor.IsActive = true;
+                Globals.getActiveRoom.UnLoad();
                 Deactivate();
             }
         }
@@ -32,6 +43,8 @@ namespace SurvivalGame
         {
             IsActive = true;
             startButton.Activate();
+            if(!Globals.Editor.IsActive)
+                editorButton.Activate();
             background.Enable();
             Globals.HUD.Deactivate();
         }
@@ -39,8 +52,10 @@ namespace SurvivalGame
         {
             IsActive = false;
             startButton.Deactivate();
+            editorButton.Deactivate();
             background.Disable();
-            Globals.HUD.Activate();
+            if(!Globals.Editor.IsActive)
+                Globals.HUD.Activate();
         }
     }
 }

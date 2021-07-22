@@ -17,7 +17,7 @@ namespace SurvivalGame
         public int radius { get; set; } = 40;
         public HealthBar HealthBar { get; set; }
         Player() { }
-        public Player(bool addToRoom = true) : base(addToRoom)
+        public Player(bool addToRoom = false) : base(addToRoom)
         {
             this.Mass = 10;
             this.Collision = true;

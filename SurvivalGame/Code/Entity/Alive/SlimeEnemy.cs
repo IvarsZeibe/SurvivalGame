@@ -33,7 +33,7 @@ namespace SurvivalGame
         public HealthBar HealthBar { get; set; }
 
         SlimeEnemy() { }
-        public SlimeEnemy(float x, float y, Entity target, bool addToRoom = true) : base(addToRoom)
+        public SlimeEnemy(float x, float y, Entity target)
         {
             this.Hitbox = new Circle(x, y, 20);
             this.AttackArea = new Circle(X, y, 21);

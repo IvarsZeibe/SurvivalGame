@@ -23,7 +23,7 @@ namespace SurvivalGame
 
         public Vector2 Knockback { get; set; } = Vector2.Zero;
         Enemy() { }
-        public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null, bool addToRoom = true) : base(addToRoom)
+        public Enemy(TextureName texture, float x, float y, int width = 20, int height = 0, int speed = 100, bool collision = true, Entity target = null, Color? color = null)
         {
             if (height == 0)
                 this.Hitbox = new Circle(x, y, width);

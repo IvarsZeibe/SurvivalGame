@@ -32,7 +32,7 @@ namespace SurvivalGame
 
 
         }
-        public void Update(SpriteBatch spriteBatch, GameTime gameTime)
+        public void Update(SpriteBatch spriteBatch)
         {
             darkness = 0.8f * (1 - (Math.Abs((Globals.worldTime / dayLengthInSeconds) % 1f - 0.5f) / 0.5f));
             Globals.graphics.GraphicsDevice.SetRenderTarget(renderTarget2D);

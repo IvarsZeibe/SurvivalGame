@@ -55,6 +55,7 @@ namespace SurvivalGame
 
         public static List<Keys> PressedKeyboardKeys = new List<Keys>();
         public static List<Keys> NewKeyboardKeys = new List<Keys>();
+        public static int ScrollWheel = 0;
 
         public static List<MouseKey> PressedMouseKeys = new List<MouseKey>();
         public static List<MouseKey> NewMouseKeys = new List<MouseKey>();
@@ -66,6 +67,7 @@ namespace SurvivalGame
         public static MainMenu MainMenu;
         public static Map Map;
         public static LightMap lightMap;
+        public static Editor Editor;
 
         public static Dictionary<(int x, int y), Room> Rooms = new Dictionary<(int x, int y), Room>();
         public static (int x, int y) activeRoomCoords { get; set; } = (0, 0);

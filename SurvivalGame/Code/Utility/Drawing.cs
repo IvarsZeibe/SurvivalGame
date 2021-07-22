@@ -81,11 +81,17 @@ namespace SurvivalGame
         public bool IsDrawn { get => isDrawn; }
         public float GetWidth()
         {
-            return Globals.Textures[Texture.ToString()].Width * scale.X;
+            if(TextureStr == "none")
+                return Globals.Textures[Texture.ToString()].Width * scale.X;
+            else
+                return Globals.Textures[TextureStr].Width * scale.X;
         }
         public float GetHeight()
         {
-            return Globals.Textures[Texture.ToString()].Height * scale.Y;
+            if (TextureStr == "none")
+                return Globals.Textures[Texture.ToString()].Height * scale.Y;
+            else
+                return Globals.Textures[TextureStr].Height * scale.Y;
         }
         public Vector2 Size { get => new Vector2(GetWidth(), GetHeight()); }
         public void Enable()
