@@ -54,6 +54,7 @@ namespace SurvivalGame
         {
             base.Update(gameTime);
             UpdateAnimations(gameTime);
+            Drawing.Coord = Hitbox.GetTopLeftPosVector();
         }
         public override bool DamageSelf(int damage, Entity source, DamageType damageType = DamageType.Unknown)
         {

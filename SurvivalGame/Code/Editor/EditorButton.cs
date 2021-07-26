@@ -17,6 +17,7 @@ namespace SurvivalGame
         public EditorButton()
         {
             Hitbox = new Rect(10, 10, 300, 50, true);
+            CreateClickAction();
         }
         protected override void OnDefault()
         {
@@ -26,19 +27,21 @@ namespace SurvivalGame
         {
             color = new Color(200, 200, 200);
         }
-        protected override void ClickEvent(GameTime gameTime)
+        void CreateClickAction()
         {
-            if (Globals.NewMouseKeys.Contains(MouseKey.LeftButton))
+            clickAction = () =>
             {
-                holding = (true, MouseKey.LeftButton);
-                if (Selectable)
+                if (Globals.NewMouseKeys.Contains(MouseKey.LeftButton))
                 {
-                    foreach (var UIElement in Globals.Editor.UIElements.Values)
-                        UIElement.LoseFocus();
-                    selected = true;
+                    holding = (true, MouseKey.LeftButton);
+                    if (Selectable)
+                    {
+                        foreach (var UIElement in Globals.Editor.UIElements.Values)
+                            UIElement.LoseFocus();
+                        selected = true;
+                    }
                 }
-                clickAction();
-            }
+            };
         }
         protected override void OnHolding()
         {
@@ -55,7 +58,7 @@ namespace SurvivalGame
             {
                 var font = Globals.SpriteFonts[SpriteFontName.Aerial16];
                 var pos = Hitbox.GetPosVector() - font.MeasureString(text) * 0.5f;
-                spriteBatch.DrawString(font, text, pos, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth - 0.01f);
+                spriteBatch.DrawString(font, text, pos, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth - 0.001f);
             }
         }
     }

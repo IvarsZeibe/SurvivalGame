@@ -310,10 +310,10 @@ namespace SurvivalGame
                 Globals.activeRoomCoords = newRoomCoords;
 
                 oldRoom.Entities.Remove(player);
-                oldRoom.Entities.Remove(Globals.MouseCursor);
+                //oldRoom.Entities.Remove(Globals.MouseCursor);
                 Globals.Rooms[Globals.activeRoomCoords].Load();
                 Globals.Rooms[Globals.activeRoomCoords].Entities.Add(player);
-                Globals.Rooms[Globals.activeRoomCoords].Entities.Add(Globals.MouseCursor);
+                //Globals.Rooms[Globals.activeRoomCoords].Entities.Add(Globals.MouseCursor);
                 oldRoom.UnLoad();
                 bool collisionDetected = false;
                 foreach (var entity in EntityTracker.Entities)
@@ -332,11 +332,11 @@ namespace SurvivalGame
                     player.X = oldPlayerPos.X;
                     player.Y = oldPlayerPos.Y;
                     generatedRoom.Entities.Remove(player);
-                    generatedRoom.Entities.Remove(Globals.MouseCursor);
+                    //generatedRoom.Entities.Remove(Globals.MouseCursor);
                     generatedRoom.UnLoad();
                     oldRoom.Load();
                     oldRoom.Entities.Add(player);
-                    oldRoom.Entities.Add(Globals.MouseCursor);
+                    //oldRoom.Entities.Add(Globals.MouseCursor);
                 }
 
                 Globals.Map.Update();

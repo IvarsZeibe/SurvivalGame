@@ -22,7 +22,7 @@ namespace SurvivalGame
             Hitbox = new Rect(windowsWidth / 2, windowsHeight / 2, (int)(windowsWidth * scale), (int)(windowsHeight * scale));
             borderWidth = 2;
             ResetRoom();
-
+            CreateClickAction();
         }
         public Item GetActiveItem()
         {
@@ -47,42 +47,49 @@ namespace SurvivalGame
             entitiesAsItems[activeItemIndex].box.borderWidth = 2;
             return true;
         }
-        protected override void ClickEvent(GameTime gameTime)
+        void CreateClickAction()
+        {
+            clickAction = () =>
+            {
+                var itemMenu = Globals.Editor.UIElements["itemMenu"] as ItemMenu;
+                var item = itemMenu.GetActiveItem();
+                if (item != null && item.isSpawner)
+                {
+                    var entity = SaveManager.Clone(item.entity);
+                    entity.Hitbox.X = (Globals.MouseCursor.X - Hitbox.Left) / scale;
+                    entity.Hitbox.Y = (Globals.MouseCursor.Y - Hitbox.Top) / scale;
+                    AddItemNoCloning(entity);
+                    room.Entities.Add(entity);
+                }
+            };
+        }
+        void AddItemNoCloning(Entity entity)
         {
             var itemMenu = Globals.Editor.UIElements["itemMenu"] as ItemMenu;
-            var item = itemMenu.GetActiveItem();
-            if(item != null && item.isSpawner)
+            EditorButton button = new EditorButton();
+            var item = new Item(button, false);
+            item.entity = entity;
+            //button.defaultColor = Color.White;
+            //button.hoverColor = Color.White;
+            //button.holdingColor = Color.White;
+            //button.releaseColor = Color.White;
+            button.Hitbox = new Rect((item.entity.Hitbox.X) * scale + Hitbox.Left, (item.entity.Hitbox.Y) * scale + Hitbox.Top,
+                (int)(item.entity.Drawing.GetWidth() * scale), (int)(item.entity.Drawing.GetHeight() * scale));
+            button.borderColor = Color.Black;
+            button.clickAction += () =>
             {
+                itemMenu.SetActiveItem(null);
+                SetActiveItem(item);
+            };
+            button.layerDepth = layerDepth - 0.005f - (float)(button.Hitbox.Y / 1000000);
 
-                EditorButton button = new EditorButton();
-                button.layerDepth = layerDepth - 0.005f;
-                var spawnedEntity = new Item(item.type, button, false);
-                spawnedEntity.entity = SaveManager.Clone(item.entity);
-                //button.defaultColor = Color.White;
-                //button.hoverColor = Color.White;
-                //button.holdingColor = Color.White;
-                //button.releaseColor = Color.White;
-                spawnedEntity.entity.Hitbox.X = (Globals.MouseCursor.X - Hitbox.Left) / scale;
-                spawnedEntity.entity.Hitbox.Y = (Globals.MouseCursor.Y - Hitbox.Top) / scale;
-                //button.Hitbox = item.entity.Hitbox * scale + new Rect(Hitbox.X, Hitbox.Y, 0, 0);
-                button.Hitbox = new Rect((spawnedEntity.entity.Hitbox.X) * scale + Hitbox.Left, (spawnedEntity.entity.Hitbox.Y) * scale + Hitbox.Top,
-                    (int)(spawnedEntity.entity.Drawing.GetWidth() * scale), (int)(spawnedEntity.entity.Drawing.GetHeight() * scale));
-                button.borderColor = Color.Black;
-                button.clickAction = () =>
-                {
-                    itemMenu.SetActiveItem(null);
-                    SetActiveItem(spawnedEntity);
-                };
+            if (item.entity.Drawing.TextureStr != "none")
+                button.textureName = item.entity.Drawing.TextureStr;
+            else
+                button.textureName = item.entity.Drawing.Texture.ToString();
+            button.defaultColor = item.entity.Drawing.Color;
 
-                if (spawnedEntity.entity.Drawing.TextureStr != "none")
-                    button.textureName = spawnedEntity.entity.Drawing.TextureStr;
-                else
-                    button.textureName = spawnedEntity.entity.Drawing.Texture.ToString();
-
-                room.Entities.Add(spawnedEntity.entity);
-                entitiesAsItems.Add(spawnedEntity);
-
-            }
+            entitiesAsItems.Add(item);
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -118,7 +125,7 @@ namespace SurvivalGame
                 spriteBatch.Draw(Globals.Textures[drawing.TextureStr], pos, null, drawing.Color, drawing.Rotation, drawing.Origin, drawingScale, SpriteEffects.None, layerDepth);
             }
         }
-        public void FinisheRoom()
+        public void FinishRoom()
         {
             if (Globals.Rooms.ContainsKey(room.Coords))
                 Globals.Rooms[room.Coords] = room;
@@ -136,11 +143,15 @@ namespace SurvivalGame
             {
                 var cords = roomCoordInput.text.ToString().Split(" ");
                 var coords = (Convert.ToInt32(cords[0]), Convert.ToInt32(cords[1]));
-                room = Globals.Rooms[coords];
+                room = SaveManager.Clone(Globals.Rooms[coords]);
+                foreach(var entity in room.Entities)
+                {
+                    AddItemNoCloning(entity);
+                }
             }
             catch { roomCoordInput.error = true; }
         }
-        void ResetRoom()
+        public void ResetRoom()
         {
             room = new Room();
             room.background = new Drawing(TextureName.Rectangle, Vector2.Zero, Color.Pink, 0f,

@@ -12,7 +12,7 @@ namespace SurvivalGame
     class ItemPropertiesWindow : UIElement
     {
         EditorBox Title;
-        //EditorButton SaveButton;
+        EditorButton Apply;
         List<(EditorBox, EditorTextInput)> properties = new List<(EditorBox, EditorTextInput)>();
         Item item = null;
         RenderTarget2D propertiesDrawing;
@@ -30,23 +30,26 @@ namespace SurvivalGame
 
             propertiesDrawing = new RenderTarget2D(Globals.graphics.GraphicsDevice, width, height);
 
-            //SaveButton = new EditorButton();
-            //SaveButton.Hitbox.Height = 30;
-            //SaveButton.Hitbox.Width = Hitbox.Width;
-            //SaveButton.Hitbox.Top = Hitbox.Bottom - 1;
-            //SaveButton.Hitbox.Left = Hitbox.Left;
-            //SaveButton.text = "Save";
-            //SaveButton.clickAction = () =>
-            //{
-            //    Entity entity = Activator.CreateInstance(ac);
-            //    Room room = (Globals.Editor.UIElements["editedRoom"] as EditedRoom).room;
-            //    room.Entities.Add(entity);
-            //};
+            Apply = new EditorButton();
+            Apply.Hitbox.Height = 30;
+            Apply.Hitbox.Width = Hitbox.Width;
+            Apply.Hitbox.Top = Hitbox.Bottom - 1;
+            Apply.Hitbox.Left = Hitbox.Left;
+            Apply.layerDepth = layerDepth - 0.002f;
+            Apply.text = "Apply";
+            Apply.clickAction += () =>
+            {
+                item.entity.Update(new GameTime());
+                foreach (var prop in properties)
+                {
+                    prop.Item2.error = !item.entity.SetProperty(prop.Item1.text, prop.Item2.text.ToString());
+                }
+            };
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(propertiesDrawing, Hitbox.GetTopLeftPosVector(), null, Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, layerDepth);
-            //SaveButton.Draw(spriteBatch);
+            Apply.Draw(spriteBatch);
         }
         void DrawRenderTarget()
         {
@@ -94,7 +97,7 @@ namespace SurvivalGame
                 property.Item1.Update(gameTime);
                 property.Item2.Update(gameTime);
             }
-            //SaveButton.Update(gameTime);
+            Apply.Update(gameTime);
             CheckForScroll();
             DrawRenderTarget();
         }
@@ -138,10 +141,10 @@ namespace SurvivalGame
             properties.Clear();
             foreach (var name in item.entity.GetPropertiesNames())
             {
-                AddProperty(name);
+                AddProperty(name, item.entity);
             }
         }
-        void AddProperty(string name)
+        void AddProperty(string name, Entity entity)
         {
             EditorBox box;
             if (properties.Count == 0)
@@ -153,14 +156,15 @@ namespace SurvivalGame
 
             var input = new EditorTextInput((int)box.Hitbox.Right + 5, (int)box.Hitbox.Top, 60, 20, true);
             input.SetBackgroundColor(Color.White);
-            input.clickAction = () => {
-                foreach (var property in properties)
-                {
-                    property.Item2.LoseFocus();
-                }
-            };
-            input.layerDepth = layerDepth - 0.01f;
-            box.layerDepth = layerDepth - 0.01f;
+            //input.clickAction += () => {
+            //    foreach (var property in properties)
+            //    {
+            //        property.Item2.LoseFocus();
+            //    }
+            //};
+            input.layerDepth = layerDepth - 0.001f;
+            input.text = new StringBuilder(entity.GetPropertyValueAsString(name));
+            box.layerDepth = layerDepth - 0.001f;
             box.AdditionalClickAndHoverCheck = new Func<bool>(() => Globals.MouseCursor.Hitbox.CollidesWith(Hitbox));
             input.AdditionalClickAndHoverCheck = new Func<bool>(() => Globals.MouseCursor.Hitbox.CollidesWith(Hitbox));
             properties.Add((box, input));

@@ -74,12 +74,19 @@ namespace SurvivalGame
         public static Entity Clone(Entity entity) 
         {
             var data = JsonSerializer.Serialize(entity, Options);
+            Entity ent = JsonSerializer.Deserialize<Entity>(data, Options);
+            myReferenceHandler.Reset();
+            return ent;
+        }
+        public static Room Clone(Room room)
+        {
+            var data = JsonSerializer.Serialize(room, Options);
             File.WriteAllText(@"C:\Users\Ivars\source\repos\SurvivalGame\SurvivalGame\Code\tempData.txt", data);
             myReferenceHandler.Reset();
             var dat = File.ReadAllText(@"C:\Users\Ivars\source\repos\SurvivalGame\SurvivalGame\Code\tempData.txt");
-            Entity ent = JsonSerializer.Deserialize<Entity>(dat, Options);
+            Room rom = JsonSerializer.Deserialize<Room>(dat, Options);
             myReferenceHandler.Reset();
-            return ent;
+            return rom;
         }
 
     }

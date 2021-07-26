@@ -20,6 +20,7 @@ namespace SurvivalGame
             this.Collision = false;
             this.Health = 100;
             this.MaxHealth = Health;
+            Drawing = new Drawing("Rectangle", Hitbox.GetTopLeftPosVector(), Color.Gray, 0f, Hitbox.GetScaleVector(), 0.2f, false);
         }
         public override void Update(GameTime gameTime)
         {

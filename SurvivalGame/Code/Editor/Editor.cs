@@ -12,12 +12,18 @@ namespace SurvivalGame
         public Color BackgroundColor = Color.LightGray;
         public Dictionary<string, UIElement> UIElements = new Dictionary<string, UIElement>();
         public bool IsActive = false;
+        public (Action, float) ButtonToActivate;
         public Editor()
         {
             UIElements.Add("editedRoom", new EditedRoom());
             UIElements.Add("Title", new EditorBox(Globals.graphics.PreferredBackBufferWidth / 2, 30, 90, 50, "Editor"));
             UIElements.Add("RoomNameInput", new EditorTextInput(50, 100, 90, 50) { placeholder = "Name" });
             UIElements.Add("RoomCoordInput", new EditorTextInput(50, 160, 90, 50) { placeholder = "Coords" });
+            var resetButton = new EditorButton();
+            resetButton.clickAction += () => { (UIElements["editedRoom"] as EditedRoom).ResetRoom(); };
+            resetButton.text = "Reset";
+            resetButton.Hitbox = new Rect(50, 220, 90, 50);
+            UIElements.Add("ResetButton", resetButton);
             UIElements.Add("finishButton", new EditorButton()
             {
                 text = "Save and Play",
@@ -27,7 +33,7 @@ namespace SurvivalGame
                     var editedRoom = (UIElements["editedRoom"] as EditedRoom);
                     if (Save())
                     {
-                        editedRoom.FinisheRoom();
+                        editedRoom.FinishRoom();
                     }
                 }
             });
@@ -46,10 +52,12 @@ namespace SurvivalGame
         }
         public void Update(GameTime gameTime)
         {
+            ButtonToActivate = (() => { }, 1);
             foreach (var element in UIElements.Values)
             {
                 element.Update(gameTime);
             }
+            ButtonToActivate.Item1();
         }
         public void Draw(SpriteBatch spriteBatch)
         {

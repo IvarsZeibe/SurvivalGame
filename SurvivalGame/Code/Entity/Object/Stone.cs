@@ -8,6 +8,7 @@ namespace SurvivalGame
     class Stone : Entity
     {
         public Hitbox drawingHitbox { get; set; }
+        string a = "none";
         Stone() { }
         public Stone(Vector2 pos) : base(false)
         {
@@ -31,14 +32,6 @@ namespace SurvivalGame
         {
             base.Update(gameTime);
             Drawing.Coord = Hitbox.GetPosVector();
-        }
-        protected override void CreateDefaultProperties()
-        {
-            properties = new Dictionary<string, Action<object>>();
-            properties.Add("width", new Action<object>(width => Hitbox.Width = Convert.ToInt32(width)));
-            properties.Add("height", new Action<object>(height => Hitbox.Height = Convert.ToInt32(height)));
-            properties.Add("x", new Action<object>(x => Hitbox.X = Convert.ToDouble(x)));
-            properties.Add("y", new Action<object>(y => Hitbox.Y = Convert.ToDouble(y)));
         }
     }
 }

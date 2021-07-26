@@ -46,7 +46,11 @@ namespace SurvivalGame
         protected virtual void OnRelease() { }
         protected virtual void OnHover() { }
         public Func<bool> AdditionalClickAndHoverCheck = new Func<bool>(() => true);
-        protected virtual void ClickEvent(GameTime gameTime) { }
+        protected void ClickEvent(GameTime gameTime) 
+        { 
+            if(layerDepth <= Globals.Editor.ButtonToActivate.Item2)
+                Globals.Editor.ButtonToActivate = (clickAction, layerDepth);
+        }
         public Action clickAction = () => { };
         public virtual void LoseFocus()
         {

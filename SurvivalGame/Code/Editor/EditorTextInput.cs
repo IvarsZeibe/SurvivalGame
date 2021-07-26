@@ -18,16 +18,20 @@ namespace SurvivalGame
         public EditorTextInput(int x, int y, int width, int height, bool topLeft = false)
         {
             Hitbox = new Rect(x, y, width, height, topLeft);
+            CreateClickAction();
         }
-        protected override void ClickEvent(GameTime gameTime)
+        void CreateClickAction()
         {
-            if (Globals.NewMouseKeys.Contains(MouseKey.LeftButton))
+            clickAction = () =>
             {
-                foreach (var UIElement in Globals.Editor.UIElements.Values)
-                    UIElement.LoseFocus();
-                selected = true;
-                error = false;
-            }
+                if (Globals.NewMouseKeys.Contains(MouseKey.LeftButton))
+                {
+                    foreach (var UIElement in Globals.Editor.UIElements.Values)
+                        UIElement.LoseFocus();
+                    selected = true;
+                    error = false;
+                }
+            };
         }
         public void SetBackgroundColor(Color color)
         {

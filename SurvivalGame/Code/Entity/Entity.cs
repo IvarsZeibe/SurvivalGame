@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -152,38 +153,74 @@ namespace SurvivalGame
         {
             return Hitbox.CollisionDetect(entity.Hitbox) != Vector2.Zero;
         }
-        protected Dictionary<string, Action<object>> properties = null;
+        //protected Dictionary<string, Action<object>> properties = null;
+        protected Dictionary<string, VariableReference> Properties = null;
         public List<string> GetPropertiesNames()
         {
-            if (properties is null)
+            //if (properties is null)
+            //    CreateDefaultProperties();
+            //List<string> propertiesNames = new List<string>();
+            //foreach (string key in properties.Keys)
+            //    propertiesNames.Add(key);
+            //return propertiesNames;
+            if (Properties is null)
                 CreateDefaultProperties();
             List<string> propertiesNames = new List<string>();
-            foreach (string key in properties.Keys)
+            foreach (string key in Properties.Keys)
                 propertiesNames.Add(key);
             return propertiesNames;
         }
-        public bool SetProperty(string name, object value)
+        public bool SetProperty(string name, string value)
         {
-            if (properties is null)
+            //if (properties is null)
+            //    CreateDefaultProperties();
+            //bool flag = properties.TryGetValue(name, out var propertySetter);
+            //try
+            //{
+            //    propertySetter(value);
+            //}
+            //catch (Exception e)
+            //{
+            //    flag = false;
+            //}
+            //return flag;
+            if (Properties is null)
                 CreateDefaultProperties();
-            bool flag = properties.TryGetValue(name, out var propertySetter);
+            bool flag = true;
             try
             {
-                propertySetter(value);
+                Properties[name].Set(value);
             }
             catch (Exception e)
             {
-                flag = false; 
+                flag = false;
             }
             return flag;
         }
+        public string GetPropertyValueAsString(string name)
+        {
+            return Properties[name].Get().ToString();
+            //var i = properties[name].GetType();
+            //return properties[name].ToString();
+            //return Properties[name].GetValue(this).ToString();
+        }
         protected virtual void CreateDefaultProperties()
         {
-            properties = new Dictionary<string, Action<object>>();
-            properties.Add("width", new Action<object>(width => Hitbox.Width = Convert.ToInt32(width)));
-            properties.Add("height", new Action<object>(height => Hitbox.Height = Convert.ToInt32(height)));
-            properties.Add("x", new Action<object>(x => Hitbox.X = Convert.ToDouble(x)));
-            properties.Add("y", new Action<object>(y => Hitbox.Y = Convert.ToDouble(y)));
+            Properties = new Dictionary<string, VariableReference>();
+            //Properties.Add("width", new VariableReference(() => { return Hitbox.Width; }, (value) => { Hitbox.Width = Convert.ToInt32(value); }));
+            //Properties.Add("height", new VariableReference(() => { return Hitbox.Height; }, (value) => { Hitbox.Height = Convert.ToInt32(value); }));
+            Properties.Add("x", new VariableReference(() => { return Hitbox.X; }, (value) => { Hitbox.X = Convert.ToDouble(value); }));
+            Properties.Add("y", new VariableReference(() => { return Hitbox.Y; }, (value) => { Hitbox.Y = Convert.ToDouble(value); }));
+            //properties.Add("width", new Action<object>(width => Hitbox.Width = Convert.ToInt32(width)));
+            //properties.Add("height", new Action<object>(height => Hitbox.Height = Convert.ToInt32(height)));
+            //properties.Add("x", new Action<object>(x => Hitbox.X = Convert.ToDouble(x)));
+            //properties.Add("y", new Action<object>(y => Hitbox.Y = Convert.ToDouble(y)));
+
+            //Properties = new Dictionary<string, PropertyInfo>();
+            //Properties.Add("width", GetType().GetProperty("Hitbox"));
+            //Properties.Add("height", Hitbox.GetType().GetProperty("Height"));
+            //Properties.Add("x", Hitbox.GetType().GetProperty("X"));
+            //Properties.Add("y", Hitbox.GetType().GetProperty("Y"));
         }
         public float Move(double movement, bool xDirection, List<(Entity movedEntity, float maxMovement)> movedEntities = null, float movementDecreaseTotal = 0f, float mass = 0)
         {
@@ -398,6 +435,16 @@ namespace SurvivalGame
 
                 }
             }
+        }
+    }
+    sealed class VariableReference
+    {
+        public Func<object> Get { get; private set; }
+        public Action<object> Set { get; private set; }
+        public VariableReference(Func<object> getter, Action<object> setter)
+        {
+            Get = getter;
+            Set = setter;
         }
     }
 }

@@ -25,6 +25,7 @@ namespace SurvivalGame
 
             AddItem(typeof(Stone));
             AddItem(typeof(Tree));
+            AddItem(typeof(SlimeEnemy));
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -55,14 +56,14 @@ namespace SurvivalGame
         {
             EditorButton button = new EditorButton();
             button.layerDepth = layerDepth - 0.01f;
-            var item = new Item(t, button, true);
+            var item = new Item(button, true);
             if (items.Count == 0)
                 button.Hitbox = new Rect((int)Hitbox.Left + 5, (int)Title.Hitbox.Bottom + 5, 20, 20, true);
             else
                 button.Hitbox = new Rect((int)Hitbox.Left + 5, (int)items[items.Count - 1].box.Hitbox.Bottom + 5, 20, 20, true);
             button.borderColor = Color.Black;
             //button.Selectable = true;
-            button.clickAction = () =>
+            button.clickAction += () =>
             {
                 SetActiveItem(item);
                 (Globals.Editor.UIElements["editedRoom"] as EditedRoom).SetActiveItem(null);
@@ -70,7 +71,7 @@ namespace SurvivalGame
             };
             //button.lostFocusAction = () => { button.borderWidth = 0; };
 
-            Entity entity = Activator.CreateInstance(item.type, true) as Entity;
+            Entity entity = Activator.CreateInstance(t, true) as Entity;
             entity.SetDafaultValues();
             item.entity = entity;
             if (entity.Drawing.TextureStr != "none")
@@ -106,15 +107,13 @@ namespace SurvivalGame
     }
     class Item
     {
-        public Type type;
         public EditorButton box;
         public Entity entity;
         public bool isSpawner;
         public bool clicked = false;
-        public Item(Type t, EditorButton b, bool spawner)
+        public Item(EditorButton b, bool spawner)
         {
             this.isSpawner = spawner;
-            type = t;
             box = b;
         }
     }
