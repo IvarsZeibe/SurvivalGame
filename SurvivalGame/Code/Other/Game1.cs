@@ -184,6 +184,9 @@ namespace SurvivalGame
             {
                 backgroundColor = Globals.Editor.BackgroundColor;
             }
+
+            if (Globals.Editor.IsActive)
+                Globals.Editor.PrepareDraw(Globals.spriteBatch);
             GraphicsDevice.Clear(backgroundColor);
             // TODO: Add your drawing code here
             if (!Globals.Editor.IsActive)
@@ -282,7 +285,7 @@ namespace SurvivalGame
                 if (!Globals.Rooms.ContainsKey(newRoomCoords))
                     if (Math.Abs(newRoomCoords.x) + Math.Abs(newRoomCoords.y) <= 10)
                     {
-                        switch (Globals.rand.Next(4,6))
+                        switch (Globals.rand.Next(0,8))
                         {
                             case 0:
                             case 1:
@@ -318,7 +321,7 @@ namespace SurvivalGame
                 bool collisionDetected = false;
                 foreach (var entity in EntityTracker.Entities)
                 {
-                    if (entity.CollidesWith(player) && entity != player)
+                    if (entity.Hitbox.CollidesWith(player.Hitbox) && entity.Collision && entity != player)
                     {
                         collisionDetected = true;
                         break;

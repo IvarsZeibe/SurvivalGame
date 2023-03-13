@@ -26,6 +26,7 @@ namespace SurvivalGame
             AddItem(typeof(Stone));
             AddItem(typeof(Tree));
             AddItem(typeof(SlimeEnemy));
+            AddItem(typeof(Wall));
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -38,18 +39,17 @@ namespace SurvivalGame
         {
             base.Update(gameTime);
             foreach (var item in items)
+            {
                 item.box.Update(gameTime);
+            }
 
         }
-        public override void LoseFocus()
+        public override void Unfocus()
         {
-            if (selected)
-                OnLostFocus();
-            selected = false;
-
+            base.Unfocus();
             foreach (var item in items)
             {
-                item.box.LoseFocus();
+                item.box.Unfocus();
             }
         }
         void AddItem(Type t)
@@ -62,22 +62,31 @@ namespace SurvivalGame
             else
                 button.Hitbox = new Rect((int)Hitbox.Left + 5, (int)items[items.Count - 1].box.Hitbox.Bottom + 5, 20, 20, true);
             button.borderColor = Color.Black;
-            //button.Selectable = true;
-            button.clickAction += () =>
+            button.Click += (object sender, EventArgs e) =>
             {
                 SetActiveItem(item);
                 (Globals.Editor.UIElements["editedRoom"] as EditedRoom).SetActiveItem(null);
-                //button.borderWidth = 1;
             };
-            //button.lostFocusAction = () => { button.borderWidth = 0; };
+            button.Focus += (object sender, EventArgs e) =>
+            {
+                button.borderWidth = 2;
+                selected = true;
+            };
 
             Entity entity = Activator.CreateInstance(t, true) as Entity;
             entity.SetDafaultValues();
+            entity.UnLoad();
             item.entity = entity;
-            if (entity.Drawing.TextureStr != "none")
-                button.textureName = entity.Drawing.TextureStr;
+            if (entity.Drawing != null)
+            {
+                if (entity.Drawing.TextureStr != "none")
+                    button.textureName = entity.Drawing.TextureStr;
+                else
+                    button.textureName = entity.Drawing.Texture.ToString();
+                button.defaultColor = entity.Drawing.Color;
+            }
             else
-                button.textureName = entity.Drawing.Texture.ToString();
+                button.textureName = "Rectangle";
 
             items.Add(item);
         }
@@ -91,17 +100,17 @@ namespace SurvivalGame
         {
             if(item is null)
             {
-                if (activeItemIndex != -1)
-                    items[activeItemIndex].box.borderWidth = 0;
+                //if (activeItemIndex != -1)
+                //    items[activeItemIndex].box.borderWidth = 0;
                 activeItemIndex = -1;
                 return true;
             }
             if (!items.Contains(item))
                 return false;
-            if(activeItemIndex != -1)
-                items[activeItemIndex].box.borderWidth = 0;
+            //if(activeItemIndex != -1)
+            //    items[activeItemIndex].box.borderWidth = 0;
             activeItemIndex = items.IndexOf(item);
-            items[activeItemIndex].box.borderWidth = 2;
+            //items[activeItemIndex].box.borderWidth = 2;
             return true;
         }
     }

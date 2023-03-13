@@ -15,11 +15,8 @@ namespace SurvivalGame
             Collision = false;
             Drawing = new Drawing("grass", Hitbox.GetTopLeftPosVector(), new Color(0, Globals.rand.Next(100, 140), 0), 0f, new Vector2(50, 50), 0.40f - (float)pos.Y / 100000);
             Drawing.originPercentage = new Vector2(0.5f, 1f);
-            //Drawing.Offset = new Vector2(0.5f, 1f) * new Vector2(50, 50);
             var animation = new ShakeAnimation(Drawing);
-            //animation.isLoop = true;
             Animations.Add("wind", animation);
-            //Animations["wind"].Start();
         }
         public override void Update(GameTime gameTime)
         {

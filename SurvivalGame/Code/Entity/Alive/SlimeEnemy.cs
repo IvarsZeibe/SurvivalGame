@@ -59,9 +59,9 @@ namespace SurvivalGame
             this.MaxHealth = Health;
             Damage = 1;
             this.Target = new NoBrainEntity(0, 0);
-            HealthBar = new HealthBar(this);
-            Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.LightGreen, 0, new Vector2(Hitbox.Width, Hitbox.Height), 0.4f, true);
-            Shadow = new Drawing(TextureName.Rectangle, new Vector2((float)Hitbox.Left, (float)Hitbox.Bottom + 1), Color.Black, 0, new Vector2(Hitbox.Width, 1f), 0.9f, true);
+            HealthBar = new HealthBar(this, false);
+            Drawing = new Drawing(TextureName.Circle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), Color.LightGreen, 0, new Vector2(Hitbox.Width, Hitbox.Height), 0.4f, false);
+            Shadow = new Drawing(TextureName.Rectangle, new Vector2((float)Hitbox.Left, (float)Hitbox.Bottom + 1), Color.Black, 0, new Vector2(Hitbox.Width, 1f), 0.9f, false);
 
         }
         public override void Update(GameTime gameTime)
@@ -81,8 +81,6 @@ namespace SurvivalGame
 
             Drawing.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Top + yOffset);
             Shadow.Position = new Vector2((float)Hitbox.Left, (float)Hitbox.Bottom + 1);
-            Drawing.Scale = new Vector2(Hitbox.Width, Hitbox.Height);
-            Shadow.Scale = new Vector2(Hitbox.Width, 1f);
         }
 
         private void Jump(GameTime gameTime)
@@ -250,8 +248,12 @@ namespace SurvivalGame
         protected override void CreateDefaultProperties()
         {
             base.CreateDefaultProperties();
-            Properties.Add("width", new VariableReference(() => { return Hitbox.Width; }, (value) => { Hitbox.Width = Convert.ToInt32(value); }));
-            Properties.Add("height", new VariableReference(() => { return Hitbox.Height; }, (value) => { Hitbox.Height = Convert.ToInt32(value); }));
+            Properties.Add("radius", new VariableReference(() => { return Hitbox.Height; }, (value) => 
+            {
+                Hitbox.Height = Convert.ToInt32(value);
+                Drawing.Scale = new Vector2(Hitbox.Width, Hitbox.Height);
+                Shadow.Scale = new Vector2(Hitbox.Width, 1f);
+            }));
         }
     }
 }

@@ -9,7 +9,7 @@ namespace SurvivalGame
     {
         public Vector2 maxScale { get; set; }
         HealthBar() { }
-        public HealthBar(Entity owner)
+        public HealthBar(Entity owner, bool isDrawn = true)
         {
             //this.Owner = owner;
             maxScale = new Vector2(50, 3f);
@@ -21,7 +21,7 @@ namespace SurvivalGame
                 0f,
                 maxScale,
                 0.36f,
-                true
+                isDrawn
             );
             //Drawing.Position = Drawing.Position - new Vector2(Drawing.Scale.X / 2, 0);
             //this.DrawingText = new DrawingText

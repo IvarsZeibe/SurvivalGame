@@ -8,48 +8,49 @@ namespace SurvivalGame
 {
     class EditorButton : UIElement
     {
-        public Color defaultColor = Color.White;
         public Color hoverColor = new Color(200, 200, 200);
         public Color holdingColor = Color.Gray;
         public Color releaseColor = Color.Red;
         public string text = "";
-        public bool Selectable = false;
+        //public bool Selectable = false;
         public EditorButton()
         {
             Hitbox = new Rect(10, 10, 300, 50, true);
-            CreateClickAction();
+            defaultColor = Color.White;
         }
-        protected override void OnDefault()
+        protected override void SetDefault()
         {
-            color = defaultColor;
+            base.SetDefault();
         }
-        protected override void OnHover()
+        protected override void OnHover(EventArgs e)
         {
             color = new Color(200, 200, 200);
+
+            base.OnHover(e);
         }
-        void CreateClickAction()
+        protected override void OnClick(EventArgs e)
         {
-            clickAction = () =>
-            {
-                if (Globals.NewMouseKeys.Contains(MouseKey.LeftButton))
-                {
-                    holding = (true, MouseKey.LeftButton);
-                    if (Selectable)
-                    {
-                        foreach (var UIElement in Globals.Editor.UIElements.Values)
-                            UIElement.LoseFocus();
-                        selected = true;
-                    }
-                }
-            };
+            //if (Selectable)
+            //{
+            //    //foreach (var UIElement in Globals.Editor.UIElements.Values)
+            //    //{
+            //    //    if(UIElement != this)
+            //    //        UIElement.LoseFocus();
+            //    //}
+            //    selected = true;
+            //}
+
+            base.OnClick(e);
         }
-        protected override void OnHolding()
+        protected override void OnHeld(EventArgs e)
         {
             color = Color.Gray;
+            base.OnHeld(e);
         }
-        protected override void OnRelease()
+        protected override void OnRelease(EventArgs e)
         {
             color = Color.Red;
+            base.OnRelease(e);
         }
         public override void Draw(SpriteBatch spriteBatch)
         {

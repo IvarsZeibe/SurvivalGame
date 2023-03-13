@@ -22,7 +22,8 @@ namespace SurvivalGame
             Hitbox = new Rect(windowsWidth / 2, windowsHeight / 2, (int)(windowsWidth * scale), (int)(windowsHeight * scale));
             borderWidth = 2;
             ResetRoom();
-            CreateClickAction();
+            //Click += EditedRoom_Click;
+            //CreateClickAction();
         }
         public Item GetActiveItem()
         {
@@ -34,34 +35,32 @@ namespace SurvivalGame
         {
             if (item is null)
             {
-                if (activeItemIndex != -1)
-                    entitiesAsItems[activeItemIndex].box.borderWidth = 0;
+                //if (activeItemIndex != -1)
+                //    entitiesAsItems[activeItemIndex].box.borderWidth = 0;
                 activeItemIndex = -1;
                 return true;
             }
             if (!entitiesAsItems.Contains(item))
                 return false;
-            if (activeItemIndex != -1)
-                entitiesAsItems[activeItemIndex].box.borderWidth = 0;
+            //if (activeItemIndex != -1)
+            //    entitiesAsItems[activeItemIndex].box.borderWidth = 0;
             activeItemIndex = entitiesAsItems.IndexOf(item);
-            entitiesAsItems[activeItemIndex].box.borderWidth = 2;
+            //entitiesAsItems[activeItemIndex].box.borderWidth = 2;
             return true;
         }
-        void CreateClickAction()
+        protected override void OnClick(EventArgs e)
         {
-            clickAction = () =>
+            var itemMenu = Globals.Editor.UIElements["itemMenu"] as ItemMenu;
+            var item = itemMenu.GetActiveItem();
+            if (item != null && item.isSpawner)
             {
-                var itemMenu = Globals.Editor.UIElements["itemMenu"] as ItemMenu;
-                var item = itemMenu.GetActiveItem();
-                if (item != null && item.isSpawner)
-                {
-                    var entity = SaveManager.Clone(item.entity);
-                    entity.Hitbox.X = (Globals.MouseCursor.X - Hitbox.Left) / scale;
-                    entity.Hitbox.Y = (Globals.MouseCursor.Y - Hitbox.Top) / scale;
-                    AddItemNoCloning(entity);
-                    room.Entities.Add(entity);
-                }
-            };
+                var entity = SaveManager.Clone(item.entity);
+                entity.Hitbox.X = (Globals.MouseCursor.X - Hitbox.Left) / scale;
+                entity.Hitbox.Y = (Globals.MouseCursor.Y - Hitbox.Top) / scale;
+                AddItemNoCloning(entity);
+                room.Entities.Add(entity);
+            }
+            base.OnClick(e);
         }
         void AddItemNoCloning(Entity entity)
         {
@@ -76,10 +75,15 @@ namespace SurvivalGame
             button.Hitbox = new Rect((item.entity.Hitbox.X) * scale + Hitbox.Left, (item.entity.Hitbox.Y) * scale + Hitbox.Top,
                 (int)(item.entity.Drawing.GetWidth() * scale), (int)(item.entity.Drawing.GetHeight() * scale));
             button.borderColor = Color.Black;
-            button.clickAction += () =>
+            button.Click += (object sender, EventArgs e) =>
             {
                 itemMenu.SetActiveItem(null);
                 SetActiveItem(item);
+            };
+            button.Focus += (object sender, EventArgs e) =>
+            {
+                button.borderWidth = 2;
+                this.selected = true;
             };
             button.layerDepth = layerDepth - 0.005f - (float)(button.Hitbox.Y / 1000000);
 
@@ -100,6 +104,14 @@ namespace SurvivalGame
                 item.box.Draw(spriteBatch);
             }
 
+        }
+        public override void Unfocus()
+        {
+            base.Unfocus();
+            foreach (var item in entitiesAsItems)
+            {
+                item.box.Unfocus();
+            }
         }
         public override void Update(GameTime gameTime)
         {
@@ -144,7 +156,8 @@ namespace SurvivalGame
                 var cords = roomCoordInput.text.ToString().Split(" ");
                 var coords = (Convert.ToInt32(cords[0]), Convert.ToInt32(cords[1]));
                 room = SaveManager.Clone(Globals.Rooms[coords]);
-                foreach(var entity in room.Entities)
+                entitiesAsItems.Clear();
+                foreach (var entity in room.Entities)
                 {
                     AddItemNoCloning(entity);
                 }
@@ -154,7 +167,7 @@ namespace SurvivalGame
         public void ResetRoom()
         {
             room = new Room();
-            room.background = new Drawing(TextureName.Rectangle, Vector2.Zero, Color.Pink, 0f,
+            room.background = new Drawing(TextureName.GrassyBackground, Vector2.Zero, Color.Green, 0f,
                 new Vector2(Globals.graphics.PreferredBackBufferWidth, Globals.graphics.PreferredBackBufferHeight), 1f, false);
 
             entitiesAsItems.Clear();

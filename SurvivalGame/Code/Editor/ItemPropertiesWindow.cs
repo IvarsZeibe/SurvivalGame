@@ -37,9 +37,9 @@ namespace SurvivalGame
             Apply.Hitbox.Left = Hitbox.Left;
             Apply.layerDepth = layerDepth - 0.002f;
             Apply.text = "Apply";
-            Apply.clickAction += () =>
+            Apply.Click += (object sender, EventArgs e) =>
             {
-                item.entity.Update(new GameTime());
+                //item.entity.Update(new GameTime());
                 foreach (var prop in properties)
                 {
                     prop.Item2.error = !item.entity.SetProperty(prop.Item1.text, prop.Item2.text.ToString());
@@ -76,9 +76,14 @@ namespace SurvivalGame
             }
             spriteBatch.End();
             Globals.graphics.GraphicsDevice.SetRenderTarget(null);
-            ///
-            /// Hitbox in wrong place
-            ///
+        }
+        public override void PrepareDraw(SpriteBatch spriteBatch)
+        {
+
+            foreach (var property in properties)
+            {
+                property.Item2.PrepareDraw(spriteBatch);
+            }
         }
         public override void Update(GameTime gameTime)
         {
@@ -100,6 +105,15 @@ namespace SurvivalGame
             Apply.Update(gameTime);
             CheckForScroll();
             DrawRenderTarget();
+        }
+        public override void Unfocus()
+        {
+            base.Unfocus();
+            foreach (var property in properties)
+            {
+                property.Item1.Unfocus();
+                property.Item2.Unfocus();
+            }
         }
         bool CheckForScroll()
         {
@@ -124,18 +138,18 @@ namespace SurvivalGame
             }
             ScrollY += value;
         }
-        public override void LoseFocus()
-        {
-            if (selected)
-                OnLostFocus();
-            selected = false;
+        //public override void LoseFocus()
+        //{
+        //    if (selected)
+        //        OnLostFocus();
+        //    selected = false;
 
-            foreach (var property in properties)
-            {
-                property.Item1.LoseFocus();
-                property.Item2.LoseFocus();
-            }
-        }
+        //    foreach (var property in properties)
+        //    {
+        //        property.Item1.LoseFocus();
+        //        property.Item2.LoseFocus();
+        //    }
+        //}
         void RefreshProperties()
         {
             properties.Clear();
@@ -155,7 +169,7 @@ namespace SurvivalGame
                 box = new EditorBox((int)Hitbox.Left, (int)properties[properties.Count - 1].Item1.Hitbox.Bottom + 6, 60, 16, name, true);
 
             var input = new EditorTextInput((int)box.Hitbox.Right + 5, (int)box.Hitbox.Top, 60, 20, true);
-            input.SetBackgroundColor(Color.White);
+            input.defaultColor = Color.White;
             //input.clickAction += () => {
             //    foreach (var property in properties)
             //    {
@@ -167,6 +181,8 @@ namespace SurvivalGame
             box.layerDepth = layerDepth - 0.001f;
             box.AdditionalClickAndHoverCheck = new Func<bool>(() => Globals.MouseCursor.Hitbox.CollidesWith(Hitbox));
             input.AdditionalClickAndHoverCheck = new Func<bool>(() => Globals.MouseCursor.Hitbox.CollidesWith(Hitbox));
+            box.Focus += (object sender, EventArgs e) => { selected = true; };
+            input.Focus += (object sender, EventArgs e) => { selected = true; };
             properties.Add((box, input));
         }
     }

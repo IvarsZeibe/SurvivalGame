@@ -12,7 +12,10 @@ namespace SurvivalGame
         public Color BackgroundColor = Color.LightGray;
         public Dictionary<string, UIElement> UIElements = new Dictionary<string, UIElement>();
         public bool IsActive = false;
-        public (Action, float) ButtonToActivate;
+        public (Action<EventArgs> action, EventArgs args, float layerDepth) ClickedElementAction;
+        public (Action<EventArgs> action, EventArgs args, float layerDepth) HoveredElementAction;
+        public (Action<EventArgs> action, EventArgs args) ReleasedElementAction;
+        public (Action<EventArgs> action, EventArgs args) HeldElementAction;
         public Editor()
         {
             UIElements.Add("editedRoom", new EditedRoom());
@@ -20,44 +23,68 @@ namespace SurvivalGame
             UIElements.Add("RoomNameInput", new EditorTextInput(50, 100, 90, 50) { placeholder = "Name" });
             UIElements.Add("RoomCoordInput", new EditorTextInput(50, 160, 90, 50) { placeholder = "Coords" });
             var resetButton = new EditorButton();
-            resetButton.clickAction += () => { (UIElements["editedRoom"] as EditedRoom).ResetRoom(); };
+            resetButton.Click += (object sender, EventArgs e) => { (UIElements["editedRoom"] as EditedRoom).ResetRoom(); };
             resetButton.text = "Reset";
             resetButton.Hitbox = new Rect(50, 220, 90, 50);
             UIElements.Add("ResetButton", resetButton);
-            UIElements.Add("finishButton", new EditorButton()
+
+            var finishButton = new EditorButton();
+            finishButton.text = "Save and Play";
+            finishButton.Hitbox = new Rect(Globals.graphics.PreferredBackBufferWidth - 210, Globals.graphics.PreferredBackBufferHeight - 50, 400, 50);
+            finishButton.Click += (object sender, EventArgs e) =>
             {
-                text = "Save and Play",
-                Hitbox = new Rect(Globals.graphics.PreferredBackBufferWidth - 210, Globals.graphics.PreferredBackBufferHeight - 50, 400, 50),
-                clickAction = () =>
+                var editedRoom = (UIElements["editedRoom"] as EditedRoom);
+                if (Save())
                 {
-                    var editedRoom = (UIElements["editedRoom"] as EditedRoom);
-                    if (Save())
-                    {
-                        editedRoom.FinishRoom();
-                    }
+                    editedRoom.FinishRoom();
                 }
-            });
-            UIElements.Add("loadButton", new EditorButton()
+            };
+            UIElements.Add("finishButton", finishButton);
+
+            var loadButton = new EditorButton();
+            loadButton.text = "Load Room";
+            loadButton.Hitbox = new Rect(Globals.graphics.PreferredBackBufferWidth - 620, Globals.graphics.PreferredBackBufferHeight - 50, 400, 50);
+            loadButton.Click += (object sender, EventArgs e) =>
             {
-                text = "Load Room",
-                Hitbox = new Rect(Globals.graphics.PreferredBackBufferWidth - 620, Globals.graphics.PreferredBackBufferHeight - 50, 400, 50),
-                clickAction = () =>
-                {
-                    (UIElements["editedRoom"] as EditedRoom).Load();
-                    
-                }
-            });
+                (UIElements["editedRoom"] as EditedRoom).Load();
+            };
+            UIElements.Add("loadButton", loadButton);
+
             UIElements.Add("itemMenu", new ItemMenu());
             UIElements.Add("itemPropertiesWindow", new ItemPropertiesWindow());
+
+            //var test = new EditorWindow(10, 10, 200, 200, true);
+            //test.layerDepth = 0.1f;
+            //test.AddElement(new EditorButton() { Hitbox = new Rect(0, 20, 50, 50, true), defaultColor = Color.Orange }, "a");
+            //test.AddElement(new EditorWindow(80, 20, 50, 50, true) { defaultColor = Color.Yellow }, "b");
+            //UIElements.Add("t", test);
         }
         public void Update(GameTime gameTime)
         {
-            ButtonToActivate = (() => { }, 1);
+            ClickedElementAction = (null, null, 1);
+            HoveredElementAction = (null, null, 1);
+            HeldElementAction = (null, null);
+            ReleasedElementAction = (null, null);
             foreach (var element in UIElements.Values)
             {
                 element.Update(gameTime);
             }
-            ButtonToActivate.Item1();
+            HoveredElementAction.action?.Invoke(HoveredElementAction.args);
+            HeldElementAction.action?.Invoke(HeldElementAction.args);
+            ReleasedElementAction.action?.Invoke(ReleasedElementAction.args);
+            ClickedElementAction.action?.Invoke(ClickedElementAction.args);
+            //if (HoveredElementAction.action != null)
+            //{
+            //    if (!(HoveredElementAction.action.Target as UIElement).holding.Item1)
+            //        HoveredElementAction.action(HoveredElementAction.args);
+            //}
+        }
+        public void PrepareDraw(SpriteBatch spriteBatch)
+        {
+            foreach (var el in UIElements.Values)
+            {
+                el.PrepareDraw(spriteBatch);
+            }
         }
         public void Draw(SpriteBatch spriteBatch)
         {

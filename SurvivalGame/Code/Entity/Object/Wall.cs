@@ -26,6 +26,18 @@ namespace SurvivalGame
             Drawing = new Drawing(texture, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), color, 0f, new Vector2(50, 50), isDrawn: true);
 
         }
+        public override void SetDafaultValues()
+        {
+            base.SetDafaultValues();
+            Mass = 19;
+            this.Collision = true;
+            this.ghost = false;
+            Hitbox = new Rect(0, 0, 50, 50);
+            Color color = Color.SaddleBrown;
+            if (ghost)
+                color = Color.SandyBrown;
+            Drawing = new Drawing(TextureName.Rectangle, new Vector2((float)Hitbox.Left, (float)Hitbox.Top), color, 0f, new Vector2(50, 50), isDrawn: true);
+        }
         public override void Update(GameTime gameTime)
         {
             timeAlive += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -33,6 +45,12 @@ namespace SurvivalGame
             {
                 Kill();
             }
+        }
+        protected override void CreateDefaultProperties()
+        {
+            base.CreateDefaultProperties();
+            Properties.Add("width", new VariableReference(() => { return Hitbox.Width; }, (object o) => { Hitbox.Width = Convert.ToInt32(o); Drawing.Scale = Hitbox.GetScaleVector(); }));
+            Properties.Add("height", new VariableReference(() => { return Hitbox.Height; }, (object o) => { Hitbox.Height = Convert.ToInt32(o); Drawing.Scale = Hitbox.GetScaleVector(); }));
         }
     }
 }

@@ -207,20 +207,8 @@ namespace SurvivalGame
         protected virtual void CreateDefaultProperties()
         {
             Properties = new Dictionary<string, VariableReference>();
-            //Properties.Add("width", new VariableReference(() => { return Hitbox.Width; }, (value) => { Hitbox.Width = Convert.ToInt32(value); }));
-            //Properties.Add("height", new VariableReference(() => { return Hitbox.Height; }, (value) => { Hitbox.Height = Convert.ToInt32(value); }));
             Properties.Add("x", new VariableReference(() => { return Hitbox.X; }, (value) => { Hitbox.X = Convert.ToDouble(value); }));
             Properties.Add("y", new VariableReference(() => { return Hitbox.Y; }, (value) => { Hitbox.Y = Convert.ToDouble(value); }));
-            //properties.Add("width", new Action<object>(width => Hitbox.Width = Convert.ToInt32(width)));
-            //properties.Add("height", new Action<object>(height => Hitbox.Height = Convert.ToInt32(height)));
-            //properties.Add("x", new Action<object>(x => Hitbox.X = Convert.ToDouble(x)));
-            //properties.Add("y", new Action<object>(y => Hitbox.Y = Convert.ToDouble(y)));
-
-            //Properties = new Dictionary<string, PropertyInfo>();
-            //Properties.Add("width", GetType().GetProperty("Hitbox"));
-            //Properties.Add("height", Hitbox.GetType().GetProperty("Height"));
-            //Properties.Add("x", Hitbox.GetType().GetProperty("X"));
-            //Properties.Add("y", Hitbox.GetType().GetProperty("Y"));
         }
         public float Move(double movement, bool xDirection, List<(Entity movedEntity, float maxMovement)> movedEntities = null, float movementDecreaseTotal = 0f, float mass = 0)
         {
